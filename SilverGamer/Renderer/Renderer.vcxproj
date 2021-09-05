@@ -70,8 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>F:\SilverEngine\SilverGamer\Resource\Model;F:\SilverEngine\SilverGamer\Renderer\3rdlib\include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\SilverEngine\SilverGamer\Renderer\3rdlib\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Resource\Model;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
