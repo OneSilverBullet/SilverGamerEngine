@@ -22,8 +22,9 @@ void Renderer::SGGraphics::Init()
 
 	//加载场景
 	m_scene = new SGScene();
-	SGBaseMesh* sceneMesh = SGBaseMesh::SGBaseMeshCube();
-	m_scene->AddMesh(sceneMesh);
+	SGModelBase* modelSphere = new SGModelBase("./Resource/Model/sphere.obj");
+	m_scene->AddModel(modelSphere);
+
 	SGPointLight* pointLight = new SGPointLight(glm::vec3(2, 2, 2));
 	m_scene->AddLight(pointLight);
 	m_scene->Init(); //初始化

@@ -23,8 +23,8 @@ namespace Renderer
 	private:
 		SGShaderFactory() {}
 		static SGShaderFactory* m_instance;
-
 	};
+	SGShaderFactory* SGShaderFactory::m_instance = nullptr;
 
 
 	class SGShader

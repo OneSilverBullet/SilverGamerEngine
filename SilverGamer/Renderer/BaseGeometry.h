@@ -30,8 +30,8 @@ namespace Renderer
 		std::vector<SGModelTexture> m_textures;
 
 		SGModelMesh(std::vector<SGModelVertex>, std::vector<unsigned int>, std::vector<SGModelTexture>);
-		void Draw(Renderer::SGShader shader);
-
+		void Draw(Renderer::SGShader shader); //直接传入shader进行绘制
+		void Draw(GLuint shaderID); //直接传入shader id进行绘制    
 
 	private:
 		unsigned int m_vao, m_vbo, m_ebo;

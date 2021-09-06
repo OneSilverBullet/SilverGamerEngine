@@ -99,6 +99,9 @@
     <ClCompile Include="ResourceLoad.cpp">
       <Filter>源文件\Resource</Filter>
     </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>源文件\Resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texture2D.h">
@@ -147,6 +150,9 @@
       <Filter>头文件\Application</Filter>
     </ClInclude>
     <ClInclude Include="ResourceLoad.h">
+      <Filter>头文件\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
       <Filter>头文件\Resource</Filter>
     </ClInclude>
   </ItemGroup>

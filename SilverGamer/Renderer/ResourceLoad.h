@@ -10,9 +10,9 @@ namespace Renderer
 	{
 	public:
 		static ResourceLoad* GetInstance() {
-			if (instance == nullptr)
-				instance = new ResourceLoad();
-			return instance;
+			if (m_instance == nullptr)
+				m_instance = new ResourceLoad();
+			return m_instance;
 		}
 
 		int LoadTexture2DResource(std::string name, std::string path);
@@ -21,12 +21,10 @@ namespace Renderer
 		ResourceLoad() {}
 		ResourceLoad(ResourceLoad&) = delete;
 		ResourceLoad& operator=(const ResourceLoad&) = delete;
-		static ResourceLoad* instance;
+		static ResourceLoad* m_instance;
 		std::map<std::string, int> m_textures; //key:textureId
-
-
 	};
-
+	ResourceLoad* ResourceLoad::m_instance = nullptr;
 
 }
 

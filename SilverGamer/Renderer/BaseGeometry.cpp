@@ -34,6 +34,34 @@ void Renderer::SGModelMesh::Draw(Renderer::SGShader shader)
 	glBindVertexArray(0);
 }
 
+void Renderer::SGModelMesh::Draw(GLuint shaderID)
+{
+	GLuint diffuseNr = 1;
+	GLuint specularNr = 1;
+	for (GLuint i = 0; i < m_textures.size(); i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i); // 在绑定纹理前需要激活适当的纹理单元
+		// 检索纹理序列号 (N in diffuse_textureN)
+		std::stringstream ss;
+		std::string number;
+		std::string name = m_textures[i].m_type;
+		if (name == "texture_diffuse")
+			ss << diffuseNr++; // 将GLuin输入到string stream
+		else if (name == "texture_specular")
+			ss << specularNr++; // 将GLuin输入到string stream
+		number = ss.str();
+
+		glUniform1f(glGetUniformLocation(shaderID, ("material." + name + number).c_str()), i);
+		glBindTexture(GL_TEXTURE_2D, m_textures[i].m_id);
+	}
+	glActiveTexture(GL_TEXTURE0);
+
+	// 绘制Mesh
+	glBindVertexArray(m_vao);
+	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
 void Renderer::SGModelMesh::ConstructMesh()
 {
 	glGenVertexArrays(1, &m_vao);
@@ -64,6 +92,13 @@ void Renderer::SGModelBase::Draw(Renderer::SGShader shader)
 {
 	for (int i = 0; i < m_meshes.size(); ++i) {
 		m_meshes[i].Draw(shader);
+	}
+}
+
+void Renderer::SGModelBase::Draw(GLuint shaderId)
+{
+	for (int i = 0; i < m_meshes.size(); ++i) {
+		m_meshes[i].Draw(shaderId);
 	}
 }
 

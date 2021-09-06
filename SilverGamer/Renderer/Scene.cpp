@@ -13,6 +13,11 @@ void Renderer::SGScene::Render(GLuint shaderProgram)
 	}
 }
 
+void Renderer::SGScene::AddModel(SGModelBase* modelBasePtr)
+{
+	m_models.push_back(modelBasePtr);
+}
+
 void Renderer::SGScene::AddModel(std::string modelDir)
 {
 	SGModelBase* newModel = new SGModelBase(modelDir.c_str());

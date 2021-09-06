@@ -14,6 +14,7 @@ namespace Renderer
 		SGScene() {}
 		void Init();  //初始化
 		void Render(GLuint shaderProgram);
+		void AddModel(SGModelBase* modelBasePtr);
 		void AddModel(std::string modelDir);
 		void AddLight(SGPointLight* light); 
 		void UploadLight(GLuint program);//进行更新当前灯光
