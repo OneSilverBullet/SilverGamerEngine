@@ -24,7 +24,7 @@ namespace Renderer
 		static ResourceLoad* m_instance;
 		std::map<std::string, int> m_textures; //key:textureId
 	};
-	ResourceLoad* ResourceLoad::m_instance = nullptr;
+	
 
 }
 

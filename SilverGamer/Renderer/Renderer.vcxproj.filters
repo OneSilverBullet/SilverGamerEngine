@@ -166,5 +166,6 @@
     <None Include="shader\shader_normal.vert">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

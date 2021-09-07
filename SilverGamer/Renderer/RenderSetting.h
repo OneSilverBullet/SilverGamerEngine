@@ -2,10 +2,8 @@
 #define SILVER_RENDER_SETTING
 
 #include <GL/glew.h>
-#include <GL/freeglut.h>
 #include <GL/gl.h>
-
-
+#include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -15,9 +13,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
-#include "3rdlib/include/LoadTexture.h"
-#include "3rdlib/include/InitShader.h"
 
 #include <iostream>
 #include <vector>

@@ -1,5 +1,4 @@
 #include "Graphics.h"
-#include "3rdlib/include/DebugCallback.h"
 #include "Scene.h"
 #include "Shader.h"
 
@@ -14,7 +13,7 @@ Renderer::SGGraphics::~SGGraphics()
 void Renderer::SGGraphics::Init()
 {
 	glewInit();
-	RegisterCallback();
+	//RegisterCallback();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 	w = glutGet(GLUT_WINDOW_WIDTH);

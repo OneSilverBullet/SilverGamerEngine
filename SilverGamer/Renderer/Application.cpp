@@ -18,15 +18,14 @@ Renderer::SGApplication & Renderer::SGApplication::GetInstance()
 
 void Renderer::SGApplication::Init(int argc, char ** argv)
 {
-#if _DEBUG
-	glutInitContextFlags(GLUT_DEBUG);
-#endif
-	glutInitContextVersion(4, 3);
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE);
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(APPLICATION_WIDTH, APLLICATION_HEIGHT);
-	window = glutCreateWindow("SilverGamer");
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+
+
 
 	m_graphicPipline = new SGGraphics();
 	m_controller = new SGControllerFPS(m_graphicPipline->GetScene()->GetCamera(), APPLICATION_WIDTH, APLLICATION_HEIGHT);

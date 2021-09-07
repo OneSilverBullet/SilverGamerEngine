@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+Renderer::SGShaderFactory* Renderer::SGShaderFactory::m_instance = nullptr;
+
 Renderer::SGShader::SGShader(std::string vertexShaderPath, std::string fragShaderPath)
 {
 	m_vertexShaderCode = LoadShaderCode(vertexShaderPath);

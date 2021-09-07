@@ -1,5 +1,6 @@
 #include "ResourceLoad.h"
 
+Renderer::ResourceLoad* Renderer::ResourceLoad::m_instance = nullptr;
 
 int Renderer::ResourceLoad::LoadTexture2DResource(std::string name, std::string path)
 {
