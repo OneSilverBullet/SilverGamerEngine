@@ -4,6 +4,7 @@
 #include "RenderSetting.h"
 #include "Graphics.h"
 #include "Controller.h"
+#include "Timer.h"
 
 namespace Renderer
 {
@@ -21,7 +22,7 @@ namespace Renderer
 	protected:
 		SGGraphics* m_graphicPipline;
 		SGControllerFPS* m_controller;
-		int window;
+		GLFWwindow* m_window
 
 
 
