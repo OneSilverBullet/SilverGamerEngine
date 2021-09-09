@@ -102,6 +102,12 @@
     <ClCompile Include="stb_image.cpp">
       <Filter>源文件\Resource</Filter>
     </ClCompile>
+    <ClCompile Include="glad.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>源文件\Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texture2D.h">
@@ -154,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="stb_image.h">
       <Filter>头文件\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>头文件\Application</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
