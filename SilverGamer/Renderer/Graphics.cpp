@@ -1,6 +1,8 @@
 #include "Graphics.h"
 #include "Scene.h"
 #include "Shader.h"
+#include "Timer.h"
+
 
 Renderer::SGGraphics::SGGraphics()
 {
@@ -29,10 +31,12 @@ void Renderer::SGGraphics::Init()
         glfwTerminate();
         return;
     }
+    /*
+    
     glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
     glfwSetCursorPosCallback(m_window, mouse_callback);
     glfwSetScrollCallback(m_window, scroll_callback);
-
+    */
     // tell GLFW to capture our mouse
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -62,5 +66,24 @@ void Renderer::SGGraphics::Init()
 
 void Renderer::SGGraphics::Render()
 {
-	m_scene->Render(m_shaderInstance); //进行绘制
+    while (!glfwWindowShouldClose(m_window))
+    {
+        SGTimer::GetInstance()->UpdateTimer(glfwGetTime()); //更新当前时间逻辑
+
+        m_scene->Render(m_shaderInstance); //进行绘制
+
+        // render
+        // ------
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+        // -------------------------------------------------------------------------------
+        glfwSwapBuffers(m_window);
+        glfwPollEvents();
+    }
+
+    // glfw: terminate, clearing all previously allocated GLFW resources.
+    // ------------------------------------------------------------------
+    glfwTerminate();
 }

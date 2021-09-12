@@ -1,5 +1,6 @@
 #include "Texture3D.h"
 
+
 Renderer::Texture3D::Texture3D(const std::string name, int size, GLenum magFilter, GLenum minFilter, GLint internalFormat, GLint type, GLint wrap)
 {
 	glGenTextures(1, &m_id); 
@@ -36,7 +37,7 @@ void Renderer::Texture3D::ActivateMap(GLuint program, GLuint textureLoc)
 //Çå³ýÑÕÉ«
 void Renderer::Texture3D::Clear(glm::vec4 color)
 {
-	glBindTexture(GL_TEXTURE_3D, m_id);
-	glClearTexImage(m_id, 0, GL_RGBA, GL_FLOAT, &color);
-	glBindTexture(GL_TEXTURE_3D, 0);
+	//glBindTexture(GL_TEXTURE_3D, m_id);
+	//glClearTexImage(m_id, 0, GL_RGBA, GL_FLOAT, &color);
+	//glBindTexture(GL_TEXTURE_3D, 0);
 }

@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "RenderSetting.h"
 
 Renderer::SGCamera::SGCamera(glm::vec3 pos,
 	glm::vec3 target,
@@ -11,8 +12,8 @@ Renderer::SGCamera::SGCamera(glm::vec3 pos,
 
 void Renderer::SGCamera::Upload(GLuint program)
 {
-	const int w = glutGet(GLUT_WINDOW_WIDTH);
-	const int  h = glutGet(GLUT_WINDOW_HEIGHT);
+	const int w = APPLICATION_WIDTH;
+	const int  h = APLLICATION_HEIGHT;
 
 	glm::mat4 V = getViewMatrix();
 	glm::mat4 P = getPerspectiveMatrix(w, h);

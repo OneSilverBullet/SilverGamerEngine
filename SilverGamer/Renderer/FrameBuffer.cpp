@@ -3,8 +3,8 @@
 
 Renderer::SGFrameBuffer::SGFrameBuffer(int texNum)
 {
-	int w = glutGet(GLUT_WINDOW_WIDTH);
-	int h = glutGet(GLUT_WINDOW_HEIGHT);
+	int w = APPLICATION_WIDTH;
+	int h = APLLICATION_HEIGHT;
 	//创建深度缓冲区
 	glGenRenderbuffers(1, &m_depthBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_depthBuffer);

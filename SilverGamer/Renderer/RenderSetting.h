@@ -1,11 +1,9 @@
 #ifndef SILVER_RENDER_SETTING
 #define SILVER_RENDER_SETTING
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GLFW/glfw3.h>
-#include <GL/glut.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
+//#include <GL/glew.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

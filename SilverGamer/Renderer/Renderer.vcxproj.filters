@@ -164,6 +164,9 @@
     <ClInclude Include="Timer.h">
       <Filter>头文件\Application</Filter>
     </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>源文件\Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\common.glsl">
