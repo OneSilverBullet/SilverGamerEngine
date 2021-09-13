@@ -40,6 +40,9 @@
 #define MATERIAL_VARIBLE_SHINESS "material.shiness"
 
 #define MATH_PI 3.141592f
+#define MATH_PI_DIV_4 0.785398
+#define MATH_PI_DIV_2 1.570796
+
 #define APPLICATION_WIDTH 1280
 #define APLLICATION_HEIGHT 720
 
