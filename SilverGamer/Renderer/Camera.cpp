@@ -63,6 +63,7 @@ glm::vec3 Renderer::SGCameraThirdRole::GetPosition()
 	cameraForward.x = cos(glm::radians(m_pitch)) * cos(glm::radians(m_yaw));
 	cameraForward.y = sin(glm::radians(m_pitch));
 	cameraForward.z = cos(glm::radians(m_pitch)) * sin(glm::radians(m_yaw));
+	cameraForward = glm::normalize(cameraForward);
 	glm::vec3 position = m_targetPos - (cameraForward * m_distance);
 	return position;
 }

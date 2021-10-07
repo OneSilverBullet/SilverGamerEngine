@@ -74,10 +74,24 @@
 #define CAMERA_FIRST_ROLE_DEFAULT_ROTATE_SPEED 0.3f
 
 
+#define COMMON_SHADER_FILE_DIR "shader/common/"
+
 
 
 enum SG_MESH_MODE {
 	SIMPLE, COMPLEX
+};
+
+
+class RenderConfig
+{
+public:
+	
+	void Initialize();
+	std::string GetConfigParam(std::string var);
+private:
+	RenderConfig();
+	std::unordered_map<std::string, std::string> m_config;
 };
 
 

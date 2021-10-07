@@ -2,12 +2,12 @@
 
 void Renderer::SGScene::Init()
 {
-	m_camera = new SGCamera(); //创建摄像机
+	m_camera = new SGCameraThirdRole(); //创建摄像机
 }
 
 void Renderer::SGScene::Render(GLuint shaderProgram)
 {
-	m_camera->Upload(shaderProgram);
+	m_camera->LoadToShader(shaderProgram);
 	for (int i = 0; i < m_models.size(); ++i) {
 		m_models[i]->Draw(shaderProgram);
 	}

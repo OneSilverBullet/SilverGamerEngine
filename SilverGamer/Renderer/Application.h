@@ -17,15 +17,10 @@ namespace Renderer
 		void Run();
 		
 		SGGraphics* GetGraphics() { return m_graphicPipline; }
-		SGControllerFPS* GetController() { return m_controller; }
 		GLFWwindow* GetGLFWWindow();
 
 	protected:
 		SGGraphics* m_graphicPipline;
-		SGControllerFPS* m_controller;
-		
-
-
 
 	};
 

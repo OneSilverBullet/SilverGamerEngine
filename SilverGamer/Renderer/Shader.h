@@ -17,11 +17,16 @@ namespace Renderer
 			}
 			return m_instance;
 		}
+		//加载正常Shader
 		SGShader* loadNormalShader();
+		//增加可以include的shader编译
+		void AddCommonShaderFile(const std::string& fileName);
+		void LoadCommonShader();
+
 
 
 	private:
-		SGShaderFactory() {}
+		SGShaderFactory() { LoadCommonShader(); }
 		static SGShaderFactory* m_instance;
 	};
 	

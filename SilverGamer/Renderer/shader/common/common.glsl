@@ -1,4 +1,3 @@
-#version 450 core
 
 struct MaterialPhong
 {
@@ -53,7 +52,7 @@ vec3 CalcDirLight(DirLight light, MaterialPhong mat, vec3 normal, vec3 viewDir, 
     float factor_diffuse = max(dot(lightDir, normal), 0);
     vec3 halfDir = normalize(lightDir + viewDir);
     float factor_spec = pow(max(dot(normal, halfDir), 0.0), mat.shininess);
-    vec3 ambient = light.ambient * vec3(texture(mat.diffuse, uv));
+    vec3 ambient = light.diffuse * vec3(texture(mat.diffuse, uv));
     vec3 diffuse = light.diffuse * factor_diffuse * vec3(texture(mat.diffuse, uv));
     vec3 specular = light.specular * factor_spec * vec3(texture(mat.specular, uv));
     return vec3(ambient + diffuse + specular);
@@ -68,7 +67,7 @@ vec3 CalcSpotLight(PointLight light, MaterialPhong mat, vec3 fragPos, vec3 norma
 {
     //Light Factor
     vec3 lightDir = normalize(light.position - fragPos);
-    float factor_diffuse = max(dot(lightDir, normal));
+    float factor_diffuse = max(dot(lightDir, normal), 0.0);
     vec3 halfDir = normalize(lightDir + viewDir);
     float factor_spec = pow(max(dot(normal, halfDir), 0.0), mat.shininess);
     //Attenuation Factor

@@ -132,13 +132,13 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="BaseGeometry.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="RenderCheck.cpp" />
+    <ClCompile Include="RenderSetting.cpp" />
     <ClCompile Include="ResourceLoad.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -172,7 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="shader\common.glsl" />
+    <None Include="shader\common\common.glsl" />
     <None Include="shader\shader_normal.frag" />
     <None Include="shader\shader_normal.vert" />
   </ItemGroup>

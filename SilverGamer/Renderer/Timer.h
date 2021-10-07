@@ -12,6 +12,7 @@ namespace Renderer
 		double GetDeltaTime() { return m_deltaTime; }
 		void Start();
 		void Stop();
+		float GetFrameNum();
 
 	private:
 		

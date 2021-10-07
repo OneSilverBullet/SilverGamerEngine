@@ -93,9 +93,6 @@
     <ClCompile Include="Application.cpp">
       <Filter>源文件\Application</Filter>
     </ClCompile>
-    <ClCompile Include="Controller.cpp">
-      <Filter>源文件\Application</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceLoad.cpp">
       <Filter>源文件\Resource</Filter>
     </ClCompile>
@@ -107,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>源文件\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSetting.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -169,9 +169,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader\common.glsl">
-      <Filter>资源文件</Filter>
-    </None>
     <None Include="shader\shader_normal.frag">
       <Filter>资源文件</Filter>
     </None>
@@ -179,5 +176,8 @@
       <Filter>资源文件</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="shader\common\common.glsl">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

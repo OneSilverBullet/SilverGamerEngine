@@ -16,6 +16,9 @@ namespace Renderer
 
 		virtual void Init();
 		virtual void Render();
+		void GetSupportExtensions();
+		bool CheckExtension(const std::string& extensionName);
+
 
 		GLFWwindow* GetGLFWWindow() { return m_window; }
 		SGScene* GetScene() { return m_scene; }
@@ -24,7 +27,7 @@ namespace Renderer
 	private:
 		std::unordered_map<std::string, GLuint> m_shaderInstanceMap;
 		GLuint m_shaderInstance;
-
+		std::vector<std::string> m_supportExtensions; //当前图形Device所支持的拓展
 
 		GLFWwindow* m_window;
 		SGFrameBuffer* m_frameBuffer; 

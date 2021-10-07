@@ -51,6 +51,15 @@ void Renderer::SGGraphics::Init()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 
+    //检查当前支持的扩展
+    GetSupportExtensions();
+    
+    //检查当前是否支持shader include 
+    if (!CheckExtension("GL_ARB_shading_language_include"))
+    {
+        std::cout << "GPU doesn't support GL_ARB_shading_language_include" << std::endl;
+    }
+
 
 	//加载场景
 	m_scene = new SGScene();
@@ -64,11 +73,39 @@ void Renderer::SGGraphics::Init()
 	m_shaderInstance = SGShaderFactory::GetInstance()->loadNormalShader()->GetShaderProgramId();
 }
 
+
+void Renderer::SGGraphics::GetSupportExtensions()
+{
+    if (!m_supportExtensions.empty())
+        return;
+
+    GLint n = 0, i = 0;
+    glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+    for (i = 0; i < n; i++)
+    {
+        std::string extension = (char*)glGetStringi(GL_EXTENSIONS, i);
+        //CEPHEI_LOGDEBUGF("%s ", extension.c_str());
+        m_supportExtensions.push_back(extension);
+    }
+}
+
+bool Renderer::SGGraphics::CheckExtension(const std::string& extensionName)
+{
+    for (int i = 0; i < m_supportExtensions.size(); i++)
+    {
+        if (m_supportExtensions[i] == extensionName)
+            return true;
+    }
+
+    return false;
+}
+
 void Renderer::SGGraphics::Render()
 {
+    SGTimer frameTimer;
     while (!glfwWindowShouldClose(m_window))
     {
-        SGTimer::GetInstance()->UpdateTimer(glfwGetTime()); //更新当前时间逻辑
+        frameTimer.Start();
 
         m_scene->Render(m_shaderInstance); //进行绘制
 
@@ -81,6 +118,9 @@ void Renderer::SGGraphics::Render()
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_window);
         glfwPollEvents();
+
+        frameTimer.Stop();
+        std::cout << "Frame:" << frameTimer.GetFrameNum() << std::endl;
     }
 
     // glfw: terminate, clearing all previously allocated GLFW resources.

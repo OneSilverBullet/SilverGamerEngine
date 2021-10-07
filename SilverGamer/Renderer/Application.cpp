@@ -10,8 +10,6 @@ void Renderer::SGApplication::Init(int argc, char ** argv)
 {
     //初始化本地对象
     m_graphicPipline = new SGGraphics();
-   // m_controller = new SGControllerFPS(m_graphicPipline->GetScene()->GetCamera(), APPLICATION_WIDTH, APLLICATION_HEIGHT);
-
     m_graphicPipline->Init(); //初始化当前渲染GLFW环境
 }
 

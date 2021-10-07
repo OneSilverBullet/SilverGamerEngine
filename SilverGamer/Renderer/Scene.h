@@ -19,17 +19,12 @@ namespace Renderer
 		void AddLight(SGPointLight* light); 
 		void UploadLight(GLuint program);//进行更新当前灯光
 		
-		SGCamera* GetCamera() { return m_camera; }
+		SGCameraBase* GetCamera() { return m_camera; }
 
 	private:
 		std::vector<SGModelBase*> m_models;
 		std::vector<SGPointLight*> m_lights;
-		SGCamera* m_camera;
-
-
-
-
-
+		SGCameraBase* m_camera;
 	};
 }
 
