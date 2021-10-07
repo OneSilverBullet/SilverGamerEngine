@@ -9,7 +9,8 @@ namespace Renderer
 	class SGCameraBase
 	{
 	public:
-		SGCameraBase() : m_cameraFov(MATH_PI_DIV_4), m_cameraAspect(1.33), m_cameraNearZ(0.1f), m_cameraFarZ(100.0f) {}
+		SGCameraBase();
+		virtual void InitializeCamera() = 0; //初始化摄像机虚函数
 		virtual glm::mat4 GetViewMatrix() = 0;
 		virtual glm::mat4 GetViewMatrixForSkybox() = 0;
 		virtual ~SGCameraBase() {}
@@ -39,27 +40,16 @@ namespace Renderer
 	class SGCameraThirdRole : public SGCameraBase
 	{
 	public:
-		SGCameraThirdRole() :SGCameraBase() {}
-
-		void InitializeThirdRoleCamera();
+		SGCameraThirdRole();
+		virtual void InitializeCamera();
 		void RotateCamera(float xoffset, float yoffset);
-
 		glm::vec3 GetPosition();
-
 		glm::mat4 GetViewMatrix();
 		glm::mat4 GetViewMatrixForSkybox();
-
-		
-
 		glm::vec3 GetForward();
-		/* {
-			glm::vec3 position = GetPosition();
-			glm::vec3 targetPosition = m_targetPos;
-			glm::vec3 forward = glm::normalize(glm::vec3(targetPosition - position));
-			return forward;
-		}*/
-		void SetTarget(glm::vec3 tar) { m_targetPos = tar; }
+		virtual void LoadToShader(GLuint program);
 
+		void SetTarget(glm::vec3 tar) { m_targetPos = tar; }
 		glm::vec3 GetTargetPosition() { return m_targetPos; }
 		glm::vec3 GetDirUp() { return m_dirUp; }
 		float GetSensity() { return m_sensity; }
@@ -67,21 +57,8 @@ namespace Renderer
 		float GetCameraPitch() { return m_pitch; }
 		float GetCameraMaxDistance() { return m_maxDistance; }
 		float GetCameraMinDistance() { return m_minDistance; }
-
 		void AddDistance(float dt);
 		void DecDistance(float dt);
-		/*
-		{
-			m_distance += dt;
-			if (m_distance > 10.0f) thirdcamera_distance = 10.0f;
-		}*/
-
-		
-		/*
-		{
-			thirdcamera_distance -= dt;
-			if (thirdcamera_distance < 2.0f) thirdcamera_distance = 2.0f;
-		}*/
 
 	private:
 		glm::vec3 m_targetPos;
@@ -94,57 +71,30 @@ namespace Renderer
 		float m_minDistance; //最小距离
 	};
 
-	class FirstRoleCamera : public Camera
+	class SGCameraFirstRole : public SGCameraBase
 	{
 	public:
-		FirstRoleCamera() :Camera() {}
-		void InitializeFirstRoleCamera();
+		SGCameraFirstRole();
+		virtual void InitializeCamera();
 		void SetYawAndPitch(float yaw, float pitch);
 		void RotateCamera(float xoffset, float yoffset);
 		void UpdateForward();
-		XMMATRIX GetViewMatrix();
-		XMMATRIX GetViewMatrixForSkybox();
+		glm::mat4 GetViewMatrix();
+		glm::mat4 GetViewMatrixForSkybox();
+		virtual void LoadToShader(GLuint program);
 
-	public:
-		void SetTarget(XMFLOAT3 pos) { firstcamera_position = pos; }
-		XMFLOAT3 GetPosition() { return firstcamera_position; }
-		XMFLOAT3 GetForward() { return firstcamera_forward; }
+		void SetTarget(glm::vec3 pos) { m_position = pos; }
+		glm::vec3 GetPosition() { return m_position; }
+		glm::vec3 GetForward() { return m_forward; }
 	private:
-		float firstcamera_pitch;
-		float firstcamera_yaw;
-		float firstcamera_rotateSpeed;
-		XMFLOAT3 firstcamera_position;
-		XMFLOAT3 firstcamera_forward;
-		XMFLOAT3 firstcamera_up;
-	};
-
-
-
-	class SGCamera
-	{
-	public:
-		SGCamera(glm::vec3 pos = glm::vec3(0, 0, 2), 
-			glm::vec3 target = glm::vec3(0, 0, 0),
-			glm::vec3 up = glm::vec3(0, 1, 0));
-		void Upload(GLuint program);
-
-		glm::vec3 GetTarget() { return m_pos + m_dir; }
-		glm::mat4 getPerspectiveMatrix(int w, int h);
-		glm::mat4 getViewMatrix();
-
-		glm::vec3 GetForward() { return m_dir; }
-		glm::vec3 GetUp() { return m_up;   }
-		glm::vec3 GetPosition() { return m_pos; }
-
-		void SetForward(glm::vec3 a) { m_dir = a; }
-		void SetUp(glm::vec3 a) { m_up = a; }
-		void SetPosition(glm::vec3 a) { m_pos = a; }
-
-	private:
-		glm::vec3 m_pos;
-		glm::vec3 m_dir;
+		float m_pitch;
+		float m_yaw;
+		float m_rotateSpeed;
+		glm::vec3 m_position;
+		glm::vec3 m_forward;
 		glm::vec3 m_up;
 	};
+
 }
 
 #endif

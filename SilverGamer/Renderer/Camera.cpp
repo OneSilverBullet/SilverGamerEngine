@@ -1,170 +1,13 @@
 #include "Camera.h"
 #include "RenderSetting.h"
 
-
-void FirstRoleCamera::InitializeFirstRoleCamera()
-{
-	XMFLOAT3 target = XMFLOAT3(0.0F, 0.0F, 0.0F);
-	firstcamera_position = XMFLOAT3(3.0f, 3.0f, 3.0f);
-	XMStoreFloat3(&firstcamera_forward, XMVector3Normalize(XMLoadFloat3(&target) - XMLoadFloat3(&firstcamera_position)));
-	firstcamera_up = XMFLOAT3(0.0f, 1.0f, 0.0f);
-
-	firstcamera_rotateSpeed = 0.3f;
-	firstcamera_pitch = 0.0f;
-	firstcamera_yaw = 0.0f;
-	UpdateForward();
-}
-
-void FirstRoleCamera::SetYawAndPitch(float yaw, float pitch)
-{
-	firstcamera_yaw = yaw;
-	firstcamera_pitch = pitch;
-	UpdateForward();
-}
-
-void FirstRoleCamera::RotateCamera(float xoffset, float yoffset)
-{
-	firstcamera_pitch += yoffset * firstcamera_rotateSpeed;
-	firstcamera_yaw += xoffset * firstcamera_rotateSpeed;
-	if (firstcamera_pitch > 89.0f) firstcamera_pitch = 89.0f;
-	if (firstcamera_pitch < -89.0f) firstcamera_pitch = -89.0f;
-	UpdateForward();
-}
-
-void FirstRoleCamera::UpdateForward()
-{
-	firstcamera_forward.x = cos(XMConvertToRadians(firstcamera_pitch)) * cos(XMConvertToRadians(firstcamera_yaw));
-	firstcamera_forward.y = sin(XMConvertToRadians(firstcamera_pitch));
-	firstcamera_forward.z = cos(XMConvertToRadians(firstcamera_pitch)) * sin(XMConvertToRadians(firstcamera_yaw));
-	XMStoreFloat3(&firstcamera_forward, XMVector3Normalize(XMLoadFloat3(&firstcamera_forward)));
-}
-
-XMMATRIX FirstRoleCamera::GetViewMatrix()
-{
-	XMVECTOR position = XMLoadFloat3(&firstcamera_position);
-	XMVECTOR forward = XMLoadFloat3(&firstcamera_forward);
-	XMVECTOR up = XMLoadFloat3(&firstcamera_up);
-	XMMATRIX viewMatrix = XMMatrixLookToLH(position, forward, up);
-	return viewMatrix;
-
-}
-
-
-XMMATRIX FirstRoleCamera::GetViewMatrixForSkybox()
-{
-	XMVECTOR position = XMLoadFloat3(&firstcamera_position);
-	XMVECTOR forward = XMLoadFloat3(&firstcamera_forward);
-	XMVECTOR up = XMLoadFloat3(&firstcamera_up);
-	XMMATRIX viewMatrix = XMMatrixLookToLH(position, forward, up);
-	XMFLOAT4X4 viewM;
-	XMStoreFloat4x4(&viewM, viewMatrix);
-	viewM._41 = 0;
-	viewM._42 = 0;
-	viewM._43 = 0;
-	viewM._44 = 1;
-	viewMatrix = XMLoadFloat4x4(&viewM);
-	return viewMatrix;
-}
-
-
-void ThirdRoleCamera::InitializeThirdRoleCamera()
-{
-	thirdcamera_target = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	thirdcamera_up = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	thirdcamera_sensity = 0.3f;
-	thirdcamera_distance = 7.0f;
-	thirdcamera_yaw = -90.0f;
-	thirdcamera_pitch = 0.0f;
-
-}
-
-void ThirdRoleCamera::RotateCamera(float xoffset, float yoffset)
-{
-	thirdcamera_pitch += yoffset * thirdcamera_sensity;
-	thirdcamera_yaw += xoffset * thirdcamera_sensity;
-	if (thirdcamera_pitch > 0.0f) thirdcamera_pitch = 0.0f;
-	if (thirdcamera_pitch < -89.0f) thirdcamera_pitch = -89.0f;
-}
-
-XMFLOAT3 ThirdRoleCamera::GetPosition()
-{
-	XMFLOAT3 thirdcamera_forward;
-	thirdcamera_forward.x = cos(XMConvertToRadians(thirdcamera_pitch)) * cos(XMConvertToRadians(thirdcamera_yaw));
-	thirdcamera_forward.y = sin(XMConvertToRadians(thirdcamera_pitch));
-	thirdcamera_forward.z = cos(XMConvertToRadians(thirdcamera_pitch)) * sin(XMConvertToRadians(thirdcamera_yaw));
-	XMVECTOR forward = XMLoadFloat3(&thirdcamera_forward);
-	XMVECTOR target = XMLoadFloat3(&thirdcamera_target);
-	XMVECTOR position = target - (forward * thirdcamera_distance);
-	XMFLOAT3 pos;
-	XMStoreFloat3(&pos, position);
-	return pos;
-}
-
-XMMATRIX ThirdRoleCamera::GetViewMatrix()
-{
-	XMFLOAT3 thirdcamera_position = GetPosition();
-	XMVECTOR position = XMLoadFloat3(&thirdcamera_position);
-	XMVECTOR target = XMLoadFloat3(&thirdcamera_target);
-	XMVECTOR up = XMLoadFloat3(&thirdcamera_up);
-	XMMATRIX viewMatrix = XMMatrixLookAtLH(position, target, up);
-	return viewMatrix;
-}
-
-XMMATRIX ThirdRoleCamera::GetViewMatrixForSkybox()
-{
-	XMFLOAT3 thirdcamera_position = GetPosition();
-	XMVECTOR position = XMLoadFloat3(&thirdcamera_position);
-	XMVECTOR target = XMLoadFloat3(&thirdcamera_target);
-	XMVECTOR up = XMLoadFloat3(&thirdcamera_up);
-	XMMATRIX viewMatrix = XMMatrixLookAtLH(position, target, up);
-	XMFLOAT4X4 viewM;
-	XMStoreFloat4x4(&viewM, viewMatrix);
-	viewM._41 = 0;
-	viewM._42 = 0;
-	viewM._43 = 0;
-	viewM._44 = 1;
-	viewMatrix = XMLoadFloat4x4(&viewM);
-	return viewMatrix;
-}
-
-
-Renderer::SGCamera::SGCamera(glm::vec3 pos,
-	glm::vec3 target,
-	glm::vec3 up)
-{
-	m_pos = pos;
-	m_dir = glm::normalize(target - pos);
-	m_up = up;
-}
-
-void Renderer::SGCamera::Upload(GLuint program)
+Renderer::SGCameraBase::SGCameraBase() : m_cameraFov(CAMERA_DEFAULT_FOV),
+m_cameraNearZ(CAMREA_DEFAULT_NEAR_Z),
+m_cameraFarZ(CAMERA_DEFAULT_FAR_Z) 
 {
 	const int w = APPLICATION_WIDTH;
 	const int  h = APLLICATION_HEIGHT;
-
-	glm::mat4 V = getViewMatrix();
-	glm::mat4 P = getPerspectiveMatrix(w, h);
-
-	int P_loc = glGetUniformLocation(program, "P");
-	if(P_loc != -1){
-		glUniformMatrix4fv(P_loc, 1, false, glm::value_ptr(P));
-	}
-	int V_loc = glGetUniformLocation(program, "V");
-	if (V_loc != -1) {
-		glUniformMatrix4fv(V_loc, 1, false, glm::value_ptr(V));
-	}
-	glUniform3fv(glGetUniformLocation(program, "camPos"), 1, &m_pos[0]);
-}
-
-glm::mat4 Renderer::SGCamera::getPerspectiveMatrix(int w, int h)
-{
-	float aspect_ratio = float(w) / float(h);
-	return glm::perspective(MATH_PI / 4.0f, aspect_ratio, 0.1f, 100.f);
-}
-
-glm::mat4 Renderer::SGCamera::getViewMatrix()
-{
-	return glm::lookAt(m_pos, GetTarget(), m_up);
+	m_cameraAspect = float(w) / float(h);
 }
 
 glm::mat4 Renderer::SGCameraBase::GetProjMatrix()
@@ -173,43 +16,164 @@ glm::mat4 Renderer::SGCameraBase::GetProjMatrix()
 	return projMatrix;
 }
 
-void Renderer::SGCameraThirdRole::InitializeThirdRoleCamera()
+void Renderer::SGCameraBase::LoadToShader(GLuint program)
 {
+	glm::mat4 V = GetViewMatrix();
+	glm::mat4 P = GetProjMatrix();
+
+	int P_loc = glGetUniformLocation(program, "P");
+	if (P_loc != -1) {
+		glUniformMatrix4fv(P_loc, 1, false, glm::value_ptr(P));
+	}
+	int V_loc = glGetUniformLocation(program, "V");
+	if (V_loc != -1) {
+		glUniformMatrix4fv(V_loc, 1, false, glm::value_ptr(V));
+	}
+}
+
+
+Renderer::SGCameraThirdRole::SGCameraThirdRole() : SGCameraBase()
+{
+	InitializeCamera(); //初始化其他参数
+}
+
+void Renderer::SGCameraThirdRole::InitializeCamera()
+{
+	m_targetPos = CAMERA_THIRD_ROLE_DEFAULT_TARGET;
+	m_dirUp = CAMERA_THIRD_ROLE_DEFAULT_UPDIR;
+	m_sensity = CAMERA_THIRD_ROLE_DEFAULT_SENSITY;
+	m_distance = CAMERA_THIRD_ROLE_DEFAULT_DISTANCE;
+	m_yaw = -90.0f;
+	m_pitch = 0.0f;
+	m_minDistance = CAMERA_THIRD_ROLE_DEFAULT_MIN_DISTANCE;
+	m_maxDistance = CAMERA_THIRD_ROLE_DEFAULT_MAX_DISTANCE;
 }
 
 void Renderer::SGCameraThirdRole::RotateCamera(float xoffset, float yoffset)
 {
+	m_pitch += yoffset * m_sensity;
+	m_yaw += xoffset * m_sensity;
+	if (m_pitch > CAMERA_THIRD_ROLE_LIMIT_PICTH) m_pitch = CAMERA_THIRD_ROLE_LIMIT_PICTH;
+	if (m_yaw < CAMERA_THIRD_ROLE_LIMIT_YAW) m_yaw = CAMERA_THIRD_ROLE_LIMIT_YAW;
 }
 
 glm::vec3 Renderer::SGCameraThirdRole::GetPosition()
 {
-	return glm::vec3();
+	glm::vec3 cameraForward;
+	cameraForward.x = cos(glm::radians(m_pitch)) * cos(glm::radians(m_yaw));
+	cameraForward.y = sin(glm::radians(m_pitch));
+	cameraForward.z = cos(glm::radians(m_pitch)) * sin(glm::radians(m_yaw));
+	glm::vec3 position = m_targetPos - (cameraForward * m_distance);
+	return position;
 }
 
 glm::mat4 Renderer::SGCameraThirdRole::GetViewMatrix()
 {
-	return glm::mat4();
+	glm::vec3 position = GetPosition();
+	return glm::lookAtLH(position, m_targetPos, m_dirUp);
 }
 
 glm::mat4 Renderer::SGCameraThirdRole::GetViewMatrixForSkybox()
 {
-	return glm::mat4();
+	glm::vec3 position = GetPosition();
+	glm::mat4 viewMat = glm::lookAtLH(position, m_targetPos, m_dirUp);
+	viewMat[3][0] = 0;
+	viewMat[3][1] = 0;
+	viewMat[3][2] = 0;
+	viewMat[3][3] = 1;
+	return viewMat; //返回针对天空盒的ViewMatrix，将位移部分取消掉
 }
 
 glm::vec3 Renderer::SGCameraThirdRole::GetForward()
 {
-	return glm::vec3();
+	glm::vec3 position = GetPosition();
+	glm::vec3 targetPosition = m_targetPos;
+	glm::vec3 forward = glm::normalize(glm::vec3(targetPosition - position));
+	return forward;
+}
+
+void Renderer::SGCameraThirdRole::LoadToShader(GLuint program)
+{
+	SGCameraBase::LoadToShader(program); //调用基类的加载函数
+	glm::vec3 position = GetPosition();
+	glUniform3fv(glGetUniformLocation(program, "camPos"), 1, &position[0]);
 }
 
 void Renderer::SGCameraThirdRole::AddDistance(float dt)
 {
 	m_distance += dt * m_sensity;
-	if (m_distance > m_maxDistance) 
+	if (m_distance > m_maxDistance)
 		m_distance = m_maxDistance;
 }
 void Renderer::SGCameraThirdRole::DecDistance(float dt)
 {
 	m_distance -= dt * m_sensity;
-	if (m_distance < m_minDistance) 
+	if (m_distance < m_minDistance)
 		m_distance = m_minDistance;
 }
+
+
+Renderer::SGCameraFirstRole::SGCameraFirstRole() : SGCameraBase()
+{
+	InitializeCamera();
+}
+
+void Renderer::SGCameraFirstRole::InitializeCamera()
+{
+	glm::vec3 target = glm::vec3(0.0F, 0.0F, 0.0F);
+	m_position = CAMERA_FIRST_ROLE_DEFAULT_POSITION;
+	m_forward = glm::normalize(target - m_position);
+	m_up = CAMERA_FIRST_ROLE_DEFAULT_UPDIR;
+	m_rotateSpeed = CAMERA_FIRST_ROLE_DEFAULT_ROTATE_SPEED;
+	m_pitch = 0.0f;
+	m_yaw = 0.0f;
+	UpdateForward();
+}
+
+void Renderer::SGCameraFirstRole::SetYawAndPitch(float yaw, float pitch)
+{
+	m_yaw = yaw;
+	m_pitch = pitch;
+	UpdateForward();
+}
+
+void Renderer::SGCameraFirstRole::RotateCamera(float xoffset, float yoffset)
+{
+	m_pitch += yoffset * m_rotateSpeed;
+	m_yaw += xoffset * m_rotateSpeed;
+	if (m_pitch > CAMERA_FIRST_ROLE_LIMIT_MAX_PITCH) m_pitch = CAMERA_FIRST_ROLE_LIMIT_MAX_PITCH;
+	if (m_pitch < CAMERA_FIRST_ROLE_LIMIT_MIN_PITCH) m_pitch = CAMERA_FIRST_ROLE_LIMIT_MIN_PITCH;
+	UpdateForward();
+}
+
+void Renderer::SGCameraFirstRole::UpdateForward()
+{
+	m_forward.x = cos(glm::radians(m_pitch)) * cos(glm::radians(m_yaw));
+	m_forward.y = sin(glm::radians(m_pitch));
+	m_forward.z = cos(glm::radians(m_pitch)) * sin(glm::radians(m_yaw));
+}
+
+glm::mat4 Renderer::SGCameraFirstRole::GetViewMatrix()
+{
+	glm::mat4 viewMatrix = glm::lookAtLH(m_position, m_forward, m_up);
+	return viewMatrix;
+}
+
+glm::mat4 Renderer::SGCameraFirstRole::GetViewMatrixForSkybox()
+{
+	glm::mat4 viewMatrix = glm::lookAtLH(m_position, m_forward, m_up);
+	viewMatrix[3][0] = 0.0f;
+	viewMatrix[3][1] = 0.0f;
+	viewMatrix[3][2] = 0.0f;
+	viewMatrix[3][3] = 1.0f;
+	return viewMatrix;
+}
+
+void Renderer::SGCameraFirstRole::LoadToShader(GLuint program)
+{
+	SGCameraBase::LoadToShader(program); //调用基类的加载函数
+	glUniform3fv(glGetUniformLocation(program, "camPos"), 1, &m_position[0]);
+}
+
+
+

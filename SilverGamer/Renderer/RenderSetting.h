@@ -22,7 +22,7 @@
 #include <unordered_map>
 #include <fstream>
 #include <sstream>
-
+#include <chrono>
 
 #define RENDER_WARDER(X) assert(X)
 #define RENDER_WARDER_NULL_ALERT(X) RENDER_WARDER(X!=nullptr)
@@ -49,6 +49,30 @@
 #define AXIS_X glm::vec3(0, 1, 0)
 #define AXIS_Y glm::vec3(1, 0, 0)
 #define AXIS_Z glm::vec3(0, 0, 1)
+
+
+
+//Cameraœ‡πÿ∫Í…Ë÷√
+#define CAMERA_DEFAULT_FOV MATH_PI_DIV_4
+#define CAMERA_DEFAULT_ASPECT 1.33F
+#define CAMREA_DEFAULT_NEAR_Z 0.1F
+#define CAMERA_DEFAULT_FAR_Z 100.0F
+
+#define CAMERA_THIRD_ROLE_LIMIT_PICTH 0.0f
+#define CAMERA_THIRD_ROLE_LIMIT_YAW -89.0f
+#define CAMERA_THIRD_ROLE_DEFAULT_TARGET glm::vec3(0.0f, 0.0f ,0.0f)
+#define CAMERA_THIRD_ROLE_DEFAULT_UPDIR glm::vec3(0.0f, 1.0f, 0.0f)
+#define CAMERA_THIRD_ROLE_DEFAULT_SENSITY 0.3f
+#define CAMERA_THIRD_ROLE_DEFAULT_DISTANCE 7.0f
+#define CAMERA_THIRD_ROLE_DEFAULT_MAX_DISTANCE 20.0f
+#define CAMERA_THIRD_ROLE_DEFAULT_MIN_DISTANCE 2.0f
+
+#define CAMERA_FIRST_ROLE_LIMIT_MAX_PITCH 89.0f
+#define CAMERA_FIRST_ROLE_LIMIT_MIN_PITCH -89.0f
+#define CAMERA_FIRST_ROLE_DEFAULT_POSITION glm::vec3(3.0f)
+#define CAMERA_FIRST_ROLE_DEFAULT_UPDIR glm::vec3(0.0f, 1.0f, 0.0f)
+#define CAMERA_FIRST_ROLE_DEFAULT_ROTATE_SPEED 0.3f
+
 
 
 
