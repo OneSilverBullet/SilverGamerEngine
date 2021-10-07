@@ -63,7 +63,7 @@ void Renderer::SGGraphics::Init()
 
 	//¼ÓÔØ³¡¾°
 	m_scene = new SGScene();
-	SGModelBase* modelSphere = new SGModelBase("./Resource/Model/sphere.obj");
+	SGModelBase* modelSphere = new SGModelBase("../Resource/Model/sphere.obj");
 	m_scene->AddModel(modelSphere);
 
 	SGPointLight* pointLight = new SGPointLight(glm::vec3(2, 2, 2));
@@ -111,7 +111,7 @@ void Renderer::SGGraphics::Render()
 
         // render
         // ------
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

@@ -21,11 +21,11 @@ void Renderer::SGCameraBase::LoadToShader(GLuint program)
 	glm::mat4 V = GetViewMatrix();
 	glm::mat4 P = GetProjMatrix();
 
-	int P_loc = glGetUniformLocation(program, "P");
+	int P_loc = glGetUniformLocation(program, "projection");
 	if (P_loc != -1) {
 		glUniformMatrix4fv(P_loc, 1, false, glm::value_ptr(P));
 	}
-	int V_loc = glGetUniformLocation(program, "V");
+	int V_loc = glGetUniformLocation(program, "view");
 	if (V_loc != -1) {
 		glUniformMatrix4fv(V_loc, 1, false, glm::value_ptr(V));
 	}
@@ -97,7 +97,7 @@ void Renderer::SGCameraThirdRole::LoadToShader(GLuint program)
 {
 	SGCameraBase::LoadToShader(program); //调用基类的加载函数
 	glm::vec3 position = GetPosition();
-	glUniform3fv(glGetUniformLocation(program, "camPos"), 1, &position[0]);
+	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &position[0]);
 }
 
 void Renderer::SGCameraThirdRole::AddDistance(float dt)

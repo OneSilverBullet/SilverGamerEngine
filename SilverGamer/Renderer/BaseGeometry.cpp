@@ -4,6 +4,8 @@
 Renderer::SGModelMesh::SGModelMesh(std::vector<SGModelVertex> verts, std::vector<unsigned int> indices, std::vector<SGModelTexture> texes)
 	:m_vertices(verts), m_indices(indices), m_textures(texes)
 {
+	//在赋值当前mesh对应数据后，构建VAO、VBO等数据结构
+	ConstructMesh();
 }
 
 void Renderer::SGModelMesh::Draw(Renderer::SGShader shader)
@@ -84,8 +86,8 @@ void Renderer::SGModelMesh::ConstructMesh()
 
 Renderer::SGModelBase::SGModelBase(const char * modelPath)
 {
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(modelPath, aiProcess_Triangulate | aiProcess_FlipUVs);
+	std::string path = modelPath;
+	LoadModel(path);
 }
 
 void Renderer::SGModelBase::Draw(Renderer::SGShader shader)
@@ -97,6 +99,9 @@ void Renderer::SGModelBase::Draw(Renderer::SGShader shader)
 
 void Renderer::SGModelBase::Draw(GLuint shaderId)
 {
+	glm::mat4 model;
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+	glUniformMatrix4fv(glGetUniformLocation(shaderId, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	for (int i = 0; i < m_meshes.size(); ++i) {
 		m_meshes[i].Draw(shaderId);
 	}
