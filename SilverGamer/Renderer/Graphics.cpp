@@ -53,7 +53,6 @@ void Renderer::SGGraphics::Init()
 
     //检查当前支持的扩展
     GetSupportExtensions();
-    
     //检查当前是否支持shader include 
     if (!CheckExtension("GL_ARB_shading_language_include"))
     {
@@ -71,6 +70,7 @@ void Renderer::SGGraphics::Init()
 	m_scene->Init(); //初始化
 	//初始化对应ShaderInstance
 	m_shaderInstance = SGShaderFactory::GetInstance()->loadNormalShader()->GetShaderProgramId();
+    
 }
 
 
@@ -102,17 +102,21 @@ bool Renderer::SGGraphics::CheckExtension(const std::string& extensionName)
 
 void Renderer::SGGraphics::Render()
 {
+    glUseProgram(m_shaderInstance);
     SGTimer frameTimer;
     while (!glfwWindowShouldClose(m_window))
     {
         frameTimer.Start();
 
-        m_scene->Render(m_shaderInstance); //进行绘制
-
         // render
         // ------
         glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+        glUseProgram(m_shaderInstance);
+        m_scene->Render(m_shaderInstance); //进行绘制
+
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

@@ -71,7 +71,8 @@ glm::vec3 Renderer::SGCameraThirdRole::GetPosition()
 glm::mat4 Renderer::SGCameraThirdRole::GetViewMatrix()
 {
 	glm::vec3 position = GetPosition();
-	return glm::lookAtLH(position, m_targetPos, m_dirUp);
+	//return glm::lookAtLH(position, m_targetPos, m_dirUp);
+	return glm::lookAt(position, m_targetPos, m_dirUp);
 }
 
 glm::mat4 Renderer::SGCameraThirdRole::GetViewMatrixForSkybox()
@@ -97,7 +98,10 @@ void Renderer::SGCameraThirdRole::LoadToShader(GLuint program)
 {
 	SGCameraBase::LoadToShader(program); //调用基类的加载函数
 	glm::vec3 position = GetPosition();
-	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &position[0]);
+	int viewPos_loc = glGetUniformLocation(program, "viewPos");
+	if (viewPos_loc != -1) {
+		glUniform3fv(viewPos_loc, 1, &position[0]);
+	}
 }
 
 void Renderer::SGCameraThirdRole::AddDistance(float dt)
@@ -127,7 +131,7 @@ void Renderer::SGCameraFirstRole::InitializeCamera()
 	m_up = CAMERA_FIRST_ROLE_DEFAULT_UPDIR;
 	m_rotateSpeed = CAMERA_FIRST_ROLE_DEFAULT_ROTATE_SPEED;
 	m_pitch = 0.0f;
-	m_yaw = 0.0f;
+	m_yaw = 179.0f;
 	UpdateForward();
 }
 
@@ -156,7 +160,7 @@ void Renderer::SGCameraFirstRole::UpdateForward()
 
 glm::mat4 Renderer::SGCameraFirstRole::GetViewMatrix()
 {
-	glm::mat4 viewMatrix = glm::lookAtLH(m_position, m_forward, m_up);
+	glm::mat4 viewMatrix = glm::lookAt(m_position, (m_position + m_forward), m_up);
 	return viewMatrix;
 }
 

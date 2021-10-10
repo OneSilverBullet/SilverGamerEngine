@@ -2,7 +2,7 @@
 
 void Renderer::SGScene::Init()
 {
-	m_camera = new SGCameraThirdRole(); //创建摄像机
+	m_camera = new SGCameraFirstRole(); //创建摄像机
 }
 
 void Renderer::SGScene::Render(GLuint shaderProgram)

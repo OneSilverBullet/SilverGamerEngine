@@ -53,7 +53,7 @@ void Renderer::SGModelMesh::Draw(GLuint shaderID)
 			ss << specularNr++; // ½«GLuinÊäÈëµ½string stream
 		number = ss.str();
 
-		glUniform1f(glGetUniformLocation(shaderID, ("material." + name + number).c_str()), i);
+		glUniform1f(glGetUniformLocation(shaderID, ("mat." + name + number).c_str()), i);
 		glBindTexture(GL_TEXTURE_2D, m_textures[i].m_id);
 	}
 	glActiveTexture(GL_TEXTURE0);
@@ -99,9 +99,15 @@ void Renderer::SGModelBase::Draw(Renderer::SGShader shader)
 
 void Renderer::SGModelBase::Draw(GLuint shaderId)
 {
-	glm::mat4 model;
+	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-	glUniformMatrix4fv(glGetUniformLocation(shaderId, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+
+	int model_loc = glGetUniformLocation(shaderId, "model");
+	if (model_loc != -1) {
+		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+	}
+	
 	for (int i = 0; i < m_meshes.size(); ++i) {
 		m_meshes[i].Draw(shaderId);
 	}
