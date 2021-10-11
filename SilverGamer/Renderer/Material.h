@@ -5,6 +5,38 @@
 
 namespace Renderer
 {
+
+	class SGMaterialBase
+	{
+	public:
+		virtual void Upload(GLuint programId) = 0;
+	};
+
+	/*
+	* SGMaterialPhongFlat：使用BlinnPhong的Flat基础模型
+	*/
+	class SGMaterialPhongFlat : public SGMaterialBase
+	{
+	public:
+		SGMaterialPhongFlat(glm::vec3 diffuse, glm::vec3 specular, float shininess);
+		SGMaterialPhongFlat();
+		void Upload(GLuint programId); //上传对应属性
+
+		glm::vec3 GetDiffuse() { return m_diffuse; }
+		void SetDiffuse(glm::vec3 v) { m_diffuse = v; }
+		glm::vec3 GetSpecular() { return m_specular; }
+		void SetSpecular(glm::vec3 v) { m_specular = v; }
+		float GetShiniess() { return m_shininess; }
+		void SetShininess(float v) { m_shininess = v; }
+
+	private:
+		glm::vec3 m_diffuse;
+		glm::vec3 m_specular;
+		float m_shininess;
+	};
+
+
+
 	class SGMaterial
 	{
 	public:

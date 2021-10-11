@@ -103,6 +103,7 @@ bool Renderer::SGGraphics::CheckExtension(const std::string& extensionName)
 void Renderer::SGGraphics::Render()
 {
     glUseProgram(m_shaderInstance);
+    m_scene->UploadStaticLight(m_shaderInstance); //ÉÏ´«¾²Ì¬µÆ¹â
     SGTimer frameTimer;
     while (!glfwWindowShouldClose(m_window))
     {

@@ -50,6 +50,9 @@
 #define AXIS_Y glm::vec3(1, 0, 0)
 #define AXIS_Z glm::vec3(0, 0, 1)
 
+//引擎灯光相关宏设置
+#define POINT_LIGHT_MAX_NUM 4 
+
 
 
 //Camera相关宏设置

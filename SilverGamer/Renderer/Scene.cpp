@@ -26,12 +26,13 @@ void Renderer::SGScene::AddModel(std::string modelDir)
 
 void Renderer::SGScene::AddLight(SGPointLight * light)
 {
-	m_lights.push_back(light);
+	m_pointLights.push_back(light);
 }
 
-void Renderer::SGScene::UploadLight(GLuint program)
+void Renderer::SGScene::UploadStaticLight(GLuint program)
 {
-	for (int i = 0; i < m_lights.size(); ++i) {
-		m_lights[i]->Upload(program, i);
+	RENDER_WARDER(m_pointLights.size() < POINT_LIGHT_MAX_NUM);
+	for (int i = 0; i < m_pointLights.size(); ++i) {
+		m_pointLights[i]->Upload(program, i);
 	}
 }

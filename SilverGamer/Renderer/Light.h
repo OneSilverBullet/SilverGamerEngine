@@ -14,6 +14,7 @@ namespace Renderer
 		void Upload(GLuint program, GLuint index);
 
 	private:
+		glm::vec3 m_color; 
 		glm::vec3 m_direction;
 		glm::vec3 m_diffuse;
 		glm::vec3 m_specular;
@@ -35,6 +36,7 @@ namespace Renderer
 
 
 	private:
+		glm::vec3 m_color;
 		glm::vec3 m_pos;
 		
 		float m_constant;
