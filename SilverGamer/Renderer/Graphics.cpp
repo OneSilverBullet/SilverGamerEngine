@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "Shader.h"
 #include "Timer.h"
-
+#include "Material.h"
 
 Renderer::SGGraphics::SGGraphics()
 {
@@ -66,7 +66,9 @@ void Renderer::SGGraphics::Init()
 	m_scene->AddModel(modelSphere);
 
 	SGPointLight* pointLight = new SGPointLight(glm::vec3(2, 2, 2));
-	m_scene->AddLight(pointLight);
+	m_scene->AddPointLight(pointLight);
+    SGDirLight* dirLight = new SGDirLight();
+    m_scene->SetDirLight(dirLight);
 	m_scene->Init(); //初始化
 	//初始化对应ShaderInstance
 	m_shaderInstance = SGShaderFactory::GetInstance()->loadNormalShader()->GetShaderProgramId();
@@ -104,6 +106,9 @@ void Renderer::SGGraphics::Render()
 {
     glUseProgram(m_shaderInstance);
     m_scene->UploadStaticLight(m_shaderInstance); //上传静态灯光
+    SGMaterialPhongFlat testMat;
+    testMat.Upload(m_shaderInstance);
+
     SGTimer frameTimer;
     while (!glfwWindowShouldClose(m_window))
     {
@@ -111,7 +116,7 @@ void Renderer::SGGraphics::Render()
 
         // render
         // ------
-        glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 

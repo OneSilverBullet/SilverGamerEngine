@@ -28,7 +28,7 @@ void Renderer::SGPointLight::Upload(GLuint program, GLuint index)
 Renderer::SGDirLight::SGDirLight(glm::vec3 pos)
 {
 	m_color = glm::vec3(1.0f, 1.0f, 1.0f);
-	m_direction = glm::vec3(-1.0f, -1.0f, -1.0f);
+	m_direction = glm::vec3(1.0f, -1.0f, -1.0f);
 	m_diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
 	m_specular = glm::vec3(1.0f, 1.0f, 1.0f);
 }

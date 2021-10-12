@@ -31,13 +31,22 @@
 #define GEOMETRY_BIND_LOCATION_NORMAL 1
 #define GEOMETRY_BIND_LOCATION_TEXCOORD 2
 
-#define MATERIAL_VARIBLE_DIFFUSE_COLOR "material.diffuseColor"
-#define MATERIAL_VARIBLE_SPECULAR_COLOR "material.specularColor"
+//Phong模型宏
+#define MATERIAL_VARIBLE_DIFFUSE "material.diffuse"
+#define MATERIAL_VARIBLE_SPECULAR "material.specular"
+#define MATERIAL_VARIBLE_SHINESS "material.shininess"
+//PBR模型钩子宏
+#define MATERIAL_VARIBLE_ALBEDO "material.albedo"
+#define MATERIAL_VARIBLE_NORMAL "material.normal"
+#define MATERIAL_VARIBLE_METALLIC "material.metallic"
+#define MATERIAL_VARIBLE_ROUGHNESS "material.roughness"
+#define MATERIAL_VARIBLE_AO "material.ao"
+
 #define MATERIAL_VARIBLE_EMISSIVITY "material.emissivity"
 #define MATERIAL_VARIBLE_TRANSPARENCY "material.transparency"
 #define MATERIAL_VARIBLE_SPECULAR_REFLECTANCE "material.specularReflectivity"
 #define MATERIAL_VARIBLE_DIFFUSE_REFLECTANCE "material.diffuseReflectivity"
-#define MATERIAL_VARIBLE_SHINESS "material.shiness"
+
 
 #define MATH_PI 3.141592f
 #define MATH_PI_DIV_4 0.785398

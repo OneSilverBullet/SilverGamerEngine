@@ -16,7 +16,8 @@ namespace Renderer
 		void Render(GLuint shaderProgram);
 		void AddModel(SGModelBase* modelBasePtr);
 		void AddModel(std::string modelDir);
-		void AddLight(SGPointLight* light); 
+		void AddPointLight(SGPointLight* light); 
+		void SetDirLight(SGDirLight* light);
 		void UploadStaticLight(GLuint program);//进行更新当前灯光
 		
 		SGCameraBase* GetCamera() { return m_camera; }
@@ -24,6 +25,7 @@ namespace Renderer
 	private:
 		std::vector<SGModelBase*> m_models;
 		std::vector<SGPointLight*> m_pointLights;
+		SGDirLight* m_dirLight;
 		SGCameraBase* m_camera;
 	};
 }

@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Resource\Model;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glew-2.1.0\include;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glfw-3.3.4.bin.WIN32\include;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\assimp\include;$(IncludePath)</IncludePath>
+    <IncludePath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\shader;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Resource\Model;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glew-2.1.0\include;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glfw-3.3.4.bin.WIN32\include;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\assimp\include;$(IncludePath)</IncludePath>
     <LibraryPath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\lib;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\assimp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

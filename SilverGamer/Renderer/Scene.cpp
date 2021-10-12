@@ -24,13 +24,19 @@ void Renderer::SGScene::AddModel(std::string modelDir)
 	m_models.push_back(newModel);
 }
 
-void Renderer::SGScene::AddLight(SGPointLight * light)
+void Renderer::SGScene::AddPointLight(SGPointLight * light)
 {
 	m_pointLights.push_back(light);
 }
 
+void Renderer::SGScene::SetDirLight(SGDirLight* light)
+{
+	m_dirLight = light;
+}
+
 void Renderer::SGScene::UploadStaticLight(GLuint program)
 {
+	m_dirLight->Upload(program, 0);
 	RENDER_WARDER(m_pointLights.size() < POINT_LIGHT_MAX_NUM);
 	for (int i = 0; i < m_pointLights.size(); ++i) {
 		m_pointLights[i]->Upload(program, i);

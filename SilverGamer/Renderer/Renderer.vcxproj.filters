@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="头文件">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
@@ -16,14 +12,8 @@
     <Filter Include="头文件\Texture">
       <UniqueIdentifier>{e0acce0f-4d1e-4b2d-9fb4-dc5b3732be16}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Texture">
-      <UniqueIdentifier>{b9d8af56-0876-43e2-b147-a3ef2ec5297c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\Geometry">
       <UniqueIdentifier>{0643ebfe-1efd-4afa-aab7-73f714980185}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Geometry">
-      <UniqueIdentifier>{8242d689-9267-457a-9708-d077c5271176}</UniqueIdentifier>
     </Filter>
     <Filter Include="头文件\Scene">
       <UniqueIdentifier>{efefd37b-b7de-486a-b4d3-23429543e973}</UniqueIdentifier>
@@ -31,82 +21,70 @@
     <Filter Include="头文件\Graphics">
       <UniqueIdentifier>{cdd198b7-81a6-48fc-8e43-db5b6bed0c03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Graphics">
-      <UniqueIdentifier>{b2a607d9-8e08-4743-83a7-bd99d30c8b3b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Scene">
-      <UniqueIdentifier>{2f4bbd25-3394-4053-9ed4-e3a1de24a4fb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\Application">
       <UniqueIdentifier>{ea4a8134-1934-46e7-96d7-5e5879125fda}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Application">
-      <UniqueIdentifier>{eb84e450-4326-42eb-9e69-2505fc95b439}</UniqueIdentifier>
     </Filter>
     <Filter Include="头文件\Resource">
       <UniqueIdentifier>{52c41383-f9f7-43f4-84e5-0a912a409a90}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Resource">
-      <UniqueIdentifier>{e04b723a-f87c-4ec1-b506-b290e82474b6}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="源.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture2D.cpp">
-      <Filter>源文件\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>源文件\Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture3D.cpp">
-      <Filter>源文件\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseGeometry.cpp">
-      <Filter>源文件\Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>源文件\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="FrameBuffer.cpp">
-      <Filter>源文件\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>源文件\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderCheck.cpp">
-      <Filter>源文件\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>源文件\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>源文件\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>源文件\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics.cpp">
-      <Filter>源文件\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Application.cpp">
-      <Filter>源文件\Application</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceLoad.cpp">
-      <Filter>源文件\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="stb_image.cpp">
-      <Filter>源文件\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="glad.c">
-      <Filter>源文件</Filter>
+      <Filter>头文件\Application</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
-      <Filter>源文件\Application</Filter>
+      <Filter>头文件\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseGeometry.cpp">
+      <Filter>头文件\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>头文件\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>头文件\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>头文件\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>头文件\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderCheck.cpp">
+      <Filter>头文件\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>头文件\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceLoad.cpp">
+      <Filter>头文件\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>头文件\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>头文件\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>头文件\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>头文件\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>头文件\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture3D.cpp">
+      <Filter>头文件\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="glad.c">
+      <Filter>头文件</Filter>
     </ClCompile>
     <ClCompile Include="RenderSetting.cpp">
-      <Filter>源文件</Filter>
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="源.cpp">
+      <Filter>头文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -165,7 +143,7 @@
       <Filter>头文件\Application</Filter>
     </ClInclude>
     <ClInclude Include="InputManager.h">
-      <Filter>源文件\Application</Filter>
+      <Filter>头文件\Application</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
