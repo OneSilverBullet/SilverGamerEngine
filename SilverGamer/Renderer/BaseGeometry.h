@@ -13,6 +13,7 @@ namespace Renderer
 		glm::vec3 m_pos;
 		glm::vec3 m_normal;
 		glm::vec2 m_uv;
+		SGModelVertex(glm::vec3 _pos, glm::vec3 _normal, glm::vec2 _uv) :m_pos(_pos), m_normal(_normal), m_uv(_uv) {}
 	};
 
 	//大部分模型所需要的模型贴图
