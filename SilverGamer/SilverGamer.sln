@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1382
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SilverGamer", "SilverGamer\SilverGamer.vcxproj", "{FABEBFD4-BA81-41CA-B274-1AFAF796F721}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -14,6 +14,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SGSystemLib", "SGSystemLib\SGSystemLib.vcxproj", "{839CD445-D375-4AF7-ABC5-5950454F7220}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Renderer", "Renderer\Renderer.vcxproj", "{6610ABC6-7264-4EC4-8ABF-C1177306D7CB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{839CD445-D375-4AF7-ABC5-5950454F7220} = {839CD445-D375-4AF7-ABC5-5950454F7220}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

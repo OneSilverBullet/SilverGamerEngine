@@ -70,8 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\shader;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Resource\Model;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glew-2.1.0\include;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glfw-3.3.4.bin.WIN32\include;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\lib;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\assimp\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\shader;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Resource\Model;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glew-2.1.0\include;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glfw-3.3.4.bin.WIN32\include;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\assimp\include;../SGSystemLib/;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\lib;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\assimp\lib;../EngineLib/;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -82,7 +82,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>kernel32.lib;user32.lib;assimp-vc142-mtd.lib;opengl32.lib;glfw3.lib;glut.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SGSystemLib.lib;kernel32.lib;user32.lib;assimp-vc142-mtd.lib;opengl32.lib;glfw3.lib;glut.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glew-2.1.0\lib\Release\Win32;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glfw-3.3.4.bin.WIN32\lib-vc2019;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;LIBCMT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="BaseGeometry.cpp" />
+    <ClCompile Include="BasicGeomFactory.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="glad.c" />
@@ -138,7 +139,6 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="RenderCheck.cpp" />
-    <ClCompile Include="RenderSetting.cpp" />
     <ClCompile Include="ResourceLoad.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -147,11 +147,12 @@
     <ClCompile Include="Texture3D.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="源.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="BaseGeometry.h" />
+    <ClInclude Include="BasicGeomFactory.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="FrameBuffer.h" />

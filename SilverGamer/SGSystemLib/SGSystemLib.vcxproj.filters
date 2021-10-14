@@ -24,18 +24,12 @@
     <ClInclude Include="MacroLib.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="SGSynchronize.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SGSystem.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

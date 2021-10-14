@@ -20,13 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MacroLib.h" />
-    <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="SGSingleton.h" />
     <ClInclude Include="SGSynchronize.h" />
     <ClInclude Include="SGSystem.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="SGSystem.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -81,7 +79,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\SilverGamer\dll</OutDir>
+    <OutDir>..\EngineLib\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

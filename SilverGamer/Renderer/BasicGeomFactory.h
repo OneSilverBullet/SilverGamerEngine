@@ -2,7 +2,6 @@
 #define SG_BASIC_GEOM_FACTORY
 
 #include "RenderSetting.h"
-#include "Singleton.h"
 #include "BaseGeometry.h"
 
 namespace Renderer

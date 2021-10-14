@@ -2,42 +2,33 @@
 #define SG_SINGLETON_H
 
 #include "MacroLib.h"
+#include <memory>
 
-namespace SILVER_ENGINE
+namespace SilverEngineLib
 {
-	template<typename T>
-	class SGSingleton
+
+	template <typename T>
+	class SG_API SGSingleton
 	{
-		static T* m_pSingleton;
-
 	public:
-		SGSingleton()
+		virtual ~SGSingleton() = default;
+		static std::shared_ptr<T> Instance()
 		{
-			SG_WANDER(!m_pSingleton);
-			m_pSingleton = static_cast<T*>(this);
+			if (!m_pInstance)
+				m_pInstance.reset(new T());    //Can not use std::make_shared<T>(), because private constructor of T cant be accessed in memory(shared_ptr object) 
+			return m_pInstance;
 		}
 
-		~SGSingleton()
-		{
-			SG_WANDER(m_pSingleton);
-			m_pSingleton = NULL;
-		}
+	protected:								   //protected, not private, because T's constuctor will call this CSingleton() constructor 
+		SGSingleton() = default;
 
-		static T& GetSingleton()
-		{
-			SG_WANDER(m_pSingleton);
-			return m_pSingleton;
-		}
-
-		static T* GetSingletonPtr()
-		{
-			SG_WANDER(m_pSingleton);
-			return (*m_pSingleton);
-		}
+	private:
+		static std::shared_ptr<T> m_pInstance;
 	};
 
-	template<typename T>
-	T* SGSingleton<T>::m_pSingleton = NULL;
+	template <typename T>
+	std::shared_ptr<T> SGSingleton<T>::m_pInstance = nullptr;
+
 }
 
 

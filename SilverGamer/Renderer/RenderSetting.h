@@ -1,6 +1,12 @@
 #ifndef SILVER_RENDER_SETTING
 #define SILVER_RENDER_SETTING
 
+//Õ‚≤øø‚¡¥Ω”:SGSingleton
+#include "SGSingleton.h"
+#pragma comment(lib,"SGSystemLib.lib") 
+using namespace SilverEngineLib;
+
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 //#include <GL/glew.h>
