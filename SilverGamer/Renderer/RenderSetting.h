@@ -29,6 +29,8 @@ using namespace SilverEngineLib;
 #include <fstream>
 #include <sstream>
 #include <chrono>
+#include <functional>
+#include <array>
 
 #define RENDER_WARDER(X) assert(X)
 #define RENDER_WARDER_NULL_ALERT(X) RENDER_WARDER(X!=nullptr)

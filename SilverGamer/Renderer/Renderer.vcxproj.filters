@@ -86,6 +86,9 @@
     <ClCompile Include="glad.c">
       <Filter>文件\Resource</Filter>
     </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>文件\Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texture2D.h">
