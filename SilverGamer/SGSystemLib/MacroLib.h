@@ -16,9 +16,6 @@
 //内联
 #define FORCEINLINE __forceinline
 
-//空指针
-#define NULL nullptr
-
 
 //一些重定义类型
 #define SILVER_UINT unsigned int

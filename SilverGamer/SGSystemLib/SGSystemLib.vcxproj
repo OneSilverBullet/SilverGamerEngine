@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MacroLib.h" />
+    <ClInclude Include="Reflection\Reflection.h" />
     <ClInclude Include="SGSingleton.h" />
     <ClInclude Include="SGSynchronize.h" />
     <ClInclude Include="SGSystem.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Reflection\Reflection.cpp" />
     <ClCompile Include="SGSystem.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -32,6 +34,7 @@
     <ProjectGuid>{839CD445-D375-4AF7-ABC5-5950454F7220}</ProjectGuid>
     <RootNamespace>SGSystemLib</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Core</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
