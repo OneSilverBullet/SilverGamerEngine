@@ -46,7 +46,7 @@ struct DirLight
     vec3 specular;
 };
 
-
+#define PI 3.14159265
 #define SG_RENDER_PIPELINE_LIGHT_NUM 4
 
 uniform DirLight dirLight;
@@ -91,8 +91,6 @@ vec3 CalcSpotLight(PointLight light, MaterialPhongFlat mat, vec3 fragPos, vec3 n
     return ambient + diffuse + specular;
 }
 
-
-
 //Blinn Phone Light Model For DirLight and MaterialPhong
 //args:
 //vec3 lightDir   = normalize(lightPos - FragPos);
@@ -132,3 +130,46 @@ vec3 CalcSpotLight(PointLight light, MaterialPhong mat, vec3 fragPos, vec3 norma
 }
 
 
+//Fresnel Equation
+//reflection ratio = reflection ray / ray
+vec3 FresnelEquation(float cosTheta, vec3 F0)
+{
+    return F0 + (1 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+//Distribution function D
+//Considering surface roughness, get the micro surface ratio 
+//the micro surfaces which have similar direction with normal-vec
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+    float alpha = roughness * roughness;
+    float alpha2 = alpha * alpha;
+    float NdotH =  max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+
+    float num = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+    return num / denom;
+}
+
+//Geometry function G
+//Micro Plane Occlusion: the ratio of planes be occlusion
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r * r) / 8.0;
+    
+    float num = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+    
+    return num / denom;
+}
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+    return ggx1 * ggx2;
+}

@@ -62,7 +62,9 @@ void Renderer::SGGraphics::Init()
 
 	//¼ÓÔØ³¡¾°
 	m_scene = new SGScene();
-	SGModelBase* modelSphere = new SGModelBase("../Resource/Model/sphere.obj");
+	//SGModelBase* modelSphere = new SGModelBase("../Resource/Model/sphere.obj");
+	SGModelBase* modelSphere = new SGModelBase("../Resource/Model/space-ship/Intergalactic_Spaceship-(Wavefront).obj");
+	//SGModelBase* modelSphere = new SGModelBase("../Resource/Model/crytek-sponza/sponza.obj");
 	m_scene->AddModel(modelSphere);
 
 	SGPointLight* pointLight = new SGPointLight(glm::vec3(2, 2, 2));

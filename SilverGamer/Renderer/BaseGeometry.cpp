@@ -204,7 +204,7 @@ std::vector<Renderer::SGModelTexture> Renderer::SGModelBase::loadMaterialTexture
 		mat->GetTexture(type, i, &str); //得到当前贴图的路径
 		bool skip = false;
 		//进行优化检查
-		for (unsigned int j = 0; j < m_loadedTextures.size(); ++i) {
+		for (unsigned int j = 0; j < m_loadedTextures.size(); ++j) {
 			//如果当前加载贴图是已有贴图
 			if (std::strcmp(m_loadedTextures[j].m_path.data(), str.C_Str()) == 0) {
 				textures.push_back(m_loadedTextures[j]);
@@ -223,5 +223,5 @@ std::vector<Renderer::SGModelTexture> Renderer::SGModelBase::loadMaterialTexture
 			m_loadedTextures.push_back(tmpTexture);
 		}
 	}
-	return std::vector<Renderer::SGModelTexture>();
+	return textures;
 }
