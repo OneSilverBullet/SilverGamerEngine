@@ -163,5 +163,11 @@
     <None Include="shader\common\common.glsl">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="shader\shader_pbr.frag">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\shader_pbr.vert">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
