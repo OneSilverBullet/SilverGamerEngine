@@ -6,9 +6,8 @@
 
 namespace SilverEngineLib
 {
-
 	template <typename T>
-	class SG_API SGSingleton
+	class SGSingleton
 	{
 	public:
 		virtual ~SGSingleton() = default;
@@ -22,13 +21,11 @@ namespace SilverEngineLib
 	protected:								   //protected, not private, because T's constuctor will call this CSingleton() constructor 
 		SGSingleton() = default;
 
-	private:
 		static std::shared_ptr<T> m_pInstance;
 	};
 
 	template <typename T>
-	std::shared_ptr<T> SGSingleton<T>::m_pInstance = nullptr;
-
+	std::shared_ptr<T> SilverEngineLib::SGSingleton<T>::m_pInstance = nullptr;
 }
 
 

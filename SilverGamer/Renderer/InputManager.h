@@ -4,6 +4,7 @@
 #include "RenderSetting.h"
 
 #define KEY_STATUS std::array<bool,1024>
+//Key太多了，暂时使用OpenGL的宏
 #define MOUSE_BUTTON_STATUS std::array<bool,3>
 #define MOUSE_LEFT_BUTTON 0
 #define MOUSE_MID_BUTTON 1
@@ -25,12 +26,15 @@ namespace Renderer
 	//用于构建输入回调的基类
 	class SGInputManager :  public SGSingleton<SGInputManager>
 	{
+		friend class SGSingleton<SGInputManager>;
 	public:
 		void	Init(GLFWwindow* window);
 		int RegistKeyCallbackFunc(std::function<void(int, int, int, int)> vkeyCallback);
 		int RegistCursorCallback(std::function<void(double, double)> vcursorCallback);
 		int RegistMouseButtonCallback(std::function<void(int, int, int)> vmouseCallback);
 		int RegistScrollCallback(std::function<void(double, double)> vscrollCallback);
+
+		void UnregistAllCallback(); //解除当前所有的绑定
 
 		void UnregistKeyCallbackFunc(std::function<void(int, int, int, int)> vkeyCallback);
 		void UnregistCursorCallback(std::function<void(double, double)> vcursorCallback);
@@ -48,6 +52,14 @@ namespace Renderer
 		const CURSOR_STATUS& GetCursorPos() const;
 		const CURSOR_STATUS& GetCursorOffset() const;
 		const SCROLL_OFFSET_STATUS& GetScrollJourney() const;
+
+		//提供对外访问状态的接口
+		bool GetMouseButtonState(int buttonIndex);
+		bool GetKeyState(int keyIndex);
+		double GetCursorOffset(int  cursorIndex);
+		double GetCursorPos(int cursorIndex);
+		double GetScrollOffset(int scrollIndex);
+
 
 	private:
 		static int m_cursorStatus;

@@ -2,12 +2,11 @@
 
 void Renderer::SGScene::Init()
 {
-	m_camera = new SGCameraFirstRole(); //´´½¨ÉãÏñ»ú
+
 }
 
 void Renderer::SGScene::Render(GLuint shaderProgram)
 {
-	m_camera->LoadToShader(shaderProgram);
 	for (int i = 0; i < m_models.size(); ++i) {
 		m_models[i]->Draw(shaderProgram);
 	}

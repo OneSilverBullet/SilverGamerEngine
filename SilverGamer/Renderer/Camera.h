@@ -13,6 +13,7 @@ namespace Renderer
 		virtual void InitializeCamera() = 0; //初始化摄像机虚函数
 		virtual glm::mat4 GetViewMatrix() = 0;
 		virtual glm::mat4 GetViewMatrixForSkybox() = 0;
+		virtual void RotateCamera(float xoffset, float yoffset) = 0;
 		virtual ~SGCameraBase() {}
 		virtual void SetTarget(glm::vec3) {}
 		virtual glm::vec3 GetPosition() = 0;
@@ -83,9 +84,11 @@ namespace Renderer
 		glm::mat4 GetViewMatrixForSkybox();
 		virtual void LoadToShader(GLuint program);
 
+		void Move(float xOffset, float yOffset);
 		void SetTarget(glm::vec3 pos) { m_position = pos; }
 		glm::vec3 GetPosition() { return m_position; }
 		glm::vec3 GetForward() { return m_forward; }
+
 	private:
 		float m_pitch;
 		float m_yaw;

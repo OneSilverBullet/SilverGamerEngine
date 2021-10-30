@@ -8,10 +8,10 @@ CURSOR_STATUS Renderer::SGInputManager::m_lastCursorPos = { 0.0 };
 CURSOR_OFFSET_STATUS Renderer::SGInputManager::m_cursorOffset = { 0.0 };
 SCROLL_OFFSET_STATUS Renderer::SGInputManager::m_scrollJourney = { 0.0 };
 
-std::vector<std::function<void(int, int, int)>> m_mouseButtonCallBackFuntions;
-std::vector<std::function<void(double, double)>> m_cursorCallBackFunctions;
-std::vector<std::function<void(double, double)>> m_scrollCallBackFunctions;
-std::vector<std::function<void(int, int, int, int)>> m_keyCallbackFunctions;
+std::vector<std::function<void(int, int, int)>> Renderer::SGInputManager::m_mouseButtonCallBackFuntions;
+std::vector<std::function<void(double, double)>> Renderer::SGInputManager::m_cursorCallBackFunctions;
+std::vector<std::function<void(double, double)>> Renderer::SGInputManager::m_scrollCallBackFunctions;
+std::vector<std::function<void(int, int, int, int)>> Renderer::SGInputManager::m_keyCallbackFunctions;
 
 void Renderer::SGInputManager::Init(GLFWwindow* window)
 {
@@ -40,6 +40,15 @@ int Renderer::SGInputManager::RegistScrollCallback(std::function<void(double, do
 {
 	m_scrollCallBackFunctions.push_back(vscrollCallback);
 	return static_cast<int>(m_scrollCallBackFunctions.size()) - 1; //返回当前call back函数的索引
+}
+
+void Renderer::SGInputManager::UnregistAllCallback()
+{
+	//卸载对应的数据
+	m_keyCallbackFunctions.clear();
+	m_cursorCallBackFunctions.clear();
+	m_mouseButtonCallBackFuntions.clear();
+	m_scrollCallBackFunctions.clear();
 }
 
 void Renderer::SGInputManager::UnregistKeyCallbackFunc(std::function<void(int, int, int, int)> vkeyCallback)
@@ -107,6 +116,31 @@ const SCROLL_OFFSET_STATUS& Renderer::SGInputManager::GetScrollJourney() const
 	return m_scrollJourney;
 }
 
+bool Renderer::SGInputManager::GetMouseButtonState(int buttonIndex)
+{
+	return m_mouseButtonStatus[buttonIndex];
+}
+
+bool Renderer::SGInputManager::GetKeyState(int keyIndex)
+{
+	return m_keyStatus[keyIndex];
+}
+
+double Renderer::SGInputManager::GetCursorOffset(int cursorIndex)
+{
+	return m_cursorOffset[cursorIndex];
+}
+
+double Renderer::SGInputManager::GetCursorPos(int cursorIndex)
+{
+	return m_cursorPos[cursorIndex];
+}
+
+double Renderer::SGInputManager::GetScrollOffset(int scrollIndex)
+{
+	return m_scrollJourney[scrollIndex];
+}
+
 Renderer::SGInputManager::SGInputManager()
 {
 }
@@ -137,8 +171,10 @@ void Renderer::SGInputManager::KeyCallbackFunc(GLFWwindow* window, GLint vKey, G
 	}
 
 	//run the binding functions
-	for (auto func : m_keyCallbackFunctions) {
-		func(vKey, vScancode, vAction, vMode);
+	if (!m_keyCallbackFunctions.empty()) {
+		for (auto func : m_keyCallbackFunctions) {
+			func(vKey, vScancode, vAction, vMode);
+		}
 	}
 }
 
@@ -158,8 +194,10 @@ void Renderer::SGInputManager::CursorCallbackFunc(GLFWwindow* window, GLdouble v
 		m_cursorOffset[1] = m_lastCursorPos[1] - m_cursorPos[1];
 	}
 	m_lastCursorPos = m_cursorPos;
-	for (auto func : m_cursorCallBackFunctions) {
-		func(vPosX, vPosY);
+	if (!m_cursorCallBackFunctions.empty()) {
+		for (auto func : m_cursorCallBackFunctions) {
+			func(vPosX, vPosY);
+		}
 	}
 }
 
@@ -167,15 +205,22 @@ void Renderer::SGInputManager::ScrollCallbackFunc(GLFWwindow* window, GLdouble v
 {
 	m_scrollJourney[0] += vOffsetX;
 	m_scrollJourney[1] += vOffsetY;
-	for (auto func : m_scrollCallBackFunctions) {
-		func(vOffsetX, vOffsetY);
+	if (!m_scrollCallBackFunctions.empty())
+	{
+		for (auto func : m_scrollCallBackFunctions) {
+			func(vOffsetX, vOffsetY);
+		}
 	}
 }
 
 void Renderer::SGInputManager::MouseButtonCallbackFunc(GLFWwindow* window, GLint vButton, GLint vAction, GLint vModes)
 {
-	m_mouseButtonStatus[vButton] = vAction;
-	for (auto func : m_mouseButtonCallBackFuntions) {
-		func(vButton, vAction, vModes);
+	//Attention: here just log 3 mouse button infor
+	m_mouseButtonStatus[vButton - GLFW_MOUSE_BUTTON_LEFT] = vAction;
+	if (!m_mouseButtonCallBackFuntions.empty())
+	{
+		for (auto func : m_mouseButtonCallBackFuntions) {
+			func(vButton, vAction, vModes);
+		}
 	}
 }

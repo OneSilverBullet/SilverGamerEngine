@@ -18,13 +18,15 @@ glm::mat4 Renderer::SGCameraBase::GetProjMatrix()
 
 void Renderer::SGCameraBase::LoadToShader(GLuint program)
 {
-	glm::mat4 V = GetViewMatrix();
+	//TODO: optimize: projection matrix should not update every frame
 	glm::mat4 P = GetProjMatrix();
-
 	int P_loc = glGetUniformLocation(program, "projection");
 	if (P_loc != -1) {
 		glUniformMatrix4fv(P_loc, 1, false, glm::value_ptr(P));
 	}
+
+	//视线坐标每一帧都更新
+	glm::mat4 V = GetViewMatrix();
 	int V_loc = glGetUniformLocation(program, "view");
 	if (V_loc != -1) {
 		glUniformMatrix4fv(V_loc, 1, false, glm::value_ptr(V));
@@ -54,7 +56,7 @@ void Renderer::SGCameraThirdRole::RotateCamera(float xoffset, float yoffset)
 	m_pitch += yoffset * m_sensity;
 	m_yaw += xoffset * m_sensity;
 	if (m_pitch > CAMERA_THIRD_ROLE_LIMIT_PICTH) m_pitch = CAMERA_THIRD_ROLE_LIMIT_PICTH;
-	if (m_yaw < CAMERA_THIRD_ROLE_LIMIT_YAW) m_yaw = CAMERA_THIRD_ROLE_LIMIT_YAW;
+	if (m_pitch < CAMERA_THIRD_ROLE_LIMIT_YAW) m_pitch = CAMERA_THIRD_ROLE_LIMIT_YAW;
 }
 
 glm::vec3 Renderer::SGCameraThirdRole::GetPosition()
@@ -178,6 +180,19 @@ void Renderer::SGCameraFirstRole::LoadToShader(GLuint program)
 {
 	SGCameraBase::LoadToShader(program); //调用基类的加载函数
 	glUniform3fv(glGetUniformLocation(program, "camPos"), 1, &m_position[0]);
+}
+
+void Renderer::SGCameraFirstRole::Move(float xOffset, float yOffset)
+{
+	//y方向是forward方向
+	glm::vec3 forwardOffset = yOffset * m_forward;
+
+	//x方向是right方向
+	glm::vec3 rightVec = glm::normalize(glm::cross(m_forward, m_up));
+	glm::vec3 rightOffset = xOffset * rightVec;
+	
+	//Update current position
+	m_position = m_position + forwardOffset + rightOffset;
 }
 
 

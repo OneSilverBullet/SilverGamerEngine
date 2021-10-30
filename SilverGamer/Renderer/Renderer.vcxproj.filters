@@ -27,6 +27,9 @@
     <Filter Include="文件\Resource">
       <UniqueIdentifier>{52c41383-f9f7-43f4-84e5-0a912a409a90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="文件\IO">
+      <UniqueIdentifier>{e3a0220f-6edd-4edb-83f2-a9cdb5c70d90}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -87,7 +90,10 @@
       <Filter>文件\Resource</Filter>
     </ClCompile>
     <ClCompile Include="InputManager.cpp">
-      <Filter>文件\Application</Filter>
+      <Filter>文件\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller.cpp">
+      <Filter>文件\IO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -133,9 +139,6 @@
     <ClInclude Include="Application.h">
       <Filter>文件\Application</Filter>
     </ClInclude>
-    <ClInclude Include="Controller.h">
-      <Filter>文件\Application</Filter>
-    </ClInclude>
     <ClInclude Include="ResourceLoad.h">
       <Filter>文件\Resource</Filter>
     </ClInclude>
@@ -145,11 +148,14 @@
     <ClInclude Include="Timer.h">
       <Filter>文件\Application</Filter>
     </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>文件\Application</Filter>
-    </ClInclude>
     <ClInclude Include="BasicGeomFactory.h">
       <Filter>文件\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>文件\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
+      <Filter>文件\IO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

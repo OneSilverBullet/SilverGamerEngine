@@ -59,7 +59,9 @@ void Renderer::SGGraphics::Init()
         std::cout << "GPU doesn't support GL_ARB_shading_language_include" << std::endl;
     }
 
-
+    //加载当前控制器
+    m_controller = new SGController(m_window); 
+   
 	//加载场景
 	m_scene = new SGScene();
 	//SGModelBase* modelSphere = new SGModelBase("../Resource/Model/sphere.obj");
@@ -121,8 +123,9 @@ void Renderer::SGGraphics::Render()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
         glUseProgram(m_shaderInstance);
+        m_controller->LoadToShader(m_shaderInstance);
+
         m_scene->Render(m_shaderInstance); //进行绘制
 
 

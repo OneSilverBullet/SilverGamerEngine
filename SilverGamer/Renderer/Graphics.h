@@ -4,6 +4,7 @@
 #include "RenderSetting.h"
 #include "Scene.h"
 #include "FrameBuffer.h"
+#include "Controller.h" 
 
 namespace Renderer
 {
@@ -32,6 +33,7 @@ namespace Renderer
 		GLFWwindow* m_window;
 		SGFrameBuffer* m_frameBuffer; 
 		SGScene* m_scene;
+		SGController* m_controller;
 		int w, h;
 	};
 

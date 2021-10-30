@@ -133,6 +133,7 @@
     <ClCompile Include="BaseGeometry.cpp" />
     <ClCompile Include="BasicGeomFactory.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Graphics.cpp" />

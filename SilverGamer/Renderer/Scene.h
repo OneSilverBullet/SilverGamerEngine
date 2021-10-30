@@ -20,13 +20,10 @@ namespace Renderer
 		void SetDirLight(SGDirLight* light);
 		void UploadStaticLight(GLuint program);//进行更新当前灯光
 		
-		SGCameraBase* GetCamera() { return m_camera; }
-
 	private:
 		std::vector<SGModelBase*> m_models;
 		std::vector<SGPointLight*> m_pointLights;
 		SGDirLight* m_dirLight;
-		SGCameraBase* m_camera;
 	};
 }
 
