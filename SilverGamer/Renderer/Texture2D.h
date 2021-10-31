@@ -9,25 +9,19 @@ namespace Renderer
 	class SGTexture2D
 	{
 	public:
-		GLuint m_id;
-		std::string m_name;
-		SGTexture2D(const std::string name, const std::string path);
-		SGTexture2D(const std::string name, int w, int h, GLenum magFilter = GL_NEAREST, GLenum minFilter = GL_NEAREST,
-			GLuint internalFormat = GL_RGB16F, GLint type = GL_FLOAT, GLint wrap= GL_REPEAT);
 		SGTexture2D();
-
-		void activate(GLuint program, GLuint textureLoc);
-
-		static SGTexture2D* Default() {
-			return new SGTexture2D("tex", 64, 64);
-		}
-
-		static SGTexture2D* Texture2DDefault() {
-			return new SGTexture2D("miniTex", 64, 64);
-		}
-
+		SGTexture2D(SG_TEXTURE_TYPE type, int width, int height, GLuint textureId);
+		//For Custom Texture
+		SGTexture2D(int w, int h, 
+			GLenum magFilter = GL_NEAREST, GLenum minFilter = GL_NEAREST,
+			GLuint internalFormat = GL_RGB16F, GLint type = GL_FLOAT, GLint wrap= GL_REPEAT);
+		//UploadTexture
+		void Upload(GLuint program, int location); 
+		
 	private:
-		int width, height;
+		int m_width, m_height; 
+		GLuint m_textureId;
+		SG_TEXTURE_TYPE m_type;
 	};
 }
 

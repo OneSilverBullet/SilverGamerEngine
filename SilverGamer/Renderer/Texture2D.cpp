@@ -1,24 +1,22 @@
 #include "Texture2D.h"
 #include "stb_image.h"
-#include "ResourceLoad.h"
 
-Renderer::SGTexture2D::SGTexture2D(const std::string name, const std::string path)
+
+Renderer::SGTexture2D::SGTexture2D()
 {
-	m_name = name;
-	m_id = ResourceLoad::GetInstance()->LoadTexture2DResource(name, path);
-
-	//获取当前Texture的height和width
-	glBindTexture(GL_TEXTURE_2D, m_id);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Renderer::SGTexture2D::SGTexture2D(const std::string name, int w, int h, GLenum magFilter, GLenum minFilter,
-	GLuint internalFormat, GLint type, GLint wrap)
+Renderer::SGTexture2D::SGTexture2D(SG_TEXTURE_TYPE type, int width, int height, GLuint textureId):
+	m_width(width), m_height(height), m_type(type), m_textureId(textureId)
 {
-	glGenTextures(1, &m_id);
-	glBindTexture(GL_TEXTURE_2D, m_id);
+}
+
+Renderer::SGTexture2D::SGTexture2D(int w, int h, GLenum magFilter, GLenum minFilter, GLuint internalFormat, GLint type, GLint wrap)
+{
+	//This Initializer is for custom texture
+	m_type = SG_TEXTURE_TYPE::TEXTURE_CUSTOM;
+	glGenTextures(1, &m_textureId);
+	glBindTexture(GL_TEXTURE_2D, m_textureId);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
@@ -27,23 +25,22 @@ Renderer::SGTexture2D::SGTexture2D(const std::string name, int w, int h, GLenum 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, GL_RGBA, type, 0);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	width = w;
-	height = h;
-	m_name = name;
+	m_width = w;
+	m_height = h;
 }
 
-Renderer::SGTexture2D::SGTexture2D()
+/*
+* program: shader program
+* location: texture location
+*/
+void Renderer::SGTexture2D::Upload(GLuint program, int location)
 {
-}
-
-//绑定对应shader程序，以及对应槽位
-void Renderer::SGTexture2D::activate(GLuint program, GLuint textureLoc)
-{
-	glActiveTexture(GL_TEXTURE0 + textureLoc);
-	glBindTexture(GL_TEXTURE_2D, m_id);
+	glActiveTexture(GL_TEXTURE0 + location);
+	glBindTexture(GL_TEXTURE_2D, m_textureId);
 	//绑定到对应位置
-	int tex_loc = glGetUniformLocation(program, m_name.c_str());
+	int tex_loc = glGetUniformLocation(program, SG_TEXTURE_GPU_HOOK[m_type].c_str());
 	if (tex_loc != -1) {
-		glUniform1i(tex_loc, textureLoc);
+		glUniform1i(tex_loc, location);
 	}
 }
+

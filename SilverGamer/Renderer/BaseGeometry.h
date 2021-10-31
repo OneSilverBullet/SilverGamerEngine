@@ -3,7 +3,7 @@
 
 #include "RenderSetting.h"
 #include "Shader.h"
-#include "ResourceLoad.h"
+
 
 namespace Renderer
 {
@@ -30,7 +30,7 @@ namespace Renderer
 		std::vector<SGModelVertex> m_vertices;
 		std::vector<unsigned int> m_indices;
 		std::vector<SGModelTexture> m_textures;
-
+		SGModelMesh();
 		SGModelMesh(std::vector<SGModelVertex>, std::vector<unsigned int>, std::vector<SGModelTexture>);
 		void Draw(Renderer::SGShader shader); //直接传入shader进行绘制
 		void Draw(GLuint shaderID); //直接传入shader id进行绘制    
@@ -48,15 +48,8 @@ namespace Renderer
 		void Draw(GLuint shaderId);
 
 	private:
-		std::vector<SGModelTexture> m_loadedTextures; //已加载贴图
 		std::vector<SGModelMesh> m_meshes;
 		std::string m_modelDir;
-		std::string m_modelName;
-
-		void LoadModel(std::string path);
-		void ProcessNode(aiNode* node, const aiScene* scene);
-		SGModelMesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<SGModelTexture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 	};
 
 

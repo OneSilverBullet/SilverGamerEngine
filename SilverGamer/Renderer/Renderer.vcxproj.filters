@@ -30,6 +30,9 @@
     <Filter Include="文件\IO">
       <UniqueIdentifier>{e3a0220f-6edd-4edb-83f2-a9cdb5c70d90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="文件\Framework">
+      <UniqueIdentifier>{272cd9cf-5e92-4132-8ef6-679a0ed88d20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -156,6 +159,9 @@
     </ClInclude>
     <ClInclude Include="Controller.h">
       <Filter>文件\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>文件\Framework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

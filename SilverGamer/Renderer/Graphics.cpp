@@ -69,13 +69,13 @@ void Renderer::SGGraphics::Init()
 	//SGModelBase* modelSphere = new SGModelBase("../Resource/Model/crytek-sponza/sponza.obj");
 	m_scene->AddModel(modelSphere);
 
-	SGPointLight* pointLight = new SGPointLight(glm::vec3(2, 2, 2));
+	SGPointLight* pointLight = new SGPointLight(glm::vec3(1, 1, 1));
 	m_scene->AddPointLight(pointLight);
     SGDirLight* dirLight = new SGDirLight();
     m_scene->SetDirLight(dirLight);
 	m_scene->Init(); //初始化
 	//初始化对应ShaderInstance
-	m_shaderInstance = SGShaderFactory::GetInstance()->loadNormalShader()->GetShaderProgramId();
+	m_shaderInstance = SGShaderFactory::Instance()->loadNormalShader()->GetShaderProgramId();
     
 }
 

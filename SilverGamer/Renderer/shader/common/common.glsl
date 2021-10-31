@@ -15,11 +15,21 @@ struct MaterialPhong
 
 struct MaterialPBR
 {
-    sampler2D albedo;
+    sampler2D diffuse;
     sampler2D normal;
     sampler2D metallic;
     sampler2D roughness;
     sampler2D ao;
+};
+
+struct MaterialPBREmit
+{
+    sampler2D diffuse;
+    sampler2D normal;
+    sampler2D metallic;
+    sampler2D roughness;
+    sampler2D ao;
+    sampler2D emit;
 };
 
 struct PointLight
@@ -48,6 +58,8 @@ struct DirLight
 
 #define PI 3.14159265
 #define SG_RENDER_PIPELINE_LIGHT_NUM 4
+
+#define METAL_WORKFLOW_F0 vec3(0.04)
 
 uniform DirLight dirLight;
 uniform PointLight pointLights[SG_RENDER_PIPELINE_LIGHT_NUM];
@@ -173,3 +185,5 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
     float ggx1 = GeometrySchlickGGX(NdotL, roughness);
     return ggx1 * ggx2;
 }
+
+

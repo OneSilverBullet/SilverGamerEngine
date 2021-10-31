@@ -3,26 +3,57 @@
 
 #include "stb_image.h"
 #include "RenderSetting.h"
+#include "SGSingleton.h"
+#include "Shader.h"
+#include "BaseGeometry.h"
+#include "Texture2D.h"
 
 namespace Renderer
 {
-	class ResourceLoad
+	class SGShaderFactory : public SGSingleton<SGShaderFactory>
 	{
+		friend class SGSingleton<SGShaderFactory>;
 	public:
-		static ResourceLoad* GetInstance() {
-			if (m_instance == nullptr)
-				m_instance = new ResourceLoad();
-			return m_instance;
-		}
+		~SGShaderFactory() {}
 
-		int LoadTexture2DResource(std::string name, std::string path);
+		//加载正常Shader
+		GLint LoadShader(const std::string vertName, const std::string fragName);
+
+		SGShader* loadNormalShader();
+		//增加可以include的shader编译
+		void AddCommonShaderFile(const std::string& fileName);
+		void LoadCommonShader();
+
+	private:
+		//（vert, frag）-> shader
+		std::map<std::pair<std::string, std::string>, SGShader*> m_shaders; //当前所有shader库
+
+		SGShaderFactory() { LoadCommonShader(); }
+	};
+
+
+
+	class ResourceLoad : public SGSingleton<ResourceLoad>
+	{
+		friend class  SGSingleton<ResourceLoad>;
+	public:
+		//Load Texture return textureId
+		SGTexture2D* LoadTexture2DResource(SG_TEXTURE_TYPE textureType, std::string path);
+
+		//Load Model: Only Process verts
+		void LoadModel(std::string path,  std::vector<Renderer::SGModelMesh>* outMeshes);
+	
 
 	private:
 		ResourceLoad() {}
 		ResourceLoad(ResourceLoad&) = delete;
 		ResourceLoad& operator=(const ResourceLoad&) = delete;
+		void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Renderer::SGModelMesh>* outMeshes);
+		Renderer::SGModelMesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
+
 		static ResourceLoad* m_instance;
-		std::map<std::string, int> m_textures; //key:textureId
+
+		std::map<std::string, SGTexture2D*> m_textures; //key:textureId
 	};
 	
 

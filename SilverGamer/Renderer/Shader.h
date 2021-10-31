@@ -2,34 +2,11 @@
 #define SG_SHADER
 
 #include "RenderSetting.h"
+#include "SGSingleton.h"
 
 namespace Renderer
 {
-	class SGShader;
 
-	class SGShaderFactory
-	{
-	public:
-		~SGShaderFactory() {}
-		static SGShaderFactory* GetInstance() {
-			if (m_instance == nullptr) {
-				m_instance = new SGShaderFactory();
-			}
-			return m_instance;
-		}
-		//加载正常Shader
-		SGShader* loadNormalShader();
-		//增加可以include的shader编译
-		void AddCommonShaderFile(const std::string& fileName);
-		void LoadCommonShader();
-
-
-
-	private:
-		SGShaderFactory() { LoadCommonShader(); }
-		static SGShaderFactory* m_instance;
-	};
-	
 
 
 	class SGShader
@@ -51,7 +28,6 @@ namespace Renderer
 		std::string m_vertexShaderCode;
 		std::string m_fragShaderCode;
 		std::string m_geomShaderCode;
-
 	};
 }
 

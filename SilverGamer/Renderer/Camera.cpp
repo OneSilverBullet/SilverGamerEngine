@@ -20,14 +20,14 @@ void Renderer::SGCameraBase::LoadToShader(GLuint program)
 {
 	//TODO: optimize: projection matrix should not update every frame
 	glm::mat4 P = GetProjMatrix();
-	int P_loc = glGetUniformLocation(program, "projection");
+	int P_loc = glGetUniformLocation(program, PROJECTION_MATRIX_GPU_HOOK);
 	if (P_loc != -1) {
 		glUniformMatrix4fv(P_loc, 1, false, glm::value_ptr(P));
 	}
 
 	//视线坐标每一帧都更新
 	glm::mat4 V = GetViewMatrix();
-	int V_loc = glGetUniformLocation(program, "view");
+	int V_loc = glGetUniformLocation(program, VIEW_MATRIX_GPU_HOOK);
 	if (V_loc != -1) {
 		glUniformMatrix4fv(V_loc, 1, false, glm::value_ptr(V));
 	}
