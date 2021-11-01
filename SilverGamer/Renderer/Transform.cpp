@@ -37,6 +37,11 @@ void Renderer::SGTransform::Upload(int program)
 	}
 }
 
+void Renderer::SGTransform::RotateEuler(glm::vec3 rotateValue)
+{
+	m_eulerRot += rotateValue;
+}
+
 void Renderer::SGTransform::RemoveChild(SGTransform* child)
 {
 	int i = 0;

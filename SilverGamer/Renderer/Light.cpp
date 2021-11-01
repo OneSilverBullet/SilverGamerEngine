@@ -25,7 +25,7 @@ void Renderer::SGPointLight::Upload(GLuint program, GLuint index)
 	glUniform1f(glGetUniformLocation(program, ("pointLights[" + std::to_string(index) + "].quadratic").c_str()), m_quadratic);
 }
 
-Renderer::SGDirLight::SGDirLight(glm::vec3 pos)
+Renderer::SGDirLight::SGDirLight()
 {
 	m_color = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_direction = glm::vec3(1.0f, -1.0f, -1.0f);
@@ -39,4 +39,10 @@ void Renderer::SGDirLight::Upload(GLuint program, GLuint index)
 	glUniform3fv(glGetUniformLocation(program, "dirLight.direction"), 1, &m_direction[0]);
 	glUniform3fv(glGetUniformLocation(program, "dirLight.diffuse"), 1, &m_diffuse[0]);
 	glUniform3fv(glGetUniformLocation(program, "dirLight.specular"), 1, &m_specular[0]);
+}
+
+void Renderer::SGDirLight::AddDirection(glm::vec3 addDirection)
+{
+	m_direction += addDirection;
+	m_direction = glm::normalize(m_direction);
 }

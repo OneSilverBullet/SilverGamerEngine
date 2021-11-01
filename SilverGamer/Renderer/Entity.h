@@ -3,7 +3,7 @@
 #include "RenderSetting.h"
 #include "Material.h"
 #include "BaseGeometry.h"
-
+#include "Transform.h"
 /*
 
 */
@@ -26,14 +26,14 @@ namespace Renderer
 	class IEntity
 	{
 	public:
+		IEntity(std::string modelDir);
 
 
 
 	private:
 		SGModelBase* m_model;
 		SGMaterialBase* m_material;
-		
-
+		SGTransform* m_transform; 
 	};
 }
 

@@ -4,7 +4,9 @@
 #include "RenderSetting.h"
 #include "BaseGeometry.h"
 #include "Light.h"
-#include "Camera.h"
+#include "Controller.h"
+#include "Entity.h"
+#include "CommonSceneInfo.h"
 
 namespace Renderer
 {
@@ -13,17 +15,18 @@ namespace Renderer
 	public:
 		SGScene() {}
 		void Init();  //初始化
-		void Render(GLuint shaderProgram);
-		void AddModel(SGModelBase* modelBasePtr);
-		void AddModel(std::string modelDir);
+		
+		void Render(SGController*); //渲染接口
+		void AddEntity(IEntity* entity);
+
+		//增加PointLight
 		void AddPointLight(SGPointLight* light); 
 		void SetDirLight(SGDirLight* light);
 		void UploadStaticLight(GLuint program);//进行更新当前灯光
 		
 	private:
-		std::vector<SGModelBase*> m_models;
-		std::vector<SGPointLight*> m_pointLights;
-		SGDirLight* m_dirLight;
+		std::vector<IEntity*> m_models;
+		CommonSceneInfo m_commonSceneInfo; //公共消息
 	};
 }
 

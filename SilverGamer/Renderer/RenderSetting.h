@@ -58,6 +58,7 @@ using namespace SilverEngineLib;
 #define VIEW_MATRIX_GPU_HOOK "view"
 #define PROJECTION_MATRIX_GPU_HOOK "projection"
 
+
 #define MATH_PI 3.141592f
 #define MATH_PI_DIV_4 0.785398
 #define MATH_PI_DIV_2 1.570796
@@ -72,7 +73,7 @@ using namespace SilverEngineLib;
 
 //引擎灯光相关宏设置
 #define POINT_LIGHT_MAX_NUM 4 
-
+#define POINT_LIGHT_NUM "lightsNum"
 
 
 //Camera相关宏设置

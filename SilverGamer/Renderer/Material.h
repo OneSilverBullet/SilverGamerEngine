@@ -10,8 +10,8 @@ namespace Renderer
 	class SGMaterialBase
 	{
 	public:
-		virtual void Load(GLuint programId) = 0;
-		virtual void Unload(GLuint programId) = 0;
+		virtual void Load() = 0;
+		virtual void Unload() = 0;
 	};
 
 	/*
@@ -23,8 +23,8 @@ namespace Renderer
 		SGMaterialPhongFlat();
 		SGMaterialPhongFlat(glm::vec3 diffuse, glm::vec3 specular, float shininess);
 		
-		void Load(); //装载现在的材质
-		void Unload(); //卸载现在的材质
+		void Load() override; //装载现在的材质
+		void Unload() override; //卸载现在的材质
 
 		glm::vec3 GetDiffuse() { return m_diffuse; }
 		void SetDiffuse(glm::vec3 v) { m_diffuse = v; }
@@ -50,8 +50,8 @@ namespace Renderer
 	public:
 		SGMaterialPBRWithEmit(std::string matDir);
 		
-		void Load(); //装载现在的材质
-		void Unload(); //卸载现在的材质
+		void Load() override; //装载现在的材质
+		void Unload() override; //卸载现在的材质
 
 	private:
 		SGTexture2D* m_diffuse; //diffuse color贴图
