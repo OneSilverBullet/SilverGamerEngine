@@ -43,6 +43,7 @@ void Renderer::SGModelMesh::Draw(Renderer::SGShader shader)
 
 void Renderer::SGModelMesh::Draw(GLuint shaderID)
 {
+	/*
 	GLuint diffuseNr = 1;
 	GLuint specularNr = 1;
 	for (GLuint i = 0; i < m_textures.size(); i++)
@@ -62,6 +63,7 @@ void Renderer::SGModelMesh::Draw(GLuint shaderID)
 		glBindTexture(GL_TEXTURE_2D, m_textures[i].m_id);
 	}
 	glActiveTexture(GL_TEXTURE0);
+	*/
 
 	// »æÖÆMesh
 	glBindVertexArray(m_vao);

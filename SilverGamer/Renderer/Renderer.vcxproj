@@ -133,7 +133,9 @@
     <ClCompile Include="BaseGeometry.cpp" />
     <ClCompile Include="BasicGeomFactory.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CommonSceneInfo.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Graphics.cpp" />
@@ -156,6 +158,7 @@
     <ClInclude Include="BaseGeometry.h" />
     <ClInclude Include="BasicGeomFactory.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CommonSceneInfo.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="Entity.h" />

@@ -12,6 +12,7 @@ namespace Renderer
 	public:
 		virtual void Load() = 0;
 		virtual void Unload() = 0;
+		virtual GLint GetShaderInstance() = 0;
 	};
 
 	/*
@@ -33,6 +34,8 @@ namespace Renderer
 		float GetShiniess() { return m_shininess; }
 		void SetShininess(float v) { m_shininess = v; }
 
+		GLint GetShaderInstance() override { return m_shader; }
+
 	private:
 		glm::vec3 m_diffuse;
 		glm::vec3 m_specular;
@@ -52,6 +55,7 @@ namespace Renderer
 		
 		void Load() override; //装载现在的材质
 		void Unload() override; //卸载现在的材质
+		GLint GetShaderInstance() override { return m_shader; }
 
 	private:
 		SGTexture2D* m_diffuse; //diffuse color贴图

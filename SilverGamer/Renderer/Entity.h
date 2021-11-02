@@ -4,6 +4,8 @@
 #include "Material.h"
 #include "BaseGeometry.h"
 #include "Transform.h"
+#include "CommonSceneInfo.h"
+
 /*
 
 */
@@ -18,19 +20,48 @@
 * 
 * （6）后续操作：构建真正的渲染框架，上述一切功能是在CPU完成，装填参数完成后，统一生成一个个render pass装入render queue。
 * 统一由渲染器进行渲染。
+* 
+* （7）模型、灯光、摄像机、世界等等无非是virtual world的组成部分，这些东西组成一个个render pass。 集合好render pass之后，
+* 再将诸多render pass 装入到 render queue中进行解析、渲染。
+* 
+* virtual world <---------------> Render Queue <--------> Render Target <-------> Final Image
+*							RenderPass									Map								 Merge
 */
 
 namespace Renderer
 {
-	//当前Entity的基类
+	/*
+	* IEntity: The basis class of render model.
+	* TODO: A model contains many submeshes. One submesh map a IEntity.
+	*/
 	class IEntity
 	{
 	public:
 		IEntity(std::string modelDir);
-
-
+		//传入一个当前场景的common scene info
+		void Render(const CommonSceneInfo&);
+		//设置Entity的位置
+		void SetEntityPosition(glm::vec3 position) { m_transform->SetPosition(position); }
+		//设置Entity的欧拉角
+		void SetEntityEulerRot(glm::vec3 eulerRot) { m_transform->SetEulerRot(eulerRot); }
+		//设置Entity的尺寸
+		void SetEntityScale(glm::vec3 scale) { m_transform->SetScale(scale); }
+		//移动函数
+		void MovePosition(glm::vec3 addDistance) { m_transform->MovePosition(addDistance); }
+		//旋转函数
+		void RotateEuler(glm::vec3 rotateValue) { m_transform->RotateEuler(rotateValue); }
+		//Set Parent Entity
+		void SetParent(IEntity* entity);
+		//Add Child Entity
+		void AddChild(IEntity* child);
+		//remove Child Entity
+		void RemoveChild(IEntity* child);
+		//change material
+		void SetMaterial(SGMaterialBase* newMaterial);
 
 	private:
+		IEntity* m_parent; 
+		std::vector<IEntity*> m_childs; 
 		SGModelBase* m_model;
 		SGMaterialBase* m_material;
 		SGTransform* m_transform; 

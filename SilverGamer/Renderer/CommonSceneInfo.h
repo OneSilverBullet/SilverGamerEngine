@@ -18,7 +18,7 @@ namespace Renderer
 		void SetDirLight(SGDirLight* dirLight) { m_dirLight = dirLight; }
 		SGPointLight* GetPointLight(int index) { return m_pointLights[index]; }
 		SGDirLight* GetDirLight() { return m_dirLight; }
-		void Upload(GLint program);
+		void Upload(GLint program) const;
 
 	private:
 		int m_pointLightsNum = 0; //point lights number

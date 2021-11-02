@@ -44,9 +44,6 @@
     <ClCompile Include="BaseGeometry.cpp">
       <Filter>文件\Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>文件\Geometry</Filter>
-    </ClCompile>
     <ClCompile Include="FrameBuffer.cpp">
       <Filter>文件\Graphics</Filter>
     </ClCompile>
@@ -98,13 +95,19 @@
     <ClCompile Include="Controller.cpp">
       <Filter>文件\IO</Filter>
     </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>文件\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>文件\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonSceneInfo.cpp">
+      <Filter>文件\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texture2D.h">
       <Filter>文件\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>文件\Geometry</Filter>
     </ClInclude>
     <ClInclude Include="BaseGeometry.h">
       <Filter>文件\Geometry</Filter>
@@ -162,6 +165,12 @@
     </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>文件\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>文件\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonSceneInfo.h">
+      <Filter>文件\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

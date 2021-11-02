@@ -1,7 +1,7 @@
 #include "CommonSceneInfo.h"
 
 
-void Renderer::CommonSceneInfo::Upload(GLint program)
+void Renderer::CommonSceneInfo::Upload(GLint program) const
 {
 	//upload direction light
 	m_dirLight->Upload(program, 0);
