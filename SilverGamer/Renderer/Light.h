@@ -8,6 +8,7 @@ namespace Renderer
 
 	//TODO: Area Light, Spot Light
 	//TODO: Light Base Class
+	//TODO: static light or dynamic light flag
 	class SGDirLight
 	{
 	public:

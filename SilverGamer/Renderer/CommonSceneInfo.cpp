@@ -10,9 +10,11 @@ void Renderer::CommonSceneInfo::Upload(GLint program) const
 	if (lightNumLocation != -1) {
 		glUniform1i(lightNumLocation, m_pointLightsNum);
 	}
+
 	//upload point lights
 	RENDER_WARDER(m_pointLights.size() < POINT_LIGHT_MAX_NUM);
 	for (int i = 0; i < m_pointLights.size(); ++i) {
 		m_pointLights[i]->Upload(program, i);
 	}
+
 }

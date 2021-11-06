@@ -1,10 +1,8 @@
 #ifndef SG_GRAPHICS_APPLICATION
 #define SG_GRAPHICS_APPLICATION
 
-#include "RenderSetting.h"
+
 #include "Graphics.h"
-#include "Controller.h"
-#include "Timer.h"
 
 namespace Renderer
 {

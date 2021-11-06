@@ -16,6 +16,7 @@ uniform vec3 lightPositions[4];
 uniform vec3 lightColors[4];
 
 
+
 out vec4 fragcolor;
 
 //tangent normal calculator

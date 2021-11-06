@@ -3,9 +3,9 @@
 Renderer::SGPointLight::SGPointLight(glm::vec3 pos)
 	:m_pos(pos)
 {
-	m_color = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_color = glm::vec3(100.0f, 100.0f, 100.0f);
 	m_ambientColor = glm::vec3(0.05f, 0.05f, 0.05f);
-	m_diffuseColor = glm::vec3(0.8f, 0.8f, 0.8f);
+	m_diffuseColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_constant = 1.0;
 	m_linear = (float)0.9;

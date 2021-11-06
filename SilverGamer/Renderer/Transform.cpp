@@ -23,6 +23,10 @@ void Renderer::SGTransform::UpdateTransformMatrix()
 		glm::mat4 globalMatrix = m_parent->GetGlobalMatrix();
 		m_globalTransform = globalMatrix * m_localTransform;
 	}
+	else
+	{
+		m_globalTransform = m_localTransform;
+	}
 	
 	for (SGTransform* child : m_childs) {
 		child->UpdateTransformMatrix(); 
@@ -31,6 +35,7 @@ void Renderer::SGTransform::UpdateTransformMatrix()
 
 void Renderer::SGTransform::Upload(int program)
 {
+	UpdateTransformMatrix();
 	int model_loc = glGetUniformLocation(program, MODEL_MATRIX_GPU_HOOK);
 	if (model_loc != -1) {
 		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(m_globalTransform));

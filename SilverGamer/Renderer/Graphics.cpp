@@ -65,18 +65,15 @@ void Renderer::SGGraphics::Init()
 	//加载场景
 	m_scene = new SGScene();
 	//SGModelBase* modelSphere = new SGModelBase("../Resource/Model/sphere.obj");
-	SGModelBase* modelSphere = new SGModelBase("../Resource/Model/space-ship/Intergalactic_Spaceship-(Wavefront).obj");
-	//SGModelBase* modelSphere = new SGModelBase("../Resource/Model/crytek-sponza/sponza.obj");
-	m_scene->AddModel(modelSphere);
+    IEntity* newEntity = new IEntity("../Resource/Model/space-ship/Intergalactic_Spaceship-(Wavefront).obj");
+    newEntity->SetEntityScale(glm::vec3(0.5f));
+    m_scene->AddEntity(newEntity);
 
-	SGPointLight* pointLight = new SGPointLight(glm::vec3(1, 1, 1));
+	SGPointLight* pointLight = new SGPointLight(glm::vec3(3, 3, 3));
 	m_scene->AddPointLight(pointLight);
     SGDirLight* dirLight = new SGDirLight();
     m_scene->SetDirLight(dirLight);
-	m_scene->Init(); //初始化
-	//初始化对应ShaderInstance
-	m_shaderInstance = SGShaderFactory::Instance()->loadNormalShader()->GetShaderProgramId();
-    
+	m_scene->Init(); //初始化    
 }
 
 
@@ -108,10 +105,7 @@ bool Renderer::SGGraphics::CheckExtension(const std::string& extensionName)
 
 void Renderer::SGGraphics::Render()
 {
-    glUseProgram(m_shaderInstance);
     m_scene->UploadStaticLight(m_shaderInstance); //上传静态灯光
-    SGMaterialPhongFlat testMat;
-    testMat.Upload(m_shaderInstance);
 
     SGTimer frameTimer;
     while (!glfwWindowShouldClose(m_window))
@@ -123,10 +117,7 @@ void Renderer::SGGraphics::Render()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(m_shaderInstance);
-        m_controller->LoadToShader(m_shaderInstance);
-
-        m_scene->Render(m_shaderInstance); //进行绘制
+        m_scene->Render(m_controller); //进行绘制
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

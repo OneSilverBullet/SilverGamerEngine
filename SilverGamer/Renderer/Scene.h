@@ -25,7 +25,7 @@ namespace Renderer
 		void UploadStaticLight(GLuint program);//进行更新当前灯光
 		
 	private:
-		std::vector<IEntity*> m_models;
+		std::vector<IEntity*> m_entities;
 		CommonSceneInfo m_commonSceneInfo; //公共消息
 	};
 }

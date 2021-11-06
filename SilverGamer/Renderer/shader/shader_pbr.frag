@@ -1,6 +1,7 @@
 #version 430 core
 #extension GL_ARB_shading_language_include : require
 #include "/common.glsl"
+#include "/math.glsl"
 
 in vec3 fragPos;
 in vec3 normal;
@@ -12,8 +13,6 @@ uniform MaterialPBREmit material;
 
 
 uniform int lightsNum;
-uniform vec3 lightPositions[4];
-uniform vec3 lightColors[4];
 
 
 out vec4 fragcolor;
@@ -21,7 +20,7 @@ out vec4 fragcolor;
 //tangent normal calculator
 vec3 GetNormalFromMap()
 {
-    vec3 tangentNormal = texture(mat.normal, uv).xyz * 2.0 - 1.0;
+    vec3 tangentNormal = texture(material.normal, uv).xyz * 2.0 - 1.0;
 
 	vec3 Q1 = dFdx(fragPos);
 	vec3 Q2 = dFdy(fragPos);
@@ -38,10 +37,10 @@ vec3 GetNormalFromMap()
 
 
 void main(){
-	vec3 diffuse = pow(texture(material.diffuse, uv),2.2);
-	vec3 emit = pow(texture(material.emit, uv), 2.2);
+	vec3 diffuse = pow(texture(material.diffuse, uv).xyz, vec3(2.2));
+	vec3 emit = pow(texture(material.emit, uv).xyz, vec3(2.2));
 	float metallic = texture(material.metallic, uv).r;
-	float roughness = texture(material.roughness, uv).r;
+	float roughness = 1.0 - texture(material.roughness, uv).r;
 	float ao = texture(material.ao, uv).r;
 
 	vec3 N = GetNormalFromMap();
@@ -51,13 +50,14 @@ void main(){
 
 	//calculate the render equation
 	vec3 res = vec3(0.0);
+	
 	for(int i=0; i <lightsNum; ++i)
 	{
-		vec3 L = normalize(lightPositions[i] - fragPos);
+		vec3 L = normalize(pointLights[i].position - fragPos);
 		vec3 H =  normalize(L + V); // half vec
-		float distance =  length(lightPositions[i] - fragPos);
+		float distance =  length(pointLights[i].position - fragPos);
 		float attenuation = 1.0 / (distance * distance);
-		vec3 radiance =  lightColors[i] * attenuation;
+		vec3 radiance =  pointLights[i].light_color * attenuation;
 
 		//Cook Torrance
 		float NDF = DistributionGGX(N, H, roughness);
@@ -65,7 +65,7 @@ void main(){
 		vec3 F = FresnelEquation(max(dot(H,V),0.0), F0);
 
 		vec3 numerator = NDF * G * F;
-		float denominator = 4 * max(dot(N,V),0.0) * max(dot(N, L), 0.0) + 0.0001;
+		float denominator = 4 * max(dot(N,V),0.0) * max(dot(N, L), 0.0) + 0.001;
 		vec3 specular = numerator / denominator;
 
 		vec3 kS = F;
@@ -76,9 +76,11 @@ void main(){
 
 		res += (kD * diffuse / PI + specular) * radiance * NdotL;
 	}
+	
+
 
 	vec3 ambient = vec3(0.03) * diffuse * ao;
-	vec3 color = ambient + res + emit; //
+	vec3 color = ambient + res + emit * 3.0f; //
 
 	//tone mapping
 	color = color / (color + vec3(1.0));
@@ -86,5 +88,5 @@ void main(){
 	//gamma
 	color = pow(color, vec3(1.0 / 2.2));
 
-	fragcolor = color;
+	fragcolor = vec4(color, 1.0);
 }

@@ -33,6 +33,9 @@
     <Filter Include="文件\Framework">
       <UniqueIdentifier>{272cd9cf-5e92-4132-8ef6-679a0ed88d20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="资源文件\common">
+      <UniqueIdentifier>{701e37b8-cf5c-4d95-8d51-068b460ee7bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -181,14 +184,17 @@
       <Filter>资源文件</Filter>
     </None>
     <None Include="packages.config" />
-    <None Include="shader\common\common.glsl">
-      <Filter>资源文件</Filter>
-    </None>
     <None Include="shader\shader_pbr.frag">
       <Filter>资源文件</Filter>
     </None>
     <None Include="shader\shader_pbr.vert">
       <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\common\common.glsl">
+      <Filter>资源文件\common</Filter>
+    </None>
+    <None Include="shader\common\math.glsl">
+      <Filter>资源文件\common</Filter>
     </None>
   </ItemGroup>
 </Project>

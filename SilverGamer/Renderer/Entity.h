@@ -5,7 +5,7 @@
 #include "BaseGeometry.h"
 #include "Transform.h"
 #include "CommonSceneInfo.h"
-
+#include "Controller.h"
 /*
 
 */
@@ -39,7 +39,7 @@ namespace Renderer
 	public:
 		IEntity(std::string modelDir);
 		//传入一个当前场景的common scene info
-		void Render(const CommonSceneInfo&);
+		void Render(CommonSceneInfo* sceneInfo, SGController* controller);
 		//设置Entity的位置
 		void SetEntityPosition(glm::vec3 position) { m_transform->SetPosition(position); }
 		//设置Entity的欧拉角
@@ -58,6 +58,8 @@ namespace Renderer
 		void RemoveChild(IEntity* child);
 		//change material
 		void SetMaterial(SGMaterialBase* newMaterial);
+		//绑定控制
+		void RotateLogic(GLint vKey, GLint vScancode, GLint vAction, GLint vMode); //移动逻辑
 
 	private:
 		IEntity* m_parent; 

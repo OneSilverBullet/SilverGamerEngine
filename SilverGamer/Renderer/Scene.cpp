@@ -7,12 +7,16 @@ void Renderer::SGScene::Init()
 
 void Renderer::SGScene::Render(SGController* controller)
 {
-
+	//TODO: Dynamic Lights
+	for (int i = 0; i < m_entities.size(); ++i)
+	{
+		m_entities[i]->Render(&m_commonSceneInfo, controller);
+	}
 }
 
 void Renderer::SGScene::AddEntity(IEntity* entity)
 {
-	m_models.push_back(entity);
+	m_entities.push_back(entity);
 }
 
 void Renderer::SGScene::AddPointLight(SGPointLight * light)

@@ -180,6 +180,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="shader\common\common.glsl" />
+    <None Include="shader\common\math.glsl" />
     <None Include="shader\shader_normal.frag" />
     <None Include="shader\shader_normal.vert" />
     <None Include="shader\shader_pbr.frag" />

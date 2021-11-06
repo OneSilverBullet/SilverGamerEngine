@@ -1,6 +1,7 @@
 #include "FrameBuffer.h"
 #include "RenderCheck.h"
 
+
 Renderer::SGFrameBuffer::SGFrameBuffer(int texNum)
 {
 	int w = APPLICATION_WIDTH;
@@ -11,12 +12,12 @@ Renderer::SGFrameBuffer::SGFrameBuffer(int texNum)
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h);
 	//创建fbo贴图
 	for (int i = 0; i < texNum; ++i) {
-		m_fboTextures.push_back(new SGTexture2D("fbo_texture" + std::to_string(i), w, h));
+		m_fboTextures.push_back(new SGTexture2D(w, h));
 	}
 	//创建framebuffer object
 	glGenFramebuffers(1, &m_fbo);
 	for (int i = 0; i < texNum; ++i) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_fboTextures[i]->m_id, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_fboTextures[i]->GetTextureID(), 0);
 	}
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
 	checkFrameBufferStatus();

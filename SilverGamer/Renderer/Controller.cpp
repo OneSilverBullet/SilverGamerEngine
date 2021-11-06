@@ -1,5 +1,5 @@
 #include "Controller.h"
-#include "InputManager.h"
+
 
 Renderer::SGController::SGController(GLFWwindow* window) : m_window(window)
 {
@@ -31,6 +31,7 @@ void Renderer::SGController::RegistCameraLogic()
 	};
 	SGInputManager::Instance()->RegistKeyCallbackFunc(moveFunc); 
 }
+
 
 void Renderer::SGController::MoveLogic(GLint vKey, GLint vScancode, GLint vAction, GLint vMode)
 {

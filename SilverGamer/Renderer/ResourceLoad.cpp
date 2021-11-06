@@ -18,11 +18,6 @@ GLint Renderer::SGShaderFactory::LoadShader(const std::string vertName, const st
 	return tempShader->GetShaderProgramId();
 }
 
-Renderer::SGShader* Renderer::SGShaderFactory::loadNormalShader()
-{
-	return new Renderer::SGShader("shader/shader_normal.vert", "shader/shader_normal.frag");
-}
-
 //参数fileName仅仅负责当前shader file的名字
 void Renderer::SGShaderFactory::AddCommonShaderFile(const std::string& fileName)
 {
@@ -62,6 +57,7 @@ void Renderer::SGShaderFactory::AddCommonShaderFile(const std::string& fileName)
 void Renderer::SGShaderFactory::LoadCommonShader()
 {
 	AddCommonShaderFile("common"); //增加common公共shader
+	AddCommonShaderFile("math");
 }
 
 /*

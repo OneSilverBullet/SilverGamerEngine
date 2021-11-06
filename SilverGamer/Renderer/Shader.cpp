@@ -1,6 +1,5 @@
 #include "Shader.h"
 
-Renderer::SGShaderFactory* Renderer::SGShaderFactory::m_instance = nullptr;
 
 static const char* const searchPath = "/";
 

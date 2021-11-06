@@ -1,7 +1,6 @@
 #ifndef SG_CONTROLLER
 #define SG_CONTROLLER
-
-
+#include "InputManager.h"
 #include "RenderSetting.h"
 #include "Camera.h"
 
