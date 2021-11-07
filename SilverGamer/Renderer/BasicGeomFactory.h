@@ -17,6 +17,8 @@ namespace Renderer
 		void BasicSphereGeom(float radius, std::vector<SGModelVertex>& outVertexVec, std::vector<unsigned int>& outIndexVec);
 		//»ù´¡Ô²ÖùÌå
 		void BasicCylinderGeom(float radius, float thickness, std::vector<SGModelVertex>& outVertexVec, std::vector<unsigned int>& outIndexVec);
+		//Basic Screen Texture Quad
+		void BasicQuad(std::vector<SGModelVertex>& outVertexVec, std::vector<unsigned int>& outIndexVec);
 
 	};
 

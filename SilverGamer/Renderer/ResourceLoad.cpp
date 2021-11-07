@@ -18,6 +18,19 @@ GLint Renderer::SGShaderFactory::LoadShader(const std::string vertName, const st
 	return tempShader->GetShaderProgramId();
 }
 
+Renderer::SGShader* Renderer::SGShaderFactory::LoadShaderPtr(const std::string vertName, const std::string fragName)
+{
+	std::string vertFile = SHADER_FILE_DIR + vertName + ".vert";
+	std::string fragFile = SHADER_FILE_DIR + fragName + ".frag";
+	std::pair<std::string, std::string> shaderFile = std::make_pair(vertFile, fragFile);
+	if (m_shaders.find(shaderFile) != m_shaders.end())
+		return m_shaders[shaderFile];
+
+	SGShader* tempShader = new SGShader(vertFile, fragFile);
+	m_shaders[shaderFile] = tempShader;
+	return tempShader;
+}
+
 //参数fileName仅仅负责当前shader file的名字
 void Renderer::SGShaderFactory::AddCommonShaderFile(const std::string& fileName)
 {

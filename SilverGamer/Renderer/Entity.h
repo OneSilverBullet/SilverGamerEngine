@@ -26,6 +26,11 @@
 * 
 * virtual world <---------------> Render Queue <--------> Render Target <-------> Final Image
 *							RenderPass									Map								 Merge
+* 
+* TODO:
+* (1) Deffered Lighting 
+* (2) Render Node, Render Pass, Render Queue
+* (3) Sky Box
 */
 
 namespace Renderer

@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Timer.h"
 #include "Material.h"
+#include "ResourceLoad.h"
 
 Renderer::SGGraphics::SGGraphics()
 {
@@ -67,6 +68,9 @@ void Renderer::SGGraphics::Init()
 	//SGModelBase* modelSphere = new SGModelBase("../Resource/Model/sphere.obj");
     IEntity* newEntity = new IEntity("../Resource/Model/space-ship/Intergalactic_Spaceship-(Wavefront).obj");
     newEntity->SetEntityScale(glm::vec3(0.5f));
+    //Create GBuffer Shader
+    //SGGBufferMaterialPBRWithEmit* gBufferGenShader = new SGGBufferMaterialPBRWithEmit("../Resource/Model/space-ship/textures/");
+    //newEntity->SetMaterial(gBufferGenShader); //Change GBuffer Shader of entity
     m_scene->AddEntity(newEntity);
 
 	SGPointLight* pointLight = new SGPointLight(glm::vec3(3, 3, 3));
@@ -74,6 +78,13 @@ void Renderer::SGGraphics::Init()
     SGDirLight* dirLight = new SGDirLight();
     m_scene->SetDirLight(dirLight);
 	m_scene->Init(); //初始化    
+
+    //Initialize Screen Quad
+    m_defferedQuad = new DefferedQuad();
+    //Initialize GBuffer
+    m_GBuffer = new SGFrameBuffer(5);
+    //Bind
+    m_defferedQuad->SetScreenTextures(m_GBuffer->GetFBOTextures());
 }
 
 
@@ -114,11 +125,15 @@ void Renderer::SGGraphics::Render()
 
         // render
         // ------
+
+
+        m_GBuffer->Enable(); //Active GBuffers
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        m_scene->Render(m_controller); //进行绘制
-
+        glEnable(GL_DEPTH_TEST);
+        m_scene->Render(m_controller); //Render Virtual Scene
+        m_GBuffer->Disable(); //Disable GBuffers
+        m_defferedQuad->ShowScreenTexture(); //Render Quad
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -132,4 +147,70 @@ void Renderer::SGGraphics::Render()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
+}
+
+
+/*
+* DefferedQuad
+*/
+Renderer::DefferedQuad::DefferedQuad()
+{
+    m_quad = new SGQuad();
+    m_shader = SGShaderFactory::Instance()->LoadShader("shader_quad", "shader_quad");
+    std::function<void(int, int, int, int)> rotateFunc = [=](int key, int scancode, int action, int mode)
+    {
+        this->ChangeRenderTextures(key, scancode, action, mode);
+    };
+    SGInputManager::Instance()->RegistKeyCallbackFunc(rotateFunc);
+}
+
+void Renderer::DefferedQuad::SetScreenTextures(std::vector<SGTexture2D*> texturesVec)
+{
+    m_screenTextures = texturesVec;
+}
+
+void Renderer::DefferedQuad::AddScreenTextures(SGTexture2D* texture)
+{
+    m_screenTextures.push_back(texture);
+}
+
+void Renderer::DefferedQuad::SwapScreenTexture()
+{
+    RENDER_WARDER(m_currentIndex >= 0 && m_currentIndex < m_screenTextures.size());
+    int screenTextureLoc = glGetUniformLocation(m_shader, "screenTexture");
+    if (screenTextureLoc != -1)
+    {
+        glUseProgram(m_shader);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_screenTextures[m_currentIndex]->GetTextureID());
+        glUniform1i(screenTextureLoc, 0);
+    }
+    else
+    {
+        std::cout << "Deffered Quad Error: Find Screen Texture Failed!" << std::endl;
+    }
+}
+
+void Renderer::DefferedQuad::ChangeRenderTextures(GLint vKey, GLint vScancode, GLint vAction, GLint vMode)
+{
+    if (vKey == GLFW_KEY_1 && vAction == GLFW_REPEAT) {
+        m_currentIndex = 0;
+    }
+    if (vKey == GLFW_KEY_2 && vAction == GLFW_REPEAT) {
+        m_currentIndex = 1;
+    }
+    if (vKey == GLFW_KEY_3 && vAction == GLFW_REPEAT) {
+        m_currentIndex = 2;
+    }
+    if (vKey == GLFW_KEY_4 && vAction == GLFW_REPEAT) {
+        m_currentIndex = 3;
+    }
+}
+
+void Renderer::DefferedQuad::ShowScreenTexture()
+{
+    //Update Screen Texture
+    SwapScreenTexture();
+    //Draw Quad
+    m_quad->Draw(m_shader);
 }

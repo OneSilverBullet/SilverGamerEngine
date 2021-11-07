@@ -40,16 +40,35 @@ namespace Renderer
 		void ConstructMesh();
 	};
 	
-	class SGModelBase
+	class IModel
+	{
+	public:
+		virtual void Draw(Renderer::SGShader shader) = 0;
+		virtual void Draw(GLuint shaderId) = 0;
+	};
+
+	class SGModelBase : public IModel
 	{
 	public:
 		SGModelBase(const char* modelPath);
-		void Draw(Renderer::SGShader shader);
-		void Draw(GLuint shaderId);
+		void Draw(Renderer::SGShader shader) override;
+		void Draw(GLuint shaderId) override;
 
 	private:
 		std::vector<SGModelMesh> m_meshes;
 		std::string m_modelDir;
+	};
+
+	//Quad Structure: There is no need for user to call this structure
+	class SGQuad : public IModel
+	{
+	public:
+		SGQuad();
+		void Draw(Renderer::SGShader shader) override;
+		void Draw(GLuint shaderId) override;
+
+	private:
+		unsigned int m_quadVAO, m_quadVBO;
 	};
 
 

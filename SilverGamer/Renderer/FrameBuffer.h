@@ -6,20 +6,25 @@
 
 namespace Renderer
 {
+
+
+
+	//TODO: bind to GPU output
 	class SGFrameBuffer
 	{
 	public:
-		GLuint m_fbo;
-		GLuint m_depthBuffer;
-		GLuint m_stencilBuffer;
-		std::vector<Renderer::SGTexture2D*> m_fboTextures;
 
 		SGFrameBuffer(int texNum);
-		void enable() { glBindFramebuffer(GL_FRAMEBUFFER, m_fbo); }
-		void disable() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
-		void drawBuffer(int buffer);
-		void drawBuffers(std::vector<int> buffers);
+		void Enable() { glBindFramebuffer(GL_FRAMEBUFFER, m_fbo); }
+		void Disable() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+		void DrawBuffer(int buffer);
+		void DrawBuffers(); //激活当前所有的framebuffer.
+		std::vector<Renderer::SGTexture2D*> GetFBOTextures() { return m_fboTextures; }
 
+	private:
+		GLuint m_fbo;
+		GLuint m_depthBuffer;
+		std::vector<Renderer::SGTexture2D*> m_fboTextures;
 	};
 
 }

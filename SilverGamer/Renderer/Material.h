@@ -52,7 +52,6 @@ namespace Renderer
 	{
 	public:
 		SGMaterialPBRWithEmit(std::string matDir);
-		
 		void Load() override; //装载现在的材质
 		void Unload() override; //卸载现在的材质
 		GLint GetShaderInstance() override { return m_shader; }
@@ -67,6 +66,30 @@ namespace Renderer
 
 		GLint m_shader; //当前材质下属shader
 	};
+
+	/*
+	* SGGBufferMaterialPBRWithEmit: PBR Material For GBuffer
+	*/
+	class SGGBufferMaterialPBRWithEmit : public SGMaterialBase
+	{
+	public:
+		SGGBufferMaterialPBRWithEmit(std::string matDir);
+		void Load() override; //装载现在的材质
+		void Unload() override; //卸载现在的材质
+		GLint GetShaderInstance() override { return m_shader; }
+
+	private:
+		SGTexture2D* m_diffuse; //diffuse color贴图
+		SGTexture2D* m_normal; //normal 贴图
+		SGTexture2D* m_roughness; //粗糙度
+		SGTexture2D* m_emit; //自发光
+		SGTexture2D* m_metalness; //金属度
+		SGTexture2D* m_ao; //ao
+
+		GLint m_shader; //当前材质下属shader
+	};
+
+
 
 }
 

@@ -42,5 +42,9 @@ void Renderer::SGTexture2D::Upload(GLuint program, int location)
 	if (tex_loc != -1) {
 		glUniform1i(tex_loc, location);
 	}
+	else
+	{
+		std::cout << "Texture Error: Texture Load Failed." << std::endl;
+	}
 }
 

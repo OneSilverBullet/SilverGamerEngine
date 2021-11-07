@@ -8,6 +8,24 @@
 
 namespace Renderer
 {
+	//用于进行延迟渲染的Quad
+	class DefferedQuad
+	{
+	public:
+		DefferedQuad();
+		void SetScreenTextures(std::vector<SGTexture2D*> texturesVec);
+		void AddScreenTextures(SGTexture2D* texture);
+		void SwapScreenTexture();
+		void ChangeRenderTextures(GLint vKey, GLint vScancode, GLint vAction, GLint vMode);
+		void ShowScreenTexture();
+
+	private:
+		SGQuad* m_quad;
+		GLuint m_shader;
+		std::vector<SGTexture2D*> m_screenTextures;
+		int m_currentIndex = 0;
+	};
+
 
 	class SGGraphics
 	{
@@ -35,6 +53,11 @@ namespace Renderer
 		SGScene* m_scene;
 		SGController* m_controller;
 		int w, h;
+
+		//About Render Pipeline
+		DefferedQuad* m_defferedQuad;
+		SGFrameBuffer* m_GBuffer; 
+
 	};
 
 

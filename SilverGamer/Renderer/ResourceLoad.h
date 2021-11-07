@@ -18,7 +18,7 @@ namespace Renderer
 
 		//加载正常Shader
 		GLint LoadShader(const std::string vertName, const std::string fragName);
-
+		SGShader* LoadShaderPtr(const std::string vertName, const std::string fragName);
 		//增加可以include的shader编译
 		void AddCommonShaderFile(const std::string& fileName);
 		void LoadCommonShader();

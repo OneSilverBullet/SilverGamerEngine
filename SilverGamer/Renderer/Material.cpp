@@ -58,7 +58,7 @@ Renderer::SGMaterialPBRWithEmit::SGMaterialPBRWithEmit(std::string matDir)
 	m_emit = ResourceLoad::Instance()->LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_EMIT, emitDir);
 	m_roughness = ResourceLoad::Instance()->LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_ROUGHNESS, roughnessDir);
 
-	m_shader = SGShaderFactory::Instance()->LoadShader("shader_pbr", "shader_pbr"); //¼ÓÔØpbr shader
+	m_shader = SGShaderFactory::Instance()->LoadShader("shader_pbr", "shader_gen_gbuffer"); //¼ÓÔØpbr shader
 }
 
 void Renderer::SGMaterialPBRWithEmit::Load()
@@ -74,4 +74,43 @@ void Renderer::SGMaterialPBRWithEmit::Load()
 
 void Renderer::SGMaterialPBRWithEmit::Unload()
 {
+	glUseProgram(0);
+}
+
+/*
+* SGGBufferMaterialPBRWithEmit: PBR Material For GBuffer
+*/
+Renderer::SGGBufferMaterialPBRWithEmit::SGGBufferMaterialPBRWithEmit(std::string matDir)
+{
+	std::string aoDir = matDir + "ao.jpg";
+	std::string diffuseDir = matDir + "color.jpg";
+	std::string emitDir = matDir + "emit.jpg";
+	std::string metallicDir = matDir + "metalness.jpg";
+	std::string normalDir = matDir + "normal.jpg";
+	std::string roughnessDir = matDir + "roughness.jpg";
+
+	m_diffuse = ResourceLoad::Instance()->LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_DIFFUSE, diffuseDir);
+	m_normal = ResourceLoad::Instance()->LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_NORMAL, normalDir);
+	m_metalness = ResourceLoad::Instance()->LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_METALLIC, metallicDir);
+	m_ao = ResourceLoad::Instance()->LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_AO, aoDir);
+	m_emit = ResourceLoad::Instance()->LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_EMIT, emitDir);
+	m_roughness = ResourceLoad::Instance()->LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_ROUGHNESS, roughnessDir);
+
+	m_shader = SGShaderFactory::Instance()->LoadShader("shader_pbr", "shader_gen_gbuffer"); //¼ÓÔØpbr shader
+}
+
+void Renderer::SGGBufferMaterialPBRWithEmit::Load()
+{
+	glUseProgram(m_shader);
+	m_diffuse->Upload(m_shader, SG_TEXTURE_ACTIVE_SLOT0);
+	m_normal->Upload(m_shader, SG_TEXTURE_ACTIVE_SLOT1);
+	m_metalness->Upload(m_shader, SG_TEXTURE_ACTIVE_SLOT2);
+	m_roughness->Upload(m_shader, SG_TEXTURE_ACTIVE_SLOT3);
+	m_ao->Upload(m_shader, SG_TEXTURE_ACTIVE_SLOT4);
+	m_emit->Upload(m_shader, SG_TEXTURE_ACTIVE_SLOT5);
+}
+
+void Renderer::SGGBufferMaterialPBRWithEmit::Unload()
+{
+	glUseProgram(0);
 }
