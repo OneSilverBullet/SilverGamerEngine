@@ -113,15 +113,12 @@ void Renderer::SGModelBase::Draw(GLuint shaderId)
 
 Renderer::SGQuad::SGQuad()
 {
-	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
-		// positions   // texCoords
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		-1.0f, -1.0f,  0.0f, 0.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-		 1.0f,  1.0f,  1.0f, 1.0f
+	GLfloat quadVertices[] = {
+		// Positions        // Texture Coords
+		-1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+		1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+		1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
 	};
 
 	glGenVertexArrays(1, &m_quadVAO);
@@ -130,22 +127,22 @@ Renderer::SGQuad::SGQuad()
 	glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glBindVertexArray(0);
 }
 
 void Renderer::SGQuad::Draw(Renderer::SGShader shader)
 {
 	glBindVertexArray(m_quadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }
 
 void Renderer::SGQuad::Draw(GLuint shaderId)
 {
 	glBindVertexArray(m_quadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }

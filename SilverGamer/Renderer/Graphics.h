@@ -19,7 +19,7 @@ namespace Renderer
 		void ChangeRenderTextures(GLint vKey, GLint vScancode, GLint vAction, GLint vMode);
 		void ShowScreenTexture();
 
-	private:
+	public:
 		SGQuad* m_quad;
 		GLuint m_shader;
 		std::vector<SGTexture2D*> m_screenTextures;

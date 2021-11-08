@@ -67,7 +67,7 @@ namespace Renderer
 		void Draw(Renderer::SGShader shader) override;
 		void Draw(GLuint shaderId) override;
 
-	private:
+	public:
 		unsigned int m_quadVAO, m_quadVBO;
 	};
 

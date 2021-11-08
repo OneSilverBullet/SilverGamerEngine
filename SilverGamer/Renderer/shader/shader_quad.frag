@@ -2,14 +2,12 @@
 #extension GL_ARB_shading_language_include : require
 #include "/common.glsl"
 
-in vec3 fragPos;
-in vec3 normal;
-in vec2 uv;
+in vec2 texCoords;
 
 out vec4 fragColor;
 
 uniform sampler2D screenTexture;
 
 void main(){
-	fragColor = texture(screenTexture, uv);
+	fragColor = vec4(texture(screenTexture, texCoords).xyz, 1.0);
 }

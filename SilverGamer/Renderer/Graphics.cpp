@@ -118,21 +118,28 @@ void Renderer::SGGraphics::Render()
 {
     m_scene->UploadStaticLight(m_shaderInstance); //ÉÏ´«¾²Ì¬µÆ¹â
 
+
     SGTimer frameTimer;
     while (!glfwWindowShouldClose(m_window))
     {
         frameTimer.Start();
 
-        // render
-        // ------
-
-
         m_GBuffer->Enable(); //Active GBuffers
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
+
         m_scene->Render(m_controller); //Render Virtual Scene
         m_GBuffer->Disable(); //Disable GBuffers
+        glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glBindVertexArray(m_defferedQuad->m_quad->m_quadVAO);
+        glDisable(GL_DEPTH_TEST);
+        glBindTexture(GL_TEXTURE_2D, m_defferedQuad->m_screenTextures[0]->GetTextureID());
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+
         m_defferedQuad->ShowScreenTexture(); //Render Quad
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -141,7 +148,7 @@ void Renderer::SGGraphics::Render()
         glfwPollEvents();
 
         frameTimer.Stop();
-        std::cout << "Frame:" << frameTimer.GetFrameNum() << std::endl;
+        //std::cout << "Frame:" << frameTimer.GetFrameNum() << std::endl;
     }
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
@@ -177,12 +184,12 @@ void Renderer::DefferedQuad::AddScreenTextures(SGTexture2D* texture)
 void Renderer::DefferedQuad::SwapScreenTexture()
 {
     RENDER_WARDER(m_currentIndex >= 0 && m_currentIndex < m_screenTextures.size());
-    int screenTextureLoc = glGetUniformLocation(m_shader, "screenTexture");
+    glUseProgram(m_shader);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_screenTextures[m_currentIndex]->GetTextureID());
+    int screenTextureLoc = glGetUniformLocation(m_shader, "screenTexture"); 
     if (screenTextureLoc != -1)
     {
-        glUseProgram(m_shader);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_screenTextures[m_currentIndex]->GetTextureID());
         glUniform1i(screenTextureLoc, 0);
     }
     else
@@ -193,16 +200,16 @@ void Renderer::DefferedQuad::SwapScreenTexture()
 
 void Renderer::DefferedQuad::ChangeRenderTextures(GLint vKey, GLint vScancode, GLint vAction, GLint vMode)
 {
-    if (vKey == GLFW_KEY_1 && vAction == GLFW_REPEAT) {
+    if (vKey == GLFW_KEY_1 && vAction == GLFW_PRESS) {
         m_currentIndex = 0;
     }
-    if (vKey == GLFW_KEY_2 && vAction == GLFW_REPEAT) {
+    if (vKey == GLFW_KEY_2 && vAction == GLFW_PRESS) {
         m_currentIndex = 1;
     }
-    if (vKey == GLFW_KEY_3 && vAction == GLFW_REPEAT) {
+    if (vKey == GLFW_KEY_3 && vAction == GLFW_PRESS) {
         m_currentIndex = 2;
     }
-    if (vKey == GLFW_KEY_4 && vAction == GLFW_REPEAT) {
+    if (vKey == GLFW_KEY_4 && vAction == GLFW_PRESS) {
         m_currentIndex = 3;
     }
 }
