@@ -1,3 +1,5 @@
+![LOGO](https://raw.githubusercontent.com/OneSilverBullet/SilverGamerEngine/master/Document/GitLogo.png)
+
 ## SilverGamer Engine
 
 ### About the project
@@ -22,13 +24,13 @@ Daily work and interests will drive me to learn a lot of graphics and engine kno
 * Complete input system.
 * Preliminary material system.
 * The Entity framework is preliminary.
+* Support PBR, and fast graphics effect switching.
+* Deffered Rendering with PBR.(And SubQuad Rendering)
 
 #### recent goals
 
 * Has a relatively complete engine framework. Contains Entity, RenderPass system rendering framework.
-* Support PBR, and fast graphics effect switching.
 * Refactor the whole to completely encapsulate GL.
-* The design of the rendering pipeline: delayed rendering access.
 
 
 #### Overall goal
