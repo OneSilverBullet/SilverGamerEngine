@@ -188,6 +188,7 @@
     <None Include="shader\shader_pbr.vert" />
     <None Include="shader\shader_quad.frag" />
     <None Include="shader\shader_quad.vert" />
+    <None Include="shader\shader_quad_pbr.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -205,5 +205,8 @@
     <None Include="shader\shader_quad.vert">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="shader\shader_quad_pbr.frag">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -79,12 +79,11 @@ void Renderer::SGGraphics::Init()
     m_scene->SetDirLight(dirLight);
 	m_scene->Init(); //初始化    
 
-    //Initialize Screen Quad
-    m_defferedQuad = new DefferedQuad();
+   
     //Initialize GBuffer
     m_GBuffer = new SGFrameBuffer(5);
-    //Bind
-    m_defferedQuad->SetScreenTextures(m_GBuffer->GetFBOTextures());
+    //Initialize Screen Quad
+    m_defferedQuad = new DefferedQuad(m_GBuffer->GetFBOTextures());
 }
 
 
@@ -118,29 +117,19 @@ void Renderer::SGGraphics::Render()
 {
     m_scene->UploadStaticLight(m_shaderInstance); //上传静态灯光
 
-
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
     SGTimer frameTimer;
     while (!glfwWindowShouldClose(m_window))
     {
         frameTimer.Start();
 
         m_GBuffer->Enable(); //Active GBuffers
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-
         m_scene->Render(m_controller); //Render Virtual Scene
         m_GBuffer->Disable(); //Disable GBuffers
-        glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glBindVertexArray(m_defferedQuad->m_quad->m_quadVAO);
-        glDisable(GL_DEPTH_TEST);
-        glBindTexture(GL_TEXTURE_2D, m_defferedQuad->m_screenTextures[0]->GetTextureID());
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
-
-        m_defferedQuad->ShowScreenTexture(); //Render Quad
+        //m_defferedQuad->ShowScreenTexture(); //Render Quad
+        m_defferedQuad->DefferedRendering(m_controller, m_scene);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -160,9 +149,12 @@ void Renderer::SGGraphics::Render()
 /*
 * DefferedQuad
 */
-Renderer::DefferedQuad::DefferedQuad()
+Renderer::DefferedQuad::DefferedQuad(std::vector<SGTexture2D*> texturesVec)
 {
     m_quad = new SGQuad();
+    
+    m_material = new SGDefferedLightingMaterialPBRWithEmit(texturesVec);
+
     m_shader = SGShaderFactory::Instance()->LoadShader("shader_quad", "shader_quad");
     std::function<void(int, int, int, int)> rotateFunc = [=](int key, int scancode, int action, int mode)
     {
@@ -216,8 +208,21 @@ void Renderer::DefferedQuad::ChangeRenderTextures(GLint vKey, GLint vScancode, G
 
 void Renderer::DefferedQuad::ShowScreenTexture()
 {
+    glDisable(GL_DEPTH_TEST);
     //Update Screen Texture
     SwapScreenTexture();
     //Draw Quad
     m_quad->Draw(m_shader);
+    
+    glEnable(GL_DEPTH_TEST);
+}
+
+void Renderer::DefferedQuad::DefferedRendering(SGController* controller, SGScene* scene)
+{
+    glDisable(GL_DEPTH_TEST);
+    m_material->Load();
+    controller->LoadToShader(m_material->GetShaderInstance());
+    scene->UploadStaticLight(m_material->GetShaderInstance());
+    m_quad->Draw(m_material->GetShaderInstance());
+    glEnable(GL_DEPTH_TEST);
 }

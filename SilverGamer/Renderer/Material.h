@@ -89,7 +89,26 @@ namespace Renderer
 		GLint m_shader; //当前材质下属shader
 	};
 
+	/*
+	* Deffered Lighting
+	*/
+	class SGDefferedLightingMaterialPBRWithEmit : public SGMaterialBase
+	{
+	public:
+		SGDefferedLightingMaterialPBRWithEmit(std::vector<SGTexture2D*> gbuffer);
+		void Load() override; //装载现在的材质
+		void Unload() override; //卸载现在的材质
+		GLint GetShaderInstance() override { return m_shader; }
 
+	private:
+		SGTexture2D* m_position; //position 贴图
+		SGTexture2D* m_diffuse; //diffuse color贴图
+		SGTexture2D* m_normal; //normal 贴图
+		SGTexture2D* m_mra; //metallic, roughness, ao
+		SGTexture2D* m_emit; //自发光
+
+		GLint m_shader; //当前材质下属shader
+	};
 
 }
 

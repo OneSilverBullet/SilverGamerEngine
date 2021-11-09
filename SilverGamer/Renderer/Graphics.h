@@ -12,16 +12,18 @@ namespace Renderer
 	class DefferedQuad
 	{
 	public:
-		DefferedQuad();
+		DefferedQuad(std::vector<SGTexture2D*>textureVec);
 		void SetScreenTextures(std::vector<SGTexture2D*> texturesVec);
 		void AddScreenTextures(SGTexture2D* texture);
 		void SwapScreenTexture();
 		void ChangeRenderTextures(GLint vKey, GLint vScancode, GLint vAction, GLint vMode);
-		void ShowScreenTexture();
-
+		void ShowScreenTexture(); //Render Target Texture
+		void DefferedRendering(SGController* controller, SGScene* scene);
+		
 	public:
 		SGQuad* m_quad;
 		GLuint m_shader;
+		SGDefferedLightingMaterialPBRWithEmit* m_material;
 		std::vector<SGTexture2D*> m_screenTextures;
 		int m_currentIndex = 0;
 	};
@@ -37,7 +39,6 @@ namespace Renderer
 		virtual void Render();
 		void GetSupportExtensions();
 		bool CheckExtension(const std::string& extensionName);
-
 
 		GLFWwindow* GetGLFWWindow() { return m_window; }
 		SGScene* GetScene() { return m_scene; }

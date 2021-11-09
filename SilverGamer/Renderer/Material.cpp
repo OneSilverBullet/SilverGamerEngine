@@ -114,3 +114,32 @@ void Renderer::SGGBufferMaterialPBRWithEmit::Unload()
 {
 	glUseProgram(0);
 }
+
+/*
+* SGDefferedLightingMaterialPBRWithEmit
+*/
+Renderer::SGDefferedLightingMaterialPBRWithEmit::SGDefferedLightingMaterialPBRWithEmit(std::vector<SGTexture2D*> gbuffer)
+{
+	m_position = gbuffer[GBUFFER_POSITION];
+	m_diffuse = gbuffer[GBUFFER_DIFFUSE];
+	m_normal = gbuffer[GBUFFER_NORMAL];
+	m_mra = gbuffer[GBUFFER_MRA];
+	m_emit = gbuffer[GBUFFER_EMIT];
+
+	m_shader = SGShaderFactory::Instance()->LoadShader("shader_quad", "shader_quad_pbr"); //¼ÓÔØpbr shader
+}
+
+void Renderer::SGDefferedLightingMaterialPBRWithEmit::Load()
+{
+	glUseProgram(m_shader);
+	m_diffuse->Upload(m_shader, MATERIAL_VARIBLE_DIFFUSE, SG_TEXTURE_ACTIVE_SLOT0);
+	m_normal->Upload(m_shader,MATERIAL_VARIBLE_NORMAL, SG_TEXTURE_ACTIVE_SLOT1);
+	m_mra->Upload(m_shader, MATERIAL_VARIABLE_MRA, SG_TEXTURE_ACTIVE_SLOT2);
+	m_position->Upload(m_shader, MATERIAL_VARIABLE_POSITION, SG_TEXTURE_ACTIVE_SLOT3);
+	m_emit->Upload(m_shader, MATERIAL_VARIBLE_EMIT, SG_TEXTURE_ACTIVE_SLOT4);
+}
+
+void Renderer::SGDefferedLightingMaterialPBRWithEmit::Unload()
+{
+	glUseProgram(0);
+}

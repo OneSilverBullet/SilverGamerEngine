@@ -44,6 +44,7 @@ using namespace SilverEngineLib;
 #define MATERIAL_VARIBLE_DIFFUSE "material.diffuse"
 #define MATERIAL_VARIBLE_SPECULAR "material.specular"
 #define MATERIAL_VARIBLE_SHINESS "material.shininess"
+
 //PBR模型钩子宏
 #define MATERIAL_VARIBLE_NORMAL "material.normal"
 #define MATERIAL_VARIBLE_METALLIC "material.metallic"
@@ -54,10 +55,22 @@ using namespace SilverEngineLib;
 #define MATERIAL_VARIBLE_TRANSPARENCY "material.transparency"
 #define MATERIAL_VARIBLE_SPECULAR_REFLECTANCE "material.specularReflectivity"
 #define MATERIAL_VARIBLE_DIFFUSE_REFLECTANCE "material.diffuseReflectivity"
+//GBuffer PBR模型钩子宏
+#define MATERIAL_VARIABLE_POSITION "material.position"
+#define MATERIAL_VARIABLE_MRA "material.mra"
+
 
 #define MODEL_MATRIX_GPU_HOOK "model"
 #define VIEW_MATRIX_GPU_HOOK "view"
 #define PROJECTION_MATRIX_GPU_HOOK "projection"
+
+//GBuffer Texture Index Hook
+#define GBUFFER_POSITION 0
+#define GBUFFER_NORMAL 1
+#define GBUFFER_DIFFUSE 2
+#define GBUFFER_MRA 3
+#define GBUFFER_EMIT 4
+
 
 
 #define MATH_PI 3.141592f
@@ -128,6 +141,8 @@ enum SG_TEXTURE_TYPE {
 	TEXTURE_ROUGHNESS = 4,
 	TEXTURE_METALLIC = 5,
 	TEXTURE_EMIT = 6,
+	TEXTURE_POSITION = 7,
+	TEXTURE_MRA = 8,
 };
 
 /*

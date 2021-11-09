@@ -13,6 +13,15 @@ struct MaterialPhong
     float shininess;
 };
 
+struct MaterialGBuffer
+{
+    sampler2D position;
+    sampler2D normal;
+    sampler2D diffuse;
+    sampler2D mra;
+    sampler2D emit;
+};
+
 struct MaterialPBR
 {
     sampler2D diffuse;

@@ -48,3 +48,18 @@ void Renderer::SGTexture2D::Upload(GLuint program, int location)
 	}
 }
 
+void Renderer::SGTexture2D::Upload(GLuint program, std::string gpuHook, int location)
+{
+	glActiveTexture(GL_TEXTURE0 + location);
+	glBindTexture(GL_TEXTURE_2D, m_textureId);
+	//绑定到对应位置
+	int tex_loc = glGetUniformLocation(program, gpuHook.c_str());
+	if (tex_loc != -1) {
+		glUniform1i(tex_loc, location);
+	}
+	else
+	{
+		std::cout << "Texture Error: Texture Load Failed." << std::endl;
+	}
+}
+

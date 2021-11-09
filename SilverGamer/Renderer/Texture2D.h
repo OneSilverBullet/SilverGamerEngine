@@ -17,6 +17,7 @@ namespace Renderer
 			GLuint internalFormat = GL_RGB16F, GLint type = GL_FLOAT, GLint wrap= GL_REPEAT);
 		//UploadTexture
 		void Upload(GLuint program, int location); 
+		void Upload(GLuint program, std::string gpuHook, int location);
 		GLuint GetTextureID() { return m_textureId; }
 
 	private:
