@@ -63,7 +63,8 @@ namespace Renderer
 	class SGQuad : public IModel
 	{
 	public:
-		SGQuad();
+		SGQuad(); //Default All Screen Quad
+		SGQuad(float minX, float minY, float maxX, float maxY);
 		void Draw(Renderer::SGShader shader) override;
 		void Draw(GLuint shaderId) override;
 

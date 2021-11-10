@@ -31,5 +31,5 @@ void Renderer::SGScene::SetDirLight(SGDirLight* light)
 
 void Renderer::SGScene::UploadStaticLight(GLuint program)
 {
-
+	m_commonSceneInfo.Upload(program);
 }

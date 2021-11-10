@@ -12,6 +12,7 @@ namespace Renderer
 	class DefferedQuad
 	{
 	public:
+		DefferedQuad(std::vector<SGTexture2D*> textureVec, float minX, float maxX, float minY, float maxY);
 		DefferedQuad(std::vector<SGTexture2D*>textureVec);
 		void SetScreenTextures(std::vector<SGTexture2D*> texturesVec);
 		void AddScreenTextures(SGTexture2D* texture);
@@ -26,6 +27,7 @@ namespace Renderer
 		SGDefferedLightingMaterialPBRWithEmit* m_material;
 		std::vector<SGTexture2D*> m_screenTextures;
 		int m_currentIndex = 0;
+		bool m_useFullScreen = true; //Is the quad a full screen?
 	};
 
 
@@ -56,6 +58,7 @@ namespace Renderer
 		int w, h;
 
 		//About Render Pipeline
+		DefferedQuad* m_subQuad;
 		DefferedQuad* m_defferedQuad;
 		SGFrameBuffer* m_GBuffer; 
 

@@ -111,6 +111,9 @@ void Renderer::SGModelBase::Draw(GLuint shaderId)
 	}
 }
 
+/*
+* SGQuad
+*/
 Renderer::SGQuad::SGQuad()
 {
 	GLfloat quadVertices[] = {
@@ -119,6 +122,28 @@ Renderer::SGQuad::SGQuad()
 		-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
 		1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 		1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+	};
+
+	glGenVertexArrays(1, &m_quadVAO);
+	glGenBuffers(1, &m_quadVBO);
+	glBindVertexArray(m_quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glBindVertexArray(0);
+}
+
+Renderer::SGQuad::SGQuad(float minX, float minY, float maxX, float maxY)
+{
+	GLfloat quadVertices[] = {
+		// Positions        // Texture Coords
+		minX, maxY, 0.0f, 0.0f, 1.0f,
+		minX, minY, 0.0f, 0.0f, 0.0f,
+		maxX, maxY, 0.0f, 1.0f, 1.0f,
+		maxX, minY, 0.0f, 1.0f, 0.0f,
 	};
 
 	glGenVertexArrays(1, &m_quadVAO);

@@ -84,6 +84,8 @@ void Renderer::SGGraphics::Init()
     m_GBuffer = new SGFrameBuffer(5);
     //Initialize Screen Quad
     m_defferedQuad = new DefferedQuad(m_GBuffer->GetFBOTextures());
+    m_subQuad = new DefferedQuad(m_GBuffer->GetFBOTextures(), 0.4f, 1.0f, 0.46f, 1.0f);
+
 }
 
 
@@ -130,7 +132,7 @@ void Renderer::SGGraphics::Render()
         m_GBuffer->Disable(); //Disable GBuffers
         //m_defferedQuad->ShowScreenTexture(); //Render Quad
         m_defferedQuad->DefferedRendering(m_controller, m_scene);
-
+        m_subQuad->ShowScreenTexture(); //Show Sub Textures
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_window);
@@ -149,18 +151,27 @@ void Renderer::SGGraphics::Render()
 /*
 * DefferedQuad
 */
-Renderer::DefferedQuad::DefferedQuad(std::vector<SGTexture2D*> texturesVec)
+//Attention: This initializer is for sub quad
+Renderer::DefferedQuad::DefferedQuad(std::vector<SGTexture2D*> textureVec, float minX, float maxX, float minY, float maxY)
 {
-    m_quad = new SGQuad();
-    
-    m_material = new SGDefferedLightingMaterialPBRWithEmit(texturesVec);
-
+    m_quad = new SGQuad(minX, minY, maxX, maxY);
+    m_screenTextures = textureVec;
     m_shader = SGShaderFactory::Instance()->LoadShader("shader_quad", "shader_quad");
     std::function<void(int, int, int, int)> rotateFunc = [=](int key, int scancode, int action, int mode)
     {
         this->ChangeRenderTextures(key, scancode, action, mode);
     };
     SGInputManager::Instance()->RegistKeyCallbackFunc(rotateFunc);
+    m_useFullScreen = false;
+}
+
+//Attention: This initializer is for full screen quad. So there is no callback func
+Renderer::DefferedQuad::DefferedQuad(std::vector<SGTexture2D*> texturesVec)
+{
+    m_quad = new SGQuad();
+    m_material = new SGDefferedLightingMaterialPBRWithEmit(texturesVec);
+    m_shader = -1;
+    m_useFullScreen = true;
 }
 
 void Renderer::DefferedQuad::SetScreenTextures(std::vector<SGTexture2D*> texturesVec)
@@ -204,21 +215,25 @@ void Renderer::DefferedQuad::ChangeRenderTextures(GLint vKey, GLint vScancode, G
     if (vKey == GLFW_KEY_4 && vAction == GLFW_PRESS) {
         m_currentIndex = 3;
     }
+    if (vKey == GLFW_KEY_5 && vAction == GLFW_PRESS) {
+        m_currentIndex = 4;
+    }
 }
 
 void Renderer::DefferedQuad::ShowScreenTexture()
 {
+    assert(m_useFullScreen == false);
     glDisable(GL_DEPTH_TEST);
     //Update Screen Texture
     SwapScreenTexture();
     //Draw Quad
     m_quad->Draw(m_shader);
-    
     glEnable(GL_DEPTH_TEST);
 }
 
 void Renderer::DefferedQuad::DefferedRendering(SGController* controller, SGScene* scene)
 {
+    assert(m_useFullScreen == true);
     glDisable(GL_DEPTH_TEST);
     m_material->Load();
     controller->LoadToShader(m_material->GetShaderInstance());
