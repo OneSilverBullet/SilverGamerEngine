@@ -175,6 +175,9 @@
     <ClInclude Include="CommonSceneInfo.h">
       <Filter>文件\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="RenderPass.h">
+      <Filter>文件\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\shader_normal.frag">

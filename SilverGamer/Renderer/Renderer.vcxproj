@@ -167,6 +167,7 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="RenderCheck.h" />
+    <ClInclude Include="RenderPass.h" />
     <ClInclude Include="RenderSetting.h" />
     <ClInclude Include="ResourceLoad.h" />
     <ClInclude Include="Scene.h" />

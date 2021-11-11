@@ -6,9 +6,6 @@
 
 namespace Renderer
 {
-
-
-
 	class SGShader
 	{
 	public:
@@ -18,11 +15,9 @@ namespace Renderer
 		GLuint GetShaderProgramId() { return m_programId; }
 		void SetShaderProgramId(GLuint newId);
 
-
 	protected:
 		std::string LoadShaderCode(std::string shaderPath);
 		void CheckShaderCompileError(GLuint shaderId, std::string type);
-
 
 		GLuint m_programId;
 		std::string m_vertexShaderCode;

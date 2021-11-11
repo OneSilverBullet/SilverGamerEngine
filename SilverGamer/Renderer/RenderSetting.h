@@ -128,6 +128,15 @@ using namespace SilverEngineLib;
 #define SG_TEXTURE_ACTIVE_SLOT11 11
 #define SG_TEXTURE_ACTIVE_SLOT12 12
 
+//Strong Enum
+enum class SG_RENDER_PASS_TYPE
+{
+	NOMAL, 
+	ONCE,
+	PARALLEL,
+	PARALLEL_ONCE,
+	DELAY,
+};
 
 enum SG_MESH_MODE {
 	SIMPLE, COMPLEX
