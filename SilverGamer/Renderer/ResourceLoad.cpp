@@ -123,6 +123,12 @@ Renderer::SGTexture2D* Renderer::ResourceLoad::LoadTexture2DResource(SG_TEXTURE_
 	return newTexture;
 }
 
+Renderer::SGTexture2D* Renderer::ResourceLoad::LoadDefaultBlackTexture2DResource(SG_TEXTURE_TYPE textureType, std::string path)
+{
+	std::string defaultTextureDir = "F:/CGProjection/SilverGameEngine/SilverGamerEngine/SilverGamer/Resource/DefaultTextures/default_emit.png";
+	return LoadTexture2DResource(textureType, defaultTextureDir);
+}
+
 void Renderer::ResourceLoad::LoadModel(std::string path, std::vector<Renderer::SGModelMesh>* outMeshes)
 {
 	Assimp::Importer importer;
@@ -131,27 +137,26 @@ void Renderer::ResourceLoad::LoadModel(std::string path, std::vector<Renderer::S
 		std::cout << "Error::Assimp::" << importer.GetErrorString() << std::endl;
 		return;
 	}
-	ProcessNode(scene->mRootNode, scene, outMeshes);
+	ProcessNode(scene->mRootNode, scene, outMeshes, path);
 }
 
-void Renderer::ResourceLoad::ProcessNode(aiNode* node, const aiScene* scene, std::vector<Renderer::SGModelMesh>* outMeshes)
+void Renderer::ResourceLoad::ProcessNode(aiNode* node, const aiScene* scene, std::vector<Renderer::SGModelMesh>* outMeshes, std::string modelPath)
 {
 	//添加当前节点的所有mesh
 	for (GLuint i = 0; i < node->mNumMeshes; ++i) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		outMeshes->push_back(ProcessMesh(mesh, scene));
+		outMeshes->push_back(ProcessMesh(mesh, scene, modelPath));
 	}
 	//递归孙子节点
 	for (GLuint i = 0; i < node->mNumChildren; ++i) {
-		ProcessNode(node->mChildren[i], scene, outMeshes);
+		ProcessNode(node->mChildren[i], scene, outMeshes, modelPath);
 	}
 }
 
-Renderer::SGModelMesh Renderer::ResourceLoad::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+Renderer::SGModelMesh Renderer::ResourceLoad::ProcessMesh(aiMesh* mesh, const aiScene* scene, std::string modelPath)
 {
 	std::vector<SGModelVertex> vertices;
 	std::vector<unsigned int> indicies;
-	std::vector<SGModelTexture> textures;
 
 	//处理顶点
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
@@ -185,5 +190,72 @@ Renderer::SGModelMesh Renderer::ResourceLoad::ProcessMesh(aiMesh* mesh, const ai
 			indicies.push_back(face.mIndices[j]);
 		}
 	}
-	return SGModelMesh(vertices, indicies, textures);
+
+	SGMaterialPBRWithEmit* subMeshMaterial = nullptr;
+	// material related 
+	if (mesh->mMaterialIndex >= 0)
+	{
+		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+		std::cout << material->GetName().C_Str() << std::endl;
+		aiString materialName;
+		GLint TextureCount = material->GetTextureCount(aiTextureType_DIFFUSE);
+		RENDER_WARDER(TextureCount == 1);
+		material->GetTexture(aiTextureType_DIFFUSE, 0, &materialName);
+		TextureCount = material->GetTextureCount(aiTextureType_AMBIENT);
+		std::cout << "		material Name:" << materialName.C_Str() << std::endl;
+		aiString materialCoef;
+		if (TextureCount == 1) {
+			material->GetTexture(aiTextureType_AMBIENT, 0, &materialCoef);
+			std::cout << "		material Coef:" << materialCoef.C_Str() << std::endl;
+
+		}
+		//Process the material coefs
+		subMeshMaterial = ProcessSubMeshPBRMaterial(modelPath, materialName.C_Str(), TextureCount > 0 ? materialCoef.C_Str() : "");
+
+	}
+	return SGModelMesh(vertices, indicies, subMeshMaterial);
+}
+
+Renderer::SGMaterialPBRWithEmit* Renderer::ResourceLoad::ProcessSubMeshPBRMaterial(std::string modelDir, std::string materialName, std::string materialCoef /*=""*/)
+{
+	SGMaterialPBRWithEmit* newMaterial = new SGMaterialPBRWithEmit();
+	int lastDirFlag = (int)modelDir.find_last_of('/');
+	std::string modelFileDir = modelDir.substr(0, lastDirFlag);
+	std::string texturesDir = modelFileDir + "/textures_pbr/" + materialName;
+	std::string diffuseTextureDir = texturesDir + materialCoef + "_diff.png";
+	std::string normalTextureDir = texturesDir + "_norm.png";
+	std::string metalTextureDir = texturesDir + "_roughness.png";
+	std::string roughnessTextureDir = texturesDir + "_metal.png";
+	std::string aoTextureDir = texturesDir + "_ao.png";
+	std::string emitTextureDir = texturesDir + "_emit.png";
+
+	assert(SGSystem::IsFileExist(diffuseTextureDir)); //diffuseTexture must exist
+	SGTexture2D* diffuseTexture = LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_DIFFUSE, diffuseTextureDir);
+	newMaterial->SetDiffuseTexture2DPtr(diffuseTexture);
+	assert(SGSystem::IsFileExist(normalTextureDir));//normalTexture must exist
+	SGTexture2D* normalTexture = LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_NORMAL, normalTextureDir);
+	newMaterial->SetNormalTexture2DPtr(normalTexture);
+	assert(SGSystem::IsFileExist(metalTextureDir));//metal must exist
+	SGTexture2D* metalTexture = LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_METALLIC, metalTextureDir);
+	newMaterial->SetMetalnessTexture2DPtr(metalTexture);
+	assert(SGSystem::IsFileExist(roughnessTextureDir));//normalTexture must exist
+	SGTexture2D* roughnessTexture = LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_ROUGHNESS, roughnessTextureDir);
+	newMaterial->SetRoughnessTexture2DPtr(roughnessTexture);
+	assert(SGSystem::IsFileExist(aoTextureDir));//normalTexture must exist
+	SGTexture2D* aoTexture = LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_AO, aoTextureDir);
+	newMaterial->SetAOTexture2DPtr(aoTexture);
+
+	//check ao texture is exist
+	if (SGSystem::IsFileExist(emitTextureDir))
+	{
+		SGTexture2D* emitTexture = LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_EMIT, emitTextureDir);
+		newMaterial->SetEmitTexture2DPtr(emitTexture);
+	}
+	else
+	{
+		SGTexture2D* emitTexture = LoadDefaultBlackTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_EMIT, emitTextureDir);
+		newMaterial->SetEmitTexture2DPtr(emitTexture);
+	}
+
+	return newMaterial;
 }

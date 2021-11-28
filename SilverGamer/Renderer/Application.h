@@ -13,7 +13,7 @@ namespace Renderer
 		static SGApplication& GetInstance();
 		void Init(int argc, char** argv);
 		void Run();
-		
+		 
 		SGGraphics* GetGraphics() { return m_graphicPipline; }
 		GLFWwindow* GetGLFWWindow();
 

@@ -3,6 +3,10 @@
 
 #include "RenderSetting.h"
 #include "Shader.h"
+#include "Material.h"
+#include "Controller.h"
+#include "CommonSceneInfo.h"
+#include "Transform.h"
 
 
 namespace Renderer
@@ -29,10 +33,12 @@ namespace Renderer
 	public:
 		std::vector<SGModelVertex> m_vertices;
 		std::vector<unsigned int> m_indices;
-		std::vector<SGModelTexture> m_textures;
+		SGMaterialPBRWithEmit* m_material; //sub mesh material
+
 		SGModelMesh();
-		SGModelMesh(std::vector<SGModelVertex>, std::vector<unsigned int>, std::vector<SGModelTexture>);
-		void Draw(Renderer::SGShader shader); //直接传入shader进行绘制
+		SGModelMesh(std::vector<SGModelVertex>, std::vector<unsigned int>, SGMaterialPBRWithEmit* mat);
+		void UploadMeshMaterial(); //Upload Submesh Material
+		void Draw(); //直接传入shader进行绘制
 		void Draw(GLuint shaderID); //直接传入shader id进行绘制    
 
 	private:
@@ -43,16 +49,21 @@ namespace Renderer
 	class IModel
 	{
 	public:
-		virtual void Draw(Renderer::SGShader shader) = 0;
-		virtual void Draw(GLuint shaderId) = 0;
+		virtual void Draw() = 0;
 	};
 
 	class SGModelBase : public IModel
 	{
 	public:
 		SGModelBase(const char* modelPath);
-		void Draw(Renderer::SGShader shader) override;
-		void Draw(GLuint shaderId) override;
+		void LoadTempRenderData(CommonSceneInfo* sinfo, SGController* ctrl, SGTransform* trans);
+		void Draw() override;
+
+	private:
+		//Temp Data
+		CommonSceneInfo* sceneInfo = nullptr;
+		SGController* controller = nullptr;
+		SGTransform* transform = nullptr;
 
 	private:
 		std::vector<SGModelMesh> m_meshes;
@@ -65,8 +76,7 @@ namespace Renderer
 	public:
 		SGQuad(); //Default All Screen Quad
 		SGQuad(float minX, float minY, float maxX, float maxY);
-		void Draw(Renderer::SGShader shader) override;
-		void Draw(GLuint shaderId) override;
+		void Draw() override;
 
 	public:
 		unsigned int m_quadVAO, m_quadVBO;

@@ -6,36 +6,16 @@ Renderer::SGModelMesh::SGModelMesh()
 {
 }
 
-Renderer::SGModelMesh::SGModelMesh(std::vector<SGModelVertex> verts, std::vector<unsigned int> indices, std::vector<SGModelTexture> texes)
-	:m_vertices(verts), m_indices(indices), m_textures(texes)
+Renderer::SGModelMesh::SGModelMesh(std::vector<SGModelVertex> verts, std::vector<unsigned int> indices, SGMaterialPBRWithEmit* mat)
+	:m_vertices(verts), m_indices(indices), m_material(mat)
 {
 	//在赋值当前mesh对应数据后，构建VAO、VBO等数据结构
 	ConstructMesh();
 }
 
-void Renderer::SGModelMesh::Draw(Renderer::SGShader shader)
+void Renderer::SGModelMesh::Draw()
 {
-	GLuint diffuseNr = 1;
-	GLuint specularNr = 1;
-	for (GLuint i = 0; i < m_textures.size(); i++)
-	{
-		glActiveTexture(GL_TEXTURE0 + i); // 在绑定纹理前需要激活适当的纹理单元
-		// 检索纹理序列号 (N in diffuse_textureN)
-		std::stringstream ss;
-		std::string number;
-		std::string name = m_textures[i].m_type;
-		if (name == "texture_diffuse")
-			ss << diffuseNr++; // 将GLuin输入到string stream
-		else if (name == "texture_specular")
-			ss << specularNr++; // 将GLuin输入到string stream
-		number = ss.str();
-
-		glUniform1f(glGetUniformLocation(shader.GetShaderProgramId(), ("material." + name + number).c_str()), i);
-		glBindTexture(GL_TEXTURE_2D, m_textures[i].m_id);
-	}
-	glActiveTexture(GL_TEXTURE0);
-
-	// 绘制Mesh
+	// Draw Mesh
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
@@ -71,6 +51,12 @@ void Renderer::SGModelMesh::Draw(GLuint shaderID)
 	glBindVertexArray(0);
 }
 
+void Renderer::SGModelMesh::UploadMeshMaterial()
+{
+	//Active submesh material
+	m_material->Load();
+}
+
 void Renderer::SGModelMesh::ConstructMesh()
 {
 	glGenVertexArrays(1, &m_vao);
@@ -91,23 +77,33 @@ void Renderer::SGModelMesh::ConstructMesh()
 	glBindVertexArray(0);
 }
 
+void Renderer::SGModelBase::LoadTempRenderData(CommonSceneInfo* sinfo, SGController* ctrl, SGTransform* trans)
+{
+	sceneInfo = sinfo;
+	controller = ctrl;
+	transform = trans;
+}
+
 Renderer::SGModelBase::SGModelBase(const char * modelPath)
 {
 	std::string path = modelPath;
 	ResourceLoad::Instance()->LoadModel(modelPath, &m_meshes);
 }
 
-void Renderer::SGModelBase::Draw(Renderer::SGShader shader)
+void Renderer::SGModelBase::Draw()
 {
+	RENDER_WARDER_NULL_ALERT(sceneInfo);
+	RENDER_WARDER_NULL_ALERT(transform);
+	RENDER_WARDER_NULL_ALERT(controller);
 	for (int i = 0; i < m_meshes.size(); ++i) {
-		m_meshes[i].Draw(shader);
-	}
-}
-
-void Renderer::SGModelBase::Draw(GLuint shaderId)
-{
-	for (int i = 0; i < m_meshes.size(); ++i) {
-		m_meshes[i].Draw(shaderId);
+		//upload submesh material info
+		m_meshes[i].UploadMeshMaterial();
+		//upload scene information
+		sceneInfo->Upload(m_meshes[i].m_material->GetShaderInstance());
+		transform->Upload(m_meshes[i].m_material->GetShaderInstance());
+		controller->Upload(m_meshes[i].m_material->GetShaderInstance());
+		//draw meshes
+		m_meshes[i].Draw();
 	}
 }
 
@@ -158,14 +154,7 @@ Renderer::SGQuad::SGQuad(float minX, float minY, float maxX, float maxY)
 	glBindVertexArray(0);
 }
 
-void Renderer::SGQuad::Draw(Renderer::SGShader shader)
-{
-	glBindVertexArray(m_quadVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-}
-
-void Renderer::SGQuad::Draw(GLuint shaderId)
+void Renderer::SGQuad::Draw()
 {
 	glBindVertexArray(m_quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

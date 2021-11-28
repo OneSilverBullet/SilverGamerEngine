@@ -93,6 +93,7 @@ namespace Renderer
 		float m_pitch;
 		float m_yaw;
 		float m_rotateSpeed;
+		float m_moveSpeed;
 		glm::vec3 m_position;
 		glm::vec3 m_forward;
 		glm::vec3 m_up;

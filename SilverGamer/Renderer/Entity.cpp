@@ -5,10 +5,6 @@ Renderer::IEntity::IEntity(std::string modelDir)
 {
 	m_model = new SGModelBase(modelDir.c_str()); //加载model
 	m_transform = new SGTransform();
-	int finalIndex = modelDir.find_last_of('/');
-	std::string modelFileDir = modelDir.substr(0, finalIndex); //Get Model File Dir
-	std::string textureDir = modelFileDir + "/textures/";
-	m_material = new SGMaterialPBRWithEmit(textureDir);
 
 	std::function<void(int, int, int, int)> rotateFunc = [=](int key, int scancode, int action, int mode)
 	{
@@ -19,16 +15,9 @@ Renderer::IEntity::IEntity(std::string modelDir)
 
 void Renderer::IEntity::Render(CommonSceneInfo* commonSceneInfo, SGController* controller)
 {
-	//上传当前material
-	m_material->Load();
-	//upload controller
-	controller->LoadToShader(m_material->GetShaderInstance());
-	//上传upload
-	commonSceneInfo->Upload(m_material->GetShaderInstance());
-	//上传transform
-	m_transform->Upload(m_material->GetShaderInstance());
+	m_model->LoadTempRenderData(commonSceneInfo, controller, m_transform);
 	//绘制模型
-	m_model->Draw(m_material->GetShaderInstance());
+	m_model->Draw();
 }
 
 void Renderer::IEntity::SetParent(IEntity* entity)
@@ -41,10 +30,6 @@ void Renderer::IEntity::AddChild(IEntity* child)
 }
 
 void Renderer::IEntity::RemoveChild(IEntity* child)
-{
-}
-
-void Renderer::IEntity::SetMaterial(SGMaterialBase* newMaterial)
 {
 }
 

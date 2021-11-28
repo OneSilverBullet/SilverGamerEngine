@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "BaseGeometry.h"
 #include "Texture2D.h"
+#include "Material.h"
 
 namespace Renderer
 {
@@ -38,6 +39,8 @@ namespace Renderer
 	public:
 		//Load Texture return textureId
 		SGTexture2D* LoadTexture2DResource(SG_TEXTURE_TYPE textureType, std::string path);
+		//Load Default Black Texture
+		SGTexture2D* LoadDefaultBlackTexture2DResource(SG_TEXTURE_TYPE textureType, std::string path);
 
 		//Load Model: Only Process verts
 		void LoadModel(std::string path,  std::vector<Renderer::SGModelMesh>* outMeshes);
@@ -47,11 +50,14 @@ namespace Renderer
 		ResourceLoad() {}
 		ResourceLoad(ResourceLoad&) = delete;
 		ResourceLoad& operator=(const ResourceLoad&) = delete;
-		void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Renderer::SGModelMesh>* outMeshes);
-		Renderer::SGModelMesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
+		//Mesh Process
+		void ProcessNode(aiNode* node, const aiScene* scene, std::vector<Renderer::SGModelMesh>* outMeshes, std::string modelPath);
+		Renderer::SGModelMesh ProcessMesh(aiMesh* mesh, const aiScene* scene, std::string modelPath);
+		//Mesh Submaterial
+		SGMaterialPBRWithEmit* ProcessSubMeshPBRMaterial(std::string modelDir, std::string materialName, std::string materialCoef = "");
+
 
 		static ResourceLoad* m_instance;
-
 		std::map<std::string, SGTexture2D*> m_textures; //key:textureId
 	};
 	

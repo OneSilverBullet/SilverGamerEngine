@@ -132,6 +132,7 @@ void Renderer::SGCameraFirstRole::InitializeCamera()
 	m_forward = glm::normalize(target - m_position);
 	m_up = CAMERA_FIRST_ROLE_DEFAULT_UPDIR;
 	m_rotateSpeed = CAMERA_FIRST_ROLE_DEFAULT_ROTATE_SPEED;
+	m_moveSpeed = CAMERA_FIRST_ROLE_DEFAULT_MOVE_SPEED;
 	m_pitch = 0.0f;
 	m_yaw = 179.0f;
 	UpdateForward();
@@ -192,7 +193,7 @@ void Renderer::SGCameraFirstRole::Move(float xOffset, float yOffset)
 	glm::vec3 rightOffset = xOffset * rightVec;
 	
 	//Update current position
-	m_position = m_position + forwardOffset + rightOffset;
+	m_position = m_position + (forwardOffset + rightOffset) * m_moveSpeed;
 }
 
 

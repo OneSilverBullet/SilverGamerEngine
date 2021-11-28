@@ -4,10 +4,12 @@
 
 //外部库链接:SGSingleton
 #include "SGSingleton.h"
+#include "SGSystem.h"
 #pragma comment(lib,"SGSystemLib.lib") 
 using namespace SilverEngineLib;
 
 
+//Renderer项目链接
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 //#include <GL/glew.h>
@@ -110,6 +112,7 @@ using namespace SilverEngineLib;
 #define CAMERA_FIRST_ROLE_DEFAULT_POSITION glm::vec3(3.0f, 0.0f, 0.0f)
 #define CAMERA_FIRST_ROLE_DEFAULT_UPDIR glm::vec3(0.0f, 1.0f, 0.0f)
 #define CAMERA_FIRST_ROLE_DEFAULT_ROTATE_SPEED 0.3f
+#define CAMERA_FIRST_ROLE_DEFAULT_MOVE_SPEED 0.1f
 
 #define COMMON_SHADER_FILE_DIR "shader/common/"
 #define SHADER_FILE_DIR "shader/"

@@ -17,13 +17,12 @@ namespace Renderer
 		void RegistCameraLogic();
 		void MoveLogic(GLint vKey, GLint vScancode, GLint vAction, GLint vMode); //移动逻辑
 		void RotateLogic(double, double); //转向逻辑
-		void LoadToShader(int shaderProgram); //将当前controller相关信息上传shader
+		void Upload(int shaderProgram); //将当前controller相关信息上传shader
 		SGCameraBase* GetCamera() { return m_camera; }
 
 	private:
 		SGCameraBase* m_camera; //涉及到摄像机
 		GLFWwindow* m_window; //涉及到当前window
-
 	};
 }
 

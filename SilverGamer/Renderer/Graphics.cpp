@@ -66,8 +66,9 @@ void Renderer::SGGraphics::Init()
 	//¼ÓÔØ³¡¾°
 	m_scene = new SGScene();
 	//SGModelBase* modelSphere = new SGModelBase("../Resource/Model/sphere.obj");
-    IEntity* newEntity = new IEntity("../Resource/Model/space-ship/Intergalactic_Spaceship-(Wavefront).obj");
-    newEntity->SetEntityScale(glm::vec3(0.5f));
+    //IEntity* newEntity = new IEntity("../Resource/Model/space-ship/Intergalactic_Spaceship-(Wavefront).obj");
+    IEntity* newEntity = new IEntity("../Resource/Model/crytek-sponza/sponza.obj");
+    newEntity->SetEntityScale(glm::vec3(0.01f));
     //Create GBuffer Shader
     //SGGBufferMaterialPBRWithEmit* gBufferGenShader = new SGGBufferMaterialPBRWithEmit("../Resource/Model/space-ship/textures/");
     //newEntity->SetMaterial(gBufferGenShader); //Change GBuffer Shader of entity
@@ -126,13 +127,17 @@ void Renderer::SGGraphics::Render()
     {
         frameTimer.Start();
 
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //m_scene->Render(m_controller); //Render Virtual Scene
+        
         m_GBuffer->Enable(); //Active GBuffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_scene->Render(m_controller); //Render Virtual Scene
         m_GBuffer->Disable(); //Disable GBuffers
-        //m_defferedQuad->ShowScreenTexture(); //Render Quad
         m_defferedQuad->DefferedRendering(m_controller, m_scene);
         m_subQuad->ShowScreenTexture(); //Show Sub Textures
+        
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_window);
@@ -227,7 +232,7 @@ void Renderer::DefferedQuad::ShowScreenTexture()
     //Update Screen Texture
     SwapScreenTexture();
     //Draw Quad
-    m_quad->Draw(m_shader);
+    m_quad->Draw();
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -236,8 +241,8 @@ void Renderer::DefferedQuad::DefferedRendering(SGController* controller, SGScene
     assert(m_useFullScreen == true);
     glDisable(GL_DEPTH_TEST);
     m_material->Load();
-    controller->LoadToShader(m_material->GetShaderInstance());
+    controller->Upload(m_material->GetShaderInstance());
     scene->UploadStaticLight(m_material->GetShaderInstance());
-    m_quad->Draw(m_material->GetShaderInstance());
+    m_quad->Draw();
     glEnable(GL_DEPTH_TEST);
 }

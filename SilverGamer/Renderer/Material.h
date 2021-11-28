@@ -51,18 +51,26 @@ namespace Renderer
 	class SGMaterialPBRWithEmit : public SGMaterialBase
 	{
 	public:
+		SGMaterialPBRWithEmit();
 		SGMaterialPBRWithEmit(std::string matDir);
 		void Load() override; //装载现在的材质
 		void Unload() override; //卸载现在的材质
 		GLint GetShaderInstance() override { return m_shader; }
 
+		void SetDiffuseTexture2DPtr(SGTexture2D* diffuse) { m_diffuse = diffuse; }
+		void SetNormalTexture2DPtr(SGTexture2D* normal) { m_normal = normal; }
+		void SetRoughnessTexture2DPtr(SGTexture2D* roughness) { m_roughness = roughness; }
+		void SetMetalnessTexture2DPtr(SGTexture2D* metalness) { m_metalness = metalness; }
+		void SetAOTexture2DPtr(SGTexture2D* ao) { m_ao = ao; }
+		void SetEmitTexture2DPtr(SGTexture2D* emit) { m_emit = emit; }
+
 	private:
-		SGTexture2D* m_diffuse; //diffuse color贴图
-		SGTexture2D* m_normal; //normal 贴图
-		SGTexture2D* m_roughness; //粗糙度
-		SGTexture2D* m_emit; //自发光
-		SGTexture2D* m_metalness; //金属度
-		SGTexture2D* m_ao; //ao
+		SGTexture2D* m_diffuse = nullptr; //diffuse color贴图
+		SGTexture2D* m_normal = nullptr; //normal 贴图
+		SGTexture2D* m_roughness = nullptr; //粗糙度
+		SGTexture2D* m_emit = nullptr; //自发光
+		SGTexture2D* m_metalness = nullptr; //金属度
+		SGTexture2D* m_ao = nullptr; //ao
 
 		GLint m_shader; //当前材质下属shader
 	};

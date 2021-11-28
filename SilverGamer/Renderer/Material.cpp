@@ -39,9 +39,16 @@ void Renderer::SGMaterialPhongFlat::Unload()
 Renderer::SGMaterialPhongFlat::SGMaterialPhongFlat()
 	: m_diffuse(glm::vec3(0.7f)), m_specular(glm::vec3(0.3f)), m_shininess(0.03f)
 {
-	m_shader = SGShaderFactory::Instance()->LoadShader("shader_pbr", "shader_pbr"); //加载normal shader
+	m_shader = SGShaderFactory::Instance()->LoadShader("shader_normal", "shader_normal"); //加载normal shader
 }
 
+//Need to load texture2D
+Renderer::SGMaterialPBRWithEmit::SGMaterialPBRWithEmit()
+{
+	m_shader = SGShaderFactory::Instance()->LoadShader("shader_pbr", "shader_gen_gbuffer"); 
+}
+
+//Load Texture2D based on dir
 Renderer::SGMaterialPBRWithEmit::SGMaterialPBRWithEmit(std::string matDir)
 {
 	std::string aoDir = matDir + "ao.jpg";
@@ -58,12 +65,15 @@ Renderer::SGMaterialPBRWithEmit::SGMaterialPBRWithEmit(std::string matDir)
 	m_emit = ResourceLoad::Instance()->LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_EMIT, emitDir);
 	m_roughness = ResourceLoad::Instance()->LoadTexture2DResource(SG_TEXTURE_TYPE::TEXTURE_ROUGHNESS, roughnessDir);
 
+
 	m_shader = SGShaderFactory::Instance()->LoadShader("shader_pbr", "shader_gen_gbuffer"); //加载pbr shader
+	//m_shader = SGShaderFactory::Instance()->LoadShader("shader_normal", "shader_normal"); //加载pbr shader
 }
 
 void Renderer::SGMaterialPBRWithEmit::Load()
 {
 	glUseProgram(m_shader);
+
 	m_diffuse->Upload(m_shader, SG_TEXTURE_ACTIVE_SLOT0);
 	m_normal->Upload(m_shader, SG_TEXTURE_ACTIVE_SLOT1);
 	m_metalness->Upload(m_shader, SG_TEXTURE_ACTIVE_SLOT2);

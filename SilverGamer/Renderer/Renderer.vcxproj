@@ -82,7 +82,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>SGSystemLib.lib;kernel32.lib;user32.lib;assimp-vc142-mtd.lib;opengl32.lib;glfw3.lib;glut.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Core.lib;kernel32.lib;user32.lib;assimp-vc142-mtd.lib;opengl32.lib;glfw3.lib;glut.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glew-2.1.0\lib\Release\Win32;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\glfw-3.3.4.bin.WIN32\lib-vc2019;F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\Renderer\3rdlib\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;LIBCMT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>

@@ -61,8 +61,6 @@ namespace Renderer
 		void AddChild(IEntity* child);
 		//remove Child Entity
 		void RemoveChild(IEntity* child);
-		//change material
-		void SetMaterial(SGMaterialBase* newMaterial);
 		//°ó¶¨¿ØÖÆ
 		void RotateLogic(GLint vKey, GLint vScancode, GLint vAction, GLint vMode); //ÒÆ¶¯Âß¼­
 
@@ -70,7 +68,6 @@ namespace Renderer
 		IEntity* m_parent; 
 		std::vector<IEntity*> m_childs; 
 		SGModelBase* m_model;
-		SGMaterialBase* m_material;
 		SGTransform* m_transform; 
 	};
 }

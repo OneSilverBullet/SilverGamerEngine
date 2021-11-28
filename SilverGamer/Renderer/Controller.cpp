@@ -3,7 +3,7 @@
 
 Renderer::SGController::SGController(GLFWwindow* window) : m_window(window)
 {
-	ChangeCamera(CONTROLLER_CAMERA_TYPE_THIRD_ROLE); //建立第三人称摄像机
+	ChangeCamera(CONTROLLER_CAMERA_TYPE_FIRST_ROLE); //建立第三人称摄像机
 	RegistCameraLogic();
 }
 
@@ -38,16 +38,16 @@ void Renderer::SGController::MoveLogic(GLint vKey, GLint vScancode, GLint vActio
 	int moveX = 0;
 	int moveY = 0;
 
-	if (vKey == GLFW_KEY_W && vAction == GLFW_PRESS) {
+	if (vKey == GLFW_KEY_W && vAction == GLFW_REPEAT) {
 		moveY = 1;
 	}
-	if (vKey == GLFW_KEY_S && vAction == GLFW_PRESS) {
+	if (vKey == GLFW_KEY_S && vAction == GLFW_REPEAT) {
 		moveY = -1;
 	}
-	if (vKey == GLFW_KEY_A && vAction == GLFW_PRESS) {
+	if (vKey == GLFW_KEY_A && vAction == GLFW_REPEAT) {
 		moveX = -1;
 	}
-	if (vKey == GLFW_KEY_D && vAction == GLFW_PRESS) {
+	if (vKey == GLFW_KEY_D && vAction == GLFW_REPEAT) {
 		moveX = 1;
 	}
 
@@ -66,7 +66,7 @@ void Renderer::SGController::RotateLogic(double xPos, double yPos)
 	m_camera->RotateCamera(xRotate, yRotate);
 }
 
-void Renderer::SGController::LoadToShader(int shaderProgram)
+void Renderer::SGController::Upload (int shaderProgram)
 {
 	m_camera->LoadToShader(shaderProgram); 
 }

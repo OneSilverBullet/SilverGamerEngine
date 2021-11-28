@@ -9,9 +9,14 @@
 #include <atlsimpstr.h>
 #include  "MacroLib.h"
 
+namespace SilverEngineLib
+{
 
+	class SG_API SGSystem {
+	public:
+		void SystemOutput();
+		static bool IsFileExist(std::string fileDir);
 
-class SG_API SGSystem {
-public:
-	void SystemOutput();
-};
+	};
+
+}
