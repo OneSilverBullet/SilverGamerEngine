@@ -36,6 +36,9 @@
     <Filter Include="资源文件\common">
       <UniqueIdentifier>{701e37b8-cf5c-4d95-8d51-068b460ee7bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="文件\FrameGraph">
+      <UniqueIdentifier>{013dbb87-079d-45d5-912e-65f686453ed3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp">
@@ -177,6 +180,12 @@
     </ClInclude>
     <ClInclude Include="RenderPass.h">
       <Filter>文件\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameGraph\FrameGraph.h">
+      <Filter>文件\FrameGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameGraph\FrameGraphNode.h">
+      <Filter>文件\FrameGraph</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

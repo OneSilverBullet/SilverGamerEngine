@@ -26,10 +26,11 @@ Daily work and interests will drive me to learn a lot of graphics and engine kno
 * The Entity framework is preliminary.
 * Support PBR, and fast graphics effect switching.
 * Deffered Rendering with PBR.(And SubQuad Rendering)
+* Multi submeshes material loader.
 
 #### recent goals
 
-* Has a relatively complete engine framework. Contains Entity, RenderPass system rendering framework.
+* Frame Graph Render pipeline.
 * Refactor the whole to completely encapsulate GL.
 
 

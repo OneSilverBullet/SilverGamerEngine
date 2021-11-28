@@ -11,12 +11,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SilverGamer", "SilverGamer\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor", "Editor\Editor.vcxproj", "{E19D9258-5A1A-4D09-856F-D6070E0E0239}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SGSystemLib", "SGSystemLib\SGSystemLib.vcxproj", "{839CD445-D375-4AF7-ABC5-5950454F7220}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "SGSystemLib\SGSystemLib.vcxproj", "{839CD445-D375-4AF7-ABC5-5950454F7220}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Renderer", "Renderer\Renderer.vcxproj", "{6610ABC6-7264-4EC4-8ABF-C1177306D7CB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{839CD445-D375-4AF7-ABC5-5950454F7220} = {839CD445-D375-4AF7-ABC5-5950454F7220}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX12Renderer", "DX12Renderer\DX12Renderer.vcxproj", "{5EA3CA9A-F43F-4BDD-A89F-F26B9F55CD83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +60,14 @@ Global
 		{6610ABC6-7264-4EC4-8ABF-C1177306D7CB}.Release|x64.Build.0 = Release|x64
 		{6610ABC6-7264-4EC4-8ABF-C1177306D7CB}.Release|x86.ActiveCfg = Release|Win32
 		{6610ABC6-7264-4EC4-8ABF-C1177306D7CB}.Release|x86.Build.0 = Release|Win32
+		{5EA3CA9A-F43F-4BDD-A89F-F26B9F55CD83}.Debug|x64.ActiveCfg = Debug|x64
+		{5EA3CA9A-F43F-4BDD-A89F-F26B9F55CD83}.Debug|x64.Build.0 = Debug|x64
+		{5EA3CA9A-F43F-4BDD-A89F-F26B9F55CD83}.Debug|x86.ActiveCfg = Debug|Win32
+		{5EA3CA9A-F43F-4BDD-A89F-F26B9F55CD83}.Debug|x86.Build.0 = Debug|Win32
+		{5EA3CA9A-F43F-4BDD-A89F-F26B9F55CD83}.Release|x64.ActiveCfg = Release|x64
+		{5EA3CA9A-F43F-4BDD-A89F-F26B9F55CD83}.Release|x64.Build.0 = Release|x64
+		{5EA3CA9A-F43F-4BDD-A89F-F26B9F55CD83}.Release|x86.ActiveCfg = Release|Win32
+		{5EA3CA9A-F43F-4BDD-A89F-F26B9F55CD83}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

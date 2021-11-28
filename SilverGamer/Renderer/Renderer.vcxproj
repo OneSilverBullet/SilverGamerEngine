@@ -162,6 +162,8 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="FrameGraph\FrameGraph.h" />
+    <ClInclude Include="FrameGraph\FrameGraphNode.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Light.h" />
