@@ -35,6 +35,8 @@ public:
 	D3D12_COMMAND_QUEUE_FLAGS GetQueueFlags();
 	ID3D12CommandQueue* GetCommandQueue();
 
+	Device* GetBindDevice();
+
 	//Functions
 	void ExecuteCommandList(CommandList commandList);
 	void ExecuteCommandLists(std::vector<CommandList> commandListArray);
@@ -53,10 +55,19 @@ private:
 class ApplicationConfig
 {
 public:
-
-
+	void LoadFromConfigFile(); //Load App Information From File
+	std::wstring GetMainWndCaption() { return mainWndCaption; }
+	int GetWidth() { return m_clientWidth; }
+	int GetHeight() { return m_clientHeight; }
+	int GetNumerator() { return m_numerator; }
+	int GetDenominator() { return m_denominator; }
+	float GetAspectRatio(){return  static_cast<float>(m_clientWidth) / m_clientHeight; }
 private:
-
+	int m_clientWidth = 1280;
+	int m_clientHeight = 720;
+	int m_numerator = 60;
+	int m_denominator = 1;
+	std::wstring mainWndCaption = L"SilverGamer";
 
 };
 
@@ -66,16 +77,28 @@ private:
 class SwapChain
 {
 public:
-	SwapChain();
+	SwapChain(CommandQueue* cq, ApplicationConfig config, HWND bindWnd);
+
+	ID3D12Resource* GetCurrentChainBuffer();
+	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const;
+	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
 
 private:
-	void CreateSwapChain();
-
+	void CreateSwapChain(CommandQueue* cq, ApplicationConfig config, HWND bindWnd);
+	void CreateRTVDSV();
 
 private:
+	CommandQueue* m_bindCommandQueue;
+	HWND m_bindWnd; 
+	bool m_msaaFlag = true;
+
 	static const int m_buffersCount = 2;
 	int m_currentBackBuffer = 0;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
+
+	DXGI_FORMAT m_backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	DXGI_FORMAT m_depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_swapChainResource[m_buffersCount];
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_depthStencilBuffer;

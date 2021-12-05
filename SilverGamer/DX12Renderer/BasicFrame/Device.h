@@ -1,16 +1,19 @@
 #ifndef SG_DEVICE
 #define SG_DEVICE
 
-#include "Common/d3dUtil.h"
+#include "../Common/d3dUtil.h"
 
 class Device
 {
 public:
 	Device(D3D_FEATURE_LEVEL featureLevel);
 	ID3D12Device* GetDevice() { return m_device.Get(); }
-	
+	IDXGIFactory4* GetFactory() { return m_dxgi.Get(); }
+	INT CheckMSAAQualityLevel(DXGI_FORMAT);
+
 private:
 	HRESULT CreateDevice();
+	
 
 private:
 	bool m_isDebug = true;

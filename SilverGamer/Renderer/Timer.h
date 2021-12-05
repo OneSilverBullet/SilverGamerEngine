@@ -1,3 +1,6 @@
+#include "..\SGSystemLib\SGSystem.h"
+#include "..\SGSystemLib\SGSystem.h"
+#include "..\SGSystemLib\SGSystem.h"
 #ifndef SG_TIMER
 #define SG_TIMER
 
@@ -9,6 +12,7 @@ namespace Renderer
 	{
 	public:
 		SGTimer() {}
+
 		double GetDeltaTime() { return m_deltaTime; }
 		void Start();
 		void Stop();
