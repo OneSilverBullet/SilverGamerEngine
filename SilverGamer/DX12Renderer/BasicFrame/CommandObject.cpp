@@ -114,6 +114,9 @@ SwapChain::SwapChain(CommandQueue* cq, ApplicationConfig config, HWND wnd)
 {
 	CreateSwapChain(cq, config, wnd);
 	CreateRTVDSV();
+	//Get The RTV and DSV size
+	m_dsvDescriptorNum = m_bindCommandQueue->GetBindDevice()->GetDescriptorHandleIncSizeDSV();
+	m_rtvDescriptorNum = m_bindCommandQueue->GetBindDevice()->GetDescriptorHandleIncSizeRTV();
 }
 
 ID3D12Resource* SwapChain::GetCurrentChainBuffer()
@@ -137,8 +140,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE SwapChain::DepthStencilView() const
 	return m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
 }
 
-
-
+//Create Swap Chain
 void SwapChain::CreateSwapChain(CommandQueue* cq, ApplicationConfig config, HWND bindWnd)
 {
 	m_swapChain.Reset();
@@ -159,7 +161,7 @@ void SwapChain::CreateSwapChain(CommandQueue* cq, ApplicationConfig config, HWND
 	swapChainDesc.Windowed = true;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	cq->GetBindDevice()->GetFactory()->CreateSwapChain(
+	GetBindFactory()->CreateSwapChain(
 		cq->GetCommandQueue(), &swapChainDesc, m_swapChain.GetAddressOf()
 	);
 }
@@ -172,7 +174,7 @@ void SwapChain::CreateRTVDSV()
 	rtvHeadDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	rtvHeadDesc.NodeMask = 0;
 	ThrowIfFailed(
-		m_bindCommandQueue->GetBindDevice()->GetDevice()->CreateDescriptorHeap(
+		GetBindDevice()->CreateDescriptorHeap(
 			&rtvHeadDesc, IID_PPV_ARGS(m_rtvHeap.GetAddressOf())
 		)
 	);
@@ -183,9 +185,19 @@ void SwapChain::CreateRTVDSV()
 	dsvHeadDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	dsvHeadDesc.NodeMask = 0;
 	ThrowIfFailed(
-		m_bindCommandQueue->GetBindDevice()->GetDevice()->CreateDescriptorHeap(
+		GetBindDevice()->CreateDescriptorHeap(
 			&dsvHeadDesc, IID_PPV_ARGS(m_dsvHeap.GetAddressOf())
 		)
 	);
+}
+
+ID3D12Device* SwapChain::GetBindDevice()
+{
+	return m_bindCommandQueue->GetBindDevice()->GetDevice();
+}
+
+IDXGIFactory4* SwapChain::GetBindFactory()
+{
+	return m_bindCommandQueue->GetBindDevice()->GetFactory();
 }
 

@@ -51,6 +51,16 @@ bool IApplication::InitMainWindow()
 	return true;
 }
 
+bool IApplication::InitGraphics()
+{
+	m_device = new Device(D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_0);
+	m_device->CreateFence(m_fence);
+	m_commandQueue = new CommandQueue(m_device);
+	m_commandList = new CommandList(m_device);
+	m_swapChain = new SwapChain(m_commandQueue, m_appConfig, m_mainWnd);
+	return false;
+}
+
 //Frame Calculate
 void IApplication::FrameCalculate()
 {

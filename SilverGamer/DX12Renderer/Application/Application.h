@@ -34,6 +34,7 @@ protected:
 
 protected:
 	bool InitMainWindow();
+	bool InitGraphics(); 
 	void FrameCalculate();
 
 
@@ -51,6 +52,9 @@ protected:
 	CommandQueue* m_commandQueue;
 	CommandList* m_commandList;
 	ApplicationConfig m_appConfig;
+	Microsoft::WRL::ComPtr<ID3D12Fence> m_fence; 
+
+
 };
 
 

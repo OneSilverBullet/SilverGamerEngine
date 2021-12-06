@@ -86,7 +86,8 @@ public:
 private:
 	void CreateSwapChain(CommandQueue* cq, ApplicationConfig config, HWND bindWnd);
 	void CreateRTVDSV();
-
+	ID3D12Device* GetBindDevice();
+	IDXGIFactory4* GetBindFactory();
 private:
 	CommandQueue* m_bindCommandQueue;
 	HWND m_bindWnd; 

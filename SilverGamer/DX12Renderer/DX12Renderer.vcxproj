@@ -19,22 +19,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CommandObject.cpp" />
+    <ClCompile Include="Application\Application.cpp" />
+    <ClCompile Include="Application\Graphics.cpp" />
+    <ClCompile Include="BasicFrame\CommandObject.cpp" />
+    <ClCompile Include="BasicFrame\Device.cpp" />
+    <ClCompile Include="BasicFrame\UploadBuffer.cpp" />
     <ClCompile Include="Common\d3dApp.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
-    <ClCompile Include="Device.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="UploadBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CommandObject.h" />
+    <ClInclude Include="Application\Application.h" />
+    <ClInclude Include="Application\ApplicationConfig.h" />
+    <ClInclude Include="Application\Graphics.h" />
+    <ClInclude Include="BasicFrame\CommandObject.h" />
+    <ClInclude Include="BasicFrame\Device.h" />
+    <ClInclude Include="BasicFrame\UploadBuffer.h" />
     <ClInclude Include="Common\d3dApp.h" />
     <ClInclude Include="Common\d3dUtil.h" />
     <ClInclude Include="Common\d3dx12.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
-    <ClInclude Include="Device.h" />
-    <ClInclude Include="UploadBuffer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -90,6 +95,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>../SGSystemLib/;$(IncludePath)</IncludePath>
+    <LibraryPath>../EngineLib/;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -110,6 +117,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

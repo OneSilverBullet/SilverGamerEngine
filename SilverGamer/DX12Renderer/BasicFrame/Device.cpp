@@ -55,6 +55,12 @@ INT Device::CheckMSAAQualityLevel(DXGI_FORMAT backBufferFormat)
 	return msQualityLevels.NumQualityLevels;
 }
 
+//
+void Device::CreateFence(Microsoft::WRL::ComPtr<ID3D12Fence>& outFence, int initialize)
+{
+	ThrowIfFailed(m_device->CreateFence(initialize, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&outFence)));
+}
+
 void Device::LogAdapters()
 {
 	//Loop Adapters
@@ -80,6 +86,24 @@ void Device::LogAdapters()
 		LogAdapterOutputs(adapterList[i]);
 		ReleaseCom(adapterList[i]);
 	}
+}
+
+//Get RTV Descriptor Size
+UINT Device::GetDescriptorHandleIncSizeRTV()
+{
+	return m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+}
+
+//Get DSV Descriptor Size
+UINT Device::GetDescriptorHandleIncSizeDSV()
+{
+	return m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+}
+
+//Get CSU Descriptor Size
+UINT Device::GetDescriptorHandleIncSizeCSU()
+{
+	return m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 void Device::LogAdapterOutputs(IDXGIAdapter* adapter)
