@@ -11,6 +11,8 @@ namespace SilverEngineLib
 
 struct ApplicationState
 {
+	int m_clientWidth = 1280;
+	int m_clientHeigh = 720;
 	bool m_applicationPaused = false;
 	bool m_minimized = false;
 	bool m_maximized = false;
@@ -36,7 +38,8 @@ protected:
 	bool InitMainWindow();
 	bool InitGraphics(); 
 	void FrameCalculate();
-
+	void FlushCommandQueue();
+	
 
 	static IApplication* m_instance;
 
@@ -45,15 +48,13 @@ protected:
 	HWND m_mainWnd;
 
 	ApplicationState m_state;
-
 	SilverEngineLib::SGGeneralTimer m_timer;
 	Device* m_device;
 	SwapChain* m_swapChain;
 	CommandQueue* m_commandQueue;
 	CommandList* m_commandList;
 	ApplicationConfig m_appConfig;
-	Microsoft::WRL::ComPtr<ID3D12Fence> m_fence; 
-
+	Fence* m_fence;
 
 };
 

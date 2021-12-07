@@ -201,3 +201,31 @@ IDXGIFactory4* SwapChain::GetBindFactory()
 	return m_bindCommandQueue->GetBindDevice()->GetFactory();
 }
 
+/*
+* Fence
+*/
+Fence::Fence(CommandQueue* commandQueue)
+{
+	assert(commandQueue != nullptr);
+	BindCommandQueue(commandQueue);
+	commandQueue->GetBindDevice()->CreateFence(m_fenceInstance);
+}
+
+void Fence::BindCommandQueue(CommandQueue* commandQueue)
+{
+	m_bindQueue = commandQueue;
+}
+
+void Fence::FlushCommandQueue()
+{
+	assert(m_bindQueue != nullptr);
+
+	m_bindQueue->Signal(m_fenceInstance.Get(), m_currentFence);
+	if (m_fenceInstance->GetCompletedValue() < m_currentFence)
+	{
+		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+		ThrowIfFailed(m_fenceInstance->SetEventOnCompletion(m_currentFence, eventHandle));
+		WaitForSingleObject(eventHandle, INFINITE);
+		CloseHandle(eventHandle);
+	}
+}

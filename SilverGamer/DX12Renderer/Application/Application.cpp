@@ -54,9 +54,9 @@ bool IApplication::InitMainWindow()
 bool IApplication::InitGraphics()
 {
 	m_device = new Device(D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_0);
-	m_device->CreateFence(m_fence);
 	m_commandQueue = new CommandQueue(m_device);
 	m_commandList = new CommandList(m_device);
+	m_fence = new Fence(m_commandQueue); //Bind a fence to the commandQueue.
 	m_swapChain = new SwapChain(m_commandQueue, m_appConfig, m_mainWnd);
 	return false;
 }
@@ -85,8 +85,35 @@ void IApplication::FrameCalculate()
 	}
 }
 
+void IApplication::FlushCommandQueue()
+{
+
+}
+
 LRESULT IApplication::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	switch (msg)
+	{
+	//Current Window Active Information
+	case WM_ACTIVATE:
+		if (LOWORD(wParam) == WA_INACTIVE) {
+			m_state.m_applicationPaused = true;
+			m_timer.Stop(); 
+		}
+		else {
+			m_state.m_applicationPaused = false;
+			m_timer.Start();
+		}
+		return;
+
+	//Window Size Information
+	case WM_SIZE:
+		m_state.
+
+
+
+	}
+
 	return LRESULT();
 }
 

@@ -112,4 +112,20 @@ private:
 };
 
 
+/*
+* Fence
+*/
+class Fence
+{
+public:
+	Fence(CommandQueue* commandQueue);
+	void BindCommandQueue(CommandQueue* commandQueue);
+	void FlushCommandQueue();
+
+private:
+	CommandQueue* m_bindQueue;
+	UINT64 m_currentFence = 0;
+	Microsoft::WRL::ComPtr<ID3D12Fence> m_fenceInstance;
+};
+
 #endif

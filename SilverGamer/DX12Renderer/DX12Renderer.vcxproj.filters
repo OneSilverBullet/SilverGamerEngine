@@ -32,14 +32,20 @@
     <ClCompile Include="Common\DDSTextureLoader.cpp">
       <Filter>文件\Common</Filter>
     </ClCompile>
-    <ClCompile Include="UploadBuffer.cpp">
+    <ClCompile Include="BasicFrame\CommandObject.cpp">
       <Filter>文件\Basic</Filter>
     </ClCompile>
-    <ClCompile Include="Device.cpp">
+    <ClCompile Include="BasicFrame\Device.cpp">
       <Filter>文件\Basic</Filter>
     </ClCompile>
-    <ClCompile Include="CommandObject.cpp">
+    <ClCompile Include="BasicFrame\UploadBuffer.cpp">
       <Filter>文件\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Application.cpp">
+      <Filter>文件\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\Graphics.cpp">
+      <Filter>文件\Application</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -55,14 +61,23 @@
     <ClInclude Include="Common\DDSTextureLoader.h">
       <Filter>文件\Common</Filter>
     </ClInclude>
-    <ClInclude Include="UploadBuffer.h">
+    <ClInclude Include="BasicFrame\CommandObject.h">
       <Filter>文件\Basic</Filter>
     </ClInclude>
-    <ClInclude Include="Device.h">
+    <ClInclude Include="BasicFrame\Device.h">
       <Filter>文件\Basic</Filter>
     </ClInclude>
-    <ClInclude Include="CommandObject.h">
+    <ClInclude Include="BasicFrame\UploadBuffer.h">
       <Filter>文件\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Application.h">
+      <Filter>文件\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\ApplicationConfig.h">
+      <Filter>文件\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Graphics.h">
+      <Filter>文件\Application</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
