@@ -33,13 +33,17 @@ public:
 protected:
 	virtual void Update(const SilverEngineLib::SGGeneralTimer& timer) = 0;
 	virtual void Render(const SilverEngineLib::SGGeneralTimer& timer) = 0;
+	// Convenience overrides for handling mouse input.
+	virtual void OnMouseDown(WPARAM btnState, int x, int y) { }
+	virtual void OnMouseUp(WPARAM btnState, int x, int y) { }
+	virtual void OnMouseMove(WPARAM btnState, int x, int y) { }
+
 
 protected:
 	bool InitMainWindow();
 	bool InitGraphics(); 
 	void FrameCalculate();
-	void FlushCommandQueue();
-	
+	void OnResize(); //The Size changed function
 
 	static IApplication* m_instance;
 
@@ -49,6 +53,9 @@ protected:
 
 	ApplicationState m_state;
 	SilverEngineLib::SGGeneralTimer m_timer;
+	D3D12_VIEWPORT m_screenViewport;
+	D3D12_RECT m_scissorRect;
+
 	Device* m_device;
 	SwapChain* m_swapChain;
 	CommandQueue* m_commandQueue;

@@ -83,9 +83,10 @@ Device* CommandQueue::GetBindDevice()
 	return m_bindDevice;
 }
 
-void CommandQueue::ExecuteCommandList(CommandList commandList)
+void CommandQueue::ExecuteCommandList(CommandList* commandList)
 {
-	ID3D12CommandList* commandListArrayPtr[] = { commandList.GetCommandList() };
+	commandList->Close();
+	ID3D12CommandList* commandListArrayPtr[] = { commandList->GetCommandList() };
 	m_commandQueue->ExecuteCommandLists(_countof(commandListArrayPtr), commandListArrayPtr);
 }
 
@@ -138,6 +139,77 @@ D3D12_CPU_DESCRIPTOR_HANDLE SwapChain::DepthStencilView() const
 {
 	//return dsv heap
 	return m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
+}
+
+void SwapChain::Reset()
+{
+	for (int i = 0; i < m_buffersCount; ++i)
+	{
+		m_swapChainResource[i].Reset();
+	}
+	m_depthStencilBuffer.Reset();
+}
+
+void SwapChain::Resize(int clientWidth, int clientHeight, CommandList* bindCommandList)
+{
+	ThrowIfFailed(m_swapChain->ResizeBuffers(
+		m_buffersCount,
+		clientWidth, clientHeight,
+		m_backBufferFormat,
+		DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
+	m_currentBackBuffer = 0; //reset
+
+	//Create RTVs
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandl(m_rtvHeap->GetCPUDescriptorHandleForHeapStart());
+	for (int i = 0; i < m_rtvDescriptorNum; ++i)
+	{
+		ThrowIfFailed(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&m_swapChainResource[i])));
+		GetBindDevice()->CreateRenderTargetView(m_swapChainResource[i].Get(), nullptr, rtvHeapHandl);
+		rtvHeapHandl.Offset(1, GetBindDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+	}
+
+	//Check MSAA Quality
+	INT msaaQuality = m_bindCommandQueue->GetBindDevice()->CheckMSAAQualityLevel(m_backBufferFormat);
+	
+	//Create Depth Stencil Desc
+	D3D12_RESOURCE_DESC depthStencilDesc;
+	depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	depthStencilDesc.Alignment = 0;
+	depthStencilDesc.Width = clientWidth;
+	depthStencilDesc.Height = clientHeight;
+	depthStencilDesc.DepthOrArraySize = 1;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+	depthStencilDesc.SampleDesc.Count = m_msaaFlag ? 4 : 1;
+	depthStencilDesc.SampleDesc.Count = m_msaaFlag ? (msaaQuality - 1) : 0;
+	depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_CLEAR_VALUE optClear;
+	optClear.Format = m_depthStencilFormat;
+	optClear.DepthStencil.Depth = 1.0f;
+	optClear.DepthStencil.Stencil = 0;
+	ThrowIfFailed(GetBindDevice()->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		D3D12_HEAP_FLAG_NONE,
+		&depthStencilDesc,
+		D3D12_RESOURCE_STATE_COMMON,
+		&optClear,
+		IID_PPV_ARGS(m_depthStencilBuffer.GetAddressOf())));
+
+	//Create Descriptor to mip 0 of depth stencil resource
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Format = m_depthStencilFormat;
+	dsvDesc.Texture2D.MipSlice = 0;
+	GetBindDevice()->CreateDepthStencilView(m_depthStencilBuffer.Get(), &dsvDesc, DepthStencilView());
+
+	bindCommandList->GetCommandList()->ResourceBarrier(
+		1, &CD3DX12_RESOURCE_BARRIER::Transition(
+			m_depthStencilBuffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+
+	m_bindCommandQueue->ExecuteCommandList(bindCommandList);
 }
 
 //Create Swap Chain

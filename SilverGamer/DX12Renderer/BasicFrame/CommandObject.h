@@ -38,7 +38,7 @@ public:
 	Device* GetBindDevice();
 
 	//Functions
-	void ExecuteCommandList(CommandList commandList);
+	void ExecuteCommandList(CommandList* commandList);
 	void ExecuteCommandLists(std::vector<CommandList> commandListArray);
 	void Signal(ID3D12Fence* fence, UINT64 currentFence);
 
@@ -82,6 +82,8 @@ public:
 	ID3D12Resource* GetCurrentChainBuffer();
 	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const;
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
+	void Reset(); 
+	void Resize(int clientWidth, int clientHeight, CommandList* bindCmd);
 
 private:
 	void CreateSwapChain(CommandQueue* cq, ApplicationConfig config, HWND bindWnd);
@@ -99,7 +101,6 @@ private:
 
 	DXGI_FORMAT m_backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	DXGI_FORMAT m_depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_swapChainResource[m_buffersCount];
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_depthStencilBuffer;
