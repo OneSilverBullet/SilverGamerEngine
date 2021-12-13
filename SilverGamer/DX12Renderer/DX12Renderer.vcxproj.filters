@@ -18,6 +18,9 @@
     <Filter Include="文件\Application">
       <UniqueIdentifier>{1611973a-0cd1-4f17-afeb-8e0041b15186}</UniqueIdentifier>
     </Filter>
+    <Filter Include="文件\Engine">
+      <UniqueIdentifier>{d942cbef-419f-4c6e-9be5-2dd8579f22d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -46,6 +49,21 @@
     </ClCompile>
     <ClCompile Include="Application\Graphics.cpp">
       <Filter>文件\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\GeometryBase.cpp">
+      <Filter>文件\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\MathHelper.cpp">
+      <Filter>文件\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicFrame\DescriptorManager.cpp">
+      <Filter>文件\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicFrame\PSO.cpp">
+      <Filter>文件\Basic</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicFrame\Shader.cpp">
+      <Filter>文件\Basic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +96,21 @@
     </ClInclude>
     <ClInclude Include="Application\Graphics.h">
       <Filter>文件\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\GeometryBase.h">
+      <Filter>文件\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MathHelper.h">
+      <Filter>文件\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicFrame\DescriptorManager.h">
+      <Filter>文件\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicFrame\PSO.h">
+      <Filter>文件\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicFrame\Shader.h">
+      <Filter>文件\Basic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
