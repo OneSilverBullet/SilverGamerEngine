@@ -11,7 +11,12 @@ class Shader
 {
 public:
 	Shader();
-
+	void* GetVertexShaderBuffer();
+	UINT GetVertexShaderBufferSize();
+	void* GetPixelShaderBuffer();
+	UINT GetPixelShaderBufferSize();
+	D3D12_INPUT_ELEMENT_DESC* GetInputLayoutData();
+	UINT GetInputLayoutNum();
 
 
 private:
@@ -40,23 +45,6 @@ private:
 
 
 
-
-class PSO
-{
-public:
-
-
-
-private:
-
-
-	bool m_isDebug = true;
-	int m_MSAASampleCounter = 4;
-	int m_MSAAQualityNum = 0;
-	D3D_FEATURE_LEVEL m_featureLevel = D3D_FEATURE_LEVEL_11_0;
-	Microsoft::WRL::ComPtr<ID3D12Device> m_device;
-	Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgi;
-};
 
 
 #endif

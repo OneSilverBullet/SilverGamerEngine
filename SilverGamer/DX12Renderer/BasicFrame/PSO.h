@@ -2,26 +2,20 @@
 #define SG_PSO
 
 #include "../Common/d3dUtil.h"
-
-
+#include "Shader.h"
+#include "CommandObject.h"
 
 class PSO
 {
 public:
-
-
-
-
+	PSO(Device* bindDevice, SwapChain* swapChain, Shader* shader, bool msaaFlag = true);
+	ID3D12PipelineState* GetPSO() { return m_pipelineStateObject.Get(); }
 
 private:
-	
-	
-	bool m_isDebug = true;
-	int m_MSAASampleCounter = 4;
-	int m_MSAAQualityNum = 0;
-	D3D_FEATURE_LEVEL m_featureLevel = D3D_FEATURE_LEVEL_11_0;
-	Microsoft::WRL::ComPtr<ID3D12Device> m_device;
-	Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgi; 
+	SwapChain* m_bindSwapChain;
+	Device* m_bindDevice;
+	Shader* m_bindShader;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> m_pipelineStateObject = nullptr;
 };
 
 

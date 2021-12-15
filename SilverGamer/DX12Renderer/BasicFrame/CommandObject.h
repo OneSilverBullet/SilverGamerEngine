@@ -10,10 +10,12 @@ class CommandList
 public:
 	CommandList(Device* currentDevice, D3D12_COMMAND_LIST_TYPE value = D3D12_COMMAND_LIST_TYPE_DIRECT);
 	ID3D12GraphicsCommandList* GetCommandList();
+	ID3D12CommandAllocator* GetCommandAllocator();
 	D3D12_COMMAND_LIST_TYPE GetCommandListType();
 	//Function
 	void Close();
 	void Reset();
+	void Reset(ID3D12PipelineState* pso);
 
 private:
 	Device* m_bindDevice;
@@ -84,6 +86,9 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
 	void Reset(); 
 	void Resize(int clientWidth, int clientHeight, CommandList* bindCmd);
+	DXGI_FORMAT GetBackBufferFormat() { return m_backBufferFormat; }
+	DXGI_FORMAT GetDepthBufferFormat() { return m_depthStencilFormat; }
+
 
 private:
 	void CreateSwapChain(CommandQueue* cq, ApplicationConfig config, HWND bindWnd);

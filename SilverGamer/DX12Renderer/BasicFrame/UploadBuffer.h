@@ -24,6 +24,12 @@ private:
 };
 
 
+class ConstantBuffer
+{
+
+};
+
+
 
 
 #endif

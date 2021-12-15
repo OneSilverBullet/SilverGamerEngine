@@ -30,6 +30,11 @@ ID3D12GraphicsCommandList* CommandList::GetCommandList()
 	return m_commandList.Get();
 }
 
+ID3D12CommandAllocator* CommandList::GetCommandAllocator()
+{
+	return m_commandAllocator.Get();
+}
+
 D3D12_COMMAND_LIST_TYPE CommandList::GetCommandListType()
 {
 	return m_commandListType;
@@ -43,6 +48,11 @@ void CommandList::Close()
 void CommandList::Reset()
 {
 	m_commandList->Reset(m_commandAllocator.Get(), nullptr);
+}
+
+void CommandList::Reset(ID3D12PipelineState* pso)
+{
+	m_commandList->Reset(m_commandAllocator.Get(), pso);
 }
 
 /*

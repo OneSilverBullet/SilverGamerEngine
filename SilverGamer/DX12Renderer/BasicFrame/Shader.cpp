@@ -1,7 +1,5 @@
 #include "Shader.h"
 
-
-
 /*
 * Shader
 */
@@ -17,7 +15,35 @@ Shader::Shader()
 	};
 }
 
+void* Shader::GetVertexShaderBuffer()
+{
+	return m_vsByteCode->GetBufferPointer();
+}
 
+UINT Shader::GetVertexShaderBufferSize()
+{
+	return m_vsByteCode->GetBufferSize();
+}
+
+void* Shader::GetPixelShaderBuffer()
+{
+	return m_psByteCode->GetBufferPointer();
+}
+
+UINT Shader::GetPixelShaderBufferSize()
+{
+	return m_psByteCode->GetBufferSize();
+}
+
+D3D12_INPUT_ELEMENT_DESC* Shader::GetInputLayoutData()
+{
+	return m_inputLayout.data();
+}
+
+UINT Shader::GetInputLayoutNum()
+{
+	return (UINT)m_inputLayout.size();
+}
 
 /*
 * RootSignature
