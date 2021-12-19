@@ -26,9 +26,6 @@
     <ClCompile Include="main.cpp">
       <Filter>文件</Filter>
     </ClCompile>
-    <ClCompile Include="Common\d3dApp.cpp">
-      <Filter>文件\Common</Filter>
-    </ClCompile>
     <ClCompile Include="Common\d3dUtil.cpp">
       <Filter>文件\Common</Filter>
     </ClCompile>
@@ -65,11 +62,14 @@
     <ClCompile Include="BasicFrame\Shader.cpp">
       <Filter>文件\Basic</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Camera.cpp">
+      <Filter>文件\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\BoxApplication.cpp">
+      <Filter>文件\Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common\d3dApp.h">
-      <Filter>文件\Common</Filter>
-    </ClInclude>
     <ClInclude Include="Common\d3dUtil.h">
       <Filter>文件\Common</Filter>
     </ClInclude>
@@ -111,6 +111,12 @@
     </ClInclude>
     <ClInclude Include="BasicFrame\Shader.h">
       <Filter>文件\Basic</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Camera.h">
+      <Filter>文件\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\BoxApplication.h">
+      <Filter>文件\Application</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

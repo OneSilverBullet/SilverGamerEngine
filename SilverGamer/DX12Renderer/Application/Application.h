@@ -18,6 +18,9 @@ struct ApplicationState
 	bool m_maximized = false;
 	bool m_resizing = false;
 	bool m_fullScreenState = false;
+
+	float AspectRatio() { return (float)m_clientWidth / (float)m_clientHeigh; }
+
 };
 
 //Basic Application Class
@@ -25,12 +28,15 @@ class IApplication
 {
 public:
 	virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
+	IApplication(HINSTANCE hInstance);
+	virtual ~IApplication();
 	int Run();
 	static IApplication* Instance();
 
 
 protected:
+
+	virtual bool Initialize();
 	virtual void Update(const SilverEngineLib::SGGeneralTimer& timer) = 0;
 	virtual void Render(const SilverEngineLib::SGGeneralTimer& timer) = 0;
 	// Convenience overrides for handling mouse input.
@@ -43,7 +49,7 @@ protected:
 	bool InitMainWindow();
 	bool InitGraphics(); 
 	void FrameCalculate();
-	void OnResize(); //The Size changed function
+	virtual void OnResize(); //The Size changed function
 
 	static IApplication* m_instance;
 

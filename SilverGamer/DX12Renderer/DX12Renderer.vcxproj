@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application\Application.cpp" />
+    <ClCompile Include="Application\BoxApplication.cpp" />
     <ClCompile Include="Application\Graphics.cpp" />
     <ClCompile Include="BasicFrame\CommandObject.cpp" />
     <ClCompile Include="BasicFrame\DescriptorManager.cpp" />
@@ -27,16 +28,17 @@
     <ClCompile Include="BasicFrame\PSO.cpp" />
     <ClCompile Include="BasicFrame\Shader.cpp" />
     <ClCompile Include="BasicFrame\UploadBuffer.cpp" />
-    <ClCompile Include="Common\d3dApp.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
+    <ClCompile Include="Engine\Camera.cpp" />
     <ClCompile Include="Engine\GeometryBase.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Application.h" />
     <ClInclude Include="Application\ApplicationConfig.h" />
+    <ClInclude Include="Application\BoxApplication.h" />
     <ClInclude Include="Application\Graphics.h" />
     <ClInclude Include="BasicFrame\CommandObject.h" />
     <ClInclude Include="BasicFrame\DescriptorManager.h" />
@@ -44,11 +46,11 @@
     <ClInclude Include="BasicFrame\PSO.h" />
     <ClInclude Include="BasicFrame\Shader.h" />
     <ClInclude Include="BasicFrame\UploadBuffer.h" />
-    <ClInclude Include="Common\d3dApp.h" />
     <ClInclude Include="Common\d3dUtil.h" />
     <ClInclude Include="Common\d3dx12.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\MathHelper.h" />
+    <ClInclude Include="Engine\Camera.h" />
     <ClInclude Include="Engine\GeometryBase.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -113,6 +115,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\SGSystemLib;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\CGProjection\SilverGameEngine\SilverGamerEngine\SilverGamer\EngineLib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -150,12 +154,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -26,16 +26,10 @@
     <ClInclude Include="SGSynchronize.h">
       <Filter>文件</Filter>
     </ClInclude>
-    <ClInclude Include="Reflection\Reflection.h">
-      <Filter>文件\Reflection</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SGSystem.cpp">
       <Filter>文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Reflection\Reflection.cpp">
-      <Filter>文件\Reflection</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

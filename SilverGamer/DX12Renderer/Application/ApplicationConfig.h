@@ -8,8 +8,7 @@
 //Õ‚≤øø‚¡¥Ω”:SGSingleton
 #include "SGSingleton.h"
 #include "SGSystem.h"
-#pragma comment(lib,"SGSystemLib.lib") 
+#pragma comment(lib,"Core.lib") 
 
 
-
-
+#define PI 3.1415926535

@@ -52,7 +52,8 @@ void CommandList::Reset()
 
 void CommandList::Reset(ID3D12PipelineState* pso)
 {
-	m_commandList->Reset(m_commandAllocator.Get(), pso);
+	ThrowIfFailed(m_commandAllocator->Reset());
+	ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), pso));
 }
 
 /*
@@ -120,8 +121,8 @@ void CommandQueue::Signal(ID3D12Fence* fence, UINT64 currentFence)
 /*
 * SwapChain
 */
-SwapChain::SwapChain(CommandQueue* cq, ApplicationConfig config, HWND wnd)
-	: m_bindCommandQueue(cq), m_bindWnd(wnd)
+SwapChain::SwapChain(CommandQueue* cq, Device* device, ApplicationConfig config, HWND wnd)
+	: m_bindCommandQueue(cq), m_bindWnd(wnd), m_bindDevice(device)
 {
 	CreateSwapChain(cq, config, wnd);
 	CreateRTVDSV();
@@ -171,7 +172,7 @@ void SwapChain::Resize(int clientWidth, int clientHeight, CommandList* bindComma
 
 	//Create RTVs
 	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandl(m_rtvHeap->GetCPUDescriptorHandleForHeapStart());
-	for (int i = 0; i < m_rtvDescriptorNum; ++i)
+	for (UINT i = 0; i < m_buffersCount; ++i)
 	{
 		ThrowIfFailed(m_swapChain->GetBuffer(i, IID_PPV_ARGS(&m_swapChainResource[i])));
 		GetBindDevice()->CreateRenderTargetView(m_swapChainResource[i].Get(), nullptr, rtvHeapHandl);
@@ -190,8 +191,8 @@ void SwapChain::Resize(int clientWidth, int clientHeight, CommandList* bindComma
 	depthStencilDesc.DepthOrArraySize = 1;
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-	depthStencilDesc.SampleDesc.Count = m_msaaFlag ? 4 : 1;
-	depthStencilDesc.SampleDesc.Count = m_msaaFlag ? (msaaQuality - 1) : 0;
+	depthStencilDesc.SampleDesc.Count = 1; //m_msaaFlag ? 4 : 1;
+	depthStencilDesc.SampleDesc.Quality = 0; //m_msaaFlag ? (msaaQuality - 1) : 0;
 	depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
@@ -222,11 +223,22 @@ void SwapChain::Resize(int clientWidth, int clientHeight, CommandList* bindComma
 	m_bindCommandQueue->ExecuteCommandList(bindCommandList);
 }
 
+void SwapChain::Present(UINT SyncInterval, UINT Flags)
+{
+	m_swapChain->Present(SyncInterval, Flags);
+}
+
+void SwapChain::ProcessLoop()
+{
+	m_currentBackBuffer = (m_currentBackBuffer + 1) % m_buffersCount;
+}
+
 //Create Swap Chain
 void SwapChain::CreateSwapChain(CommandQueue* cq, ApplicationConfig config, HWND bindWnd)
 {
 	m_swapChain.Reset();
 	INT m4xMsaaQuality = cq->GetBindDevice()->CheckMSAAQualityLevel(m_backBufferFormat);
+	/*
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	swapChainDesc.BufferDesc.Width = config.GetWidth();
 	swapChainDesc.BufferDesc.Height = config.GetHeight();
@@ -235,17 +247,37 @@ void SwapChain::CreateSwapChain(CommandQueue* cq, ApplicationConfig config, HWND
 	swapChainDesc.BufferDesc.Format = m_backBufferFormat;
 	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	swapChainDesc.SampleDesc.Count = m_msaaFlag ? 4 : 1;
-	swapChainDesc.SampleDesc.Quality = m_msaaFlag ? (m4xMsaaQuality - 1) : 0;
+	swapChainDesc.SampleDesc.Count = 1; //m_msaaFlag ? 4 : 1;
+	swapChainDesc.SampleDesc.Quality = 0;// m_msaaFlag ? (m4xMsaaQuality - 1) : 0;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount = m_buffersCount;
 	swapChainDesc.OutputWindow = m_bindWnd;
 	swapChainDesc.Windowed = true;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	GetBindFactory()->CreateSwapChain(
-		cq->GetCommandQueue(), &swapChainDesc, m_swapChain.GetAddressOf()
-	);
+	*/
+
+	DXGI_SWAP_CHAIN_DESC sd;
+	sd.BufferDesc.Width = 800;
+	sd.BufferDesc.Height = 600;
+	sd.BufferDesc.RefreshRate.Numerator = 60;
+	sd.BufferDesc.RefreshRate.Denominator = 1;
+	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	sd.SampleDesc.Count = 1;
+	sd.SampleDesc.Quality = 0;
+	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	sd.BufferCount = 2;
+	sd.OutputWindow = m_bindWnd;
+	sd.Windowed = true;
+	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	ID3D12CommandQueue* commandQ = (cq->GetCommandQueue());
+	m_swapChain.GetAddressOf();
+	ThrowIfFailed(m_bindDevice->GetFactory()->CreateSwapChain(
+		commandQ, &sd, m_swapChain.GetAddressOf()
+	));
 }
 
 void SwapChain::CreateRTVDSV()

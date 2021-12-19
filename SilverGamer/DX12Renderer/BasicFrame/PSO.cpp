@@ -1,16 +1,17 @@
 #include "PSO.h"
 
-PSO::PSO(Device* bindDevice, SwapChain* swapChain, Shader* shader, bool msaaFlag)
-	: m_bindDevice(bindDevice), m_bindSwapChain(swapChain), m_bindShader(shader)
+PSO::PSO(Device* bindDevice, SwapChain* swapChain, Shader* shader, RootSignature* sig, bool msaaFlag)
+	: m_bindDevice(bindDevice), m_bindSwapChain(swapChain), m_bindShader(shader), m_bindRootSig(sig)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	//Load Shader Information
 	psoDesc.InputLayout.pInputElementDescs = shader->GetInputLayoutData();
 	psoDesc.InputLayout.NumElements = shader->GetInputLayoutNum();
-	psoDesc.VS.pShaderBytecode = shader->GetVertexShaderBuffer();
-	psoDesc.VS.BytecodeLength = shader->GetInputLayoutNum();
-	psoDesc.PS.pShaderBytecode = shader->GetPixelShaderBuffer();
+	psoDesc.pRootSignature = m_bindRootSig->GetRootSig();
+	psoDesc.VS.pShaderBytecode = reinterpret_cast<BYTE*>(shader->GetVertexShaderBuffer());
+	psoDesc.VS.BytecodeLength = shader->GetVertexShaderBufferSize();
+	psoDesc.PS.pShaderBytecode = reinterpret_cast<BYTE*>(shader->GetPixelShaderBuffer());
 	psoDesc.PS.BytecodeLength = shader->GetPixelShaderBufferSize();
 
 	//
@@ -23,8 +24,8 @@ PSO::PSO(Device* bindDevice, SwapChain* swapChain, Shader* shader, bool msaaFlag
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	psoDesc.NumRenderTargets = 1;
 	psoDesc.RTVFormats[0] = m_bindSwapChain->GetBackBufferFormat();
-	psoDesc.SampleDesc.Count = msaaFlag ? 4 : 1;
-	psoDesc.SampleDesc.Quality = msaaFlag ? (m4xMsaaQuality - 1) : 0;
+	psoDesc.SampleDesc.Count = 1; //msaaFlag ? 4 : 1;
+	psoDesc.SampleDesc.Quality = 0; // msaaFlag ? (m4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = m_bindSwapChain->GetDepthBufferFormat();
 
 	//Create the device

@@ -59,16 +59,16 @@ class ApplicationConfig
 public:
 	void LoadFromConfigFile(); //Load App Information From File
 	std::wstring GetMainWndCaption() { return mainWndCaption; }
-	int GetWidth() { return m_clientWidth; }
-	int GetHeight() { return m_clientHeight; }
-	int GetNumerator() { return m_numerator; }
-	int GetDenominator() { return m_denominator; }
+	UINT GetWidth() { return m_clientWidth; }
+	UINT GetHeight() { return m_clientHeight; }
+	UINT GetNumerator() { return m_numerator; }
+	UINT GetDenominator() { return m_denominator; }
 	float GetAspectRatio(){return  static_cast<float>(m_clientWidth) / m_clientHeight; }
 private:
-	int m_clientWidth = 1280;
-	int m_clientHeight = 720;
-	int m_numerator = 60;
-	int m_denominator = 1;
+	UINT m_clientWidth = 1280;
+	UINT m_clientHeight = 720;
+	UINT m_numerator = 60;
+	UINT m_denominator = 1;
 	std::wstring mainWndCaption = L"SilverGamer";
 
 };
@@ -79,7 +79,7 @@ private:
 class SwapChain
 {
 public:
-	SwapChain(CommandQueue* cq, ApplicationConfig config, HWND bindWnd);
+	SwapChain(CommandQueue* cq, Device* device, ApplicationConfig config, HWND bindWnd);
 
 	ID3D12Resource* GetCurrentChainBuffer();
 	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const;
@@ -88,15 +88,18 @@ public:
 	void Resize(int clientWidth, int clientHeight, CommandList* bindCmd);
 	DXGI_FORMAT GetBackBufferFormat() { return m_backBufferFormat; }
 	DXGI_FORMAT GetDepthBufferFormat() { return m_depthStencilFormat; }
+	void Present(UINT SyncInterval, UINT Flags);
+	void ProcessLoop();
 
-
-private:
+public:
 	void CreateSwapChain(CommandQueue* cq, ApplicationConfig config, HWND bindWnd);
 	void CreateRTVDSV();
 	ID3D12Device* GetBindDevice();
 	IDXGIFactory4* GetBindFactory();
-private:
+
+public:
 	CommandQueue* m_bindCommandQueue;
+	Device* m_bindDevice;
 	HWND m_bindWnd; 
 	bool m_msaaFlag = true;
 

@@ -8,10 +8,11 @@
 class PSO
 {
 public:
-	PSO(Device* bindDevice, SwapChain* swapChain, Shader* shader, bool msaaFlag = true);
+	PSO(Device* bindDevice, SwapChain* swapChain, Shader* shader,RootSignature* rootSignature, bool msaaFlag = true);
 	ID3D12PipelineState* GetPSO() { return m_pipelineStateObject.Get(); }
 
 private:
+	RootSignature* m_bindRootSig;
 	SwapChain* m_bindSwapChain;
 	Device* m_bindDevice;
 	Shader* m_bindShader;

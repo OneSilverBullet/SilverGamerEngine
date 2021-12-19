@@ -36,16 +36,16 @@ bool IApplication::InitMainWindow()
 	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
 	int width = R.right - R.left;
 	int height = R.bottom - R.top;
-
-	m_mainWnd = CreateWindow(L"MainWnd", m_appConfig.GetMainWndCaption().c_str(),
+	m_mainWnd = CreateWindow(L"SilverGamer", m_appConfig.GetMainWndCaption().c_str(),
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
 		width, height, 0, 0, m_appInstance, 0);
+
+
 	if (!m_mainWnd)
 	{
 		MessageBox(0, L"CreateWindow Failed.", 0, 0);
 		return false;
 	}
-
 	ShowWindow(m_mainWnd, SW_SHOW);
 	UpdateWindow(m_mainWnd);
 	return true;
@@ -53,12 +53,51 @@ bool IApplication::InitMainWindow()
 
 bool IApplication::InitGraphics()
 {
+#if defined(DEBUG) || defined(_DEBUG) 
+	// Enable the D3D12 debug layer.
+	{
+		Microsoft::WRL::ComPtr<ID3D12Debug> debugController;
+		ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
+		debugController->EnableDebugLayer();
+	}
+#endif
+
 	m_device = new Device(D3D_FEATURE_LEVEL::D3D_FEATURE_LEVEL_11_0);
 	m_commandQueue = new CommandQueue(m_device);
 	m_commandList = new CommandList(m_device);
 	m_fence = new Fence(m_commandQueue); //Bind a fence to the commandQueue.
-	m_swapChain = new SwapChain(m_commandQueue, m_appConfig, m_mainWnd);
-	return false;
+
+
+	// Release the previous swapchain we will be recreating.
+	/*
+	Microsoft::WRL::ComPtr<IDXGISwapChain> tSwapChain;
+	tSwapChain.Reset();
+	DXGI_SWAP_CHAIN_DESC sd;
+	sd.BufferDesc.Width = 800;
+	sd.BufferDesc.Height = 600;
+	sd.BufferDesc.RefreshRate.Numerator = 60;
+	sd.BufferDesc.RefreshRate.Denominator = 1;
+	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	sd.SampleDesc.Count = 1;
+	sd.SampleDesc.Quality = 0;
+	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	sd.BufferCount = 2;
+	sd.OutputWindow = m_mainWnd;
+	sd.Windowed = true;
+	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+	// Note: Swap chain uses queue to perform flush.
+	ThrowIfFailed(m_device->GetFactory()->CreateSwapChain(
+		m_commandQueue->GetCommandQueue(),
+		&sd,
+		tSwapChain.GetAddressOf()));
+
+	*/
+	m_swapChain = new SwapChain(m_commandQueue, m_device, m_appConfig, m_mainWnd);
+	return true;
 }
 
 //Frame Calculate
@@ -122,7 +161,7 @@ LRESULT IApplication::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			m_state.m_applicationPaused = false;
 			m_timer.Start();
 		}
-		return;
+		return 0;
 
 	//Window Size Information
 	case WM_SIZE:
@@ -217,6 +256,19 @@ LRESULT IApplication::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
+IApplication::IApplication(HINSTANCE hInstance):
+	m_appInstance(hInstance)
+{
+	assert(m_instance == nullptr);
+	m_instance = this;
+}
+
+IApplication::~IApplication()
+{
+	if (m_device != nullptr)
+		m_fence->FlushCommandQueue();
+}
+
 int IApplication::Run()
 {
 	m_timer.Reset();
@@ -251,4 +303,17 @@ IApplication* IApplication::m_instance = nullptr;
 IApplication* IApplication::Instance()
 {
 	return m_instance;
+}
+
+bool IApplication::Initialize()
+{
+	if (!InitMainWindow())
+		return false;
+
+	if (!InitGraphics())
+		return false;
+
+	// Do the initial resize code.
+	OnResize();
+	return true;
 }

@@ -20,7 +20,7 @@ struct ObjectConstants
 };
 
 //SubMesh
-struct SubMesh
+struct ISubMesh
 {
 	UINT m_indexCount = 0;
 	UINT m_startIndexLocation = 0; //start vertex
@@ -43,11 +43,10 @@ struct MeshBase
 	//Data about Buffers
 	UINT m_vertexByteStride = 0; //vertex stride
 	UINT m_vertexBufferByteSize = 0; //all byte size
-	DXGI_FORMAT indexFormat = DXGI_FORMAT_R16_UINT;
-	UINT m_indexBufferByteSize = 0; //
+	DXGI_FORMAT m_indexFormat = DXGI_FORMAT_R16_UINT;
 	UINT m_indexBufferByteSize = 0; //
 
-	std::unordered_map<std::string, SubMesh> m_submeshes;
+	std::unordered_map<std::string, ISubMesh> m_submeshes;
 
 	D3D12_VERTEX_BUFFER_VIEW VertexBufferView() const
 	{
@@ -63,7 +62,7 @@ struct MeshBase
 		D3D12_INDEX_BUFFER_VIEW idv;
 		idv.BufferLocation = m_indexBufferGPU->GetGPUVirtualAddress();
 		idv.SizeInBytes = m_indexBufferByteSize;
-		idv.Format = indexFormat;
+		idv.Format = m_indexFormat;
 		return idv;
 	}
 

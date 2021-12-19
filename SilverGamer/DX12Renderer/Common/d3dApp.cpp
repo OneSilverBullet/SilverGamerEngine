@@ -114,7 +114,6 @@ bool D3DApp::Initialize()
 
     // Do the initial resize code.
     OnResize();
-
 	return true;
 }
  

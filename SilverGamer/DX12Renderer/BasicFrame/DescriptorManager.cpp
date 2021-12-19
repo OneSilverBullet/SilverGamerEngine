@@ -9,12 +9,13 @@ DescirptorHeap::DescirptorHeap(Device* dev,
 	m_descriptorHeapFlags(heapFlags)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC heapDesc;
+	heapDesc.NumDescriptors = 1;
 	heapDesc.Type = m_descriptorHeapType;
 	heapDesc.Flags = m_descriptorHeapFlags;
 	heapDesc.NodeMask = 0;
 	ThrowIfFailed(m_bindDevice->GetDevice()->
 		CreateDescriptorHeap(&heapDesc,
-			IID_PPV_ARGS(&m_descriptorHeap)));
+			IID_PPV_ARGS(m_descriptorHeap.GetAddressOf())));
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE DescirptorHeap::GetGPUStartDescriptorHandle()

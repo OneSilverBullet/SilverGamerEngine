@@ -10,7 +10,7 @@ using namespace DirectX;
 class ICamera
 {
 public:
-	ICamera() : camera_fov(XM_PIDIV4), camera_aspect(1.33), camera_nearZ(0.1f), camera_farZ(100.0f) {}
+	ICamera() : camera_fov(XM_PIDIV4), camera_aspect(1.33f), camera_nearZ(0.1f), camera_farZ(100.0f) {}
 	virtual XMMATRIX GetViewMatrix() = 0;
 	virtual XMMATRIX GetViewMatrixForSkybox() = 0;
 	virtual ~ICamera() {}
@@ -61,6 +61,13 @@ public:
 	}
 	float GetCameraYaw() { return thirdcamera_yaw; }
 	float GetCameraPitch() { return thirdcamera_pitch; }
+
+	void MoveDistance(float dt) {
+		thirdcamera_distance += dt;
+		if (thirdcamera_distance > 10.0f) thirdcamera_distance = 10.0f;
+		if (thirdcamera_distance < 2.0f) thirdcamera_distance = 2.0f;
+	}
+
 	void AddDistance(float dt) {
 		thirdcamera_distance += dt;
 		if (thirdcamera_distance > 10.0f) thirdcamera_distance = 10.0f;
