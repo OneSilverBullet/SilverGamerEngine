@@ -14,6 +14,7 @@ public:
 	D3D12_COMMAND_LIST_TYPE GetCommandListType();
 	//Function
 	void Close();
+	void ResetAllocator();
 	void Reset();
 	void Reset(ID3D12PipelineState* pso);
 

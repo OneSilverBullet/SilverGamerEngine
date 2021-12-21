@@ -53,6 +53,11 @@
     <ClInclude Include="Engine\Camera.h" />
     <ClInclude Include="Engine\GeometryBase.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ShaderResouce\color.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

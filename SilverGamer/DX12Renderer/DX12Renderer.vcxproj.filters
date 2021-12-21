@@ -119,4 +119,9 @@
       <Filter>文件\Application</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ShaderResouce\color.hlsl">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
 </Project>

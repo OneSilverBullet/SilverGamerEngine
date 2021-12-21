@@ -13,7 +13,7 @@ DescirptorHeap::DescirptorHeap(Device* dev,
 	heapDesc.Type = m_descriptorHeapType;
 	heapDesc.Flags = m_descriptorHeapFlags;
 	heapDesc.NodeMask = 0;
-	ThrowIfFailed(m_bindDevice->GetDevice()->
+	ThrowIfFailed(dev->GetDevice()->
 		CreateDescriptorHeap(&heapDesc,
 			IID_PPV_ARGS(m_descriptorHeap.GetAddressOf())));
 }

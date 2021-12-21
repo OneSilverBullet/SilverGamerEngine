@@ -45,14 +45,18 @@ void CommandList::Close()
 	m_commandList->Close();
 }
 
+void CommandList::ResetAllocator()
+{
+	ThrowIfFailed(m_commandAllocator->Reset());
+}
+
 void CommandList::Reset()
 {
-	m_commandList->Reset(m_commandAllocator.Get(), nullptr);
+	ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), nullptr));
 }
 
 void CommandList::Reset(ID3D12PipelineState* pso)
 {
-	ThrowIfFailed(m_commandAllocator->Reset());
 	ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), pso));
 }
 
@@ -163,6 +167,7 @@ void SwapChain::Reset()
 
 void SwapChain::Resize(int clientWidth, int clientHeight, CommandList* bindCommandList)
 {
+
 	ThrowIfFailed(m_swapChain->ResizeBuffers(
 		m_buffersCount,
 		clientWidth, clientHeight,
@@ -238,28 +243,11 @@ void SwapChain::CreateSwapChain(CommandQueue* cq, ApplicationConfig config, HWND
 {
 	m_swapChain.Reset();
 	INT m4xMsaaQuality = cq->GetBindDevice()->CheckMSAAQualityLevel(m_backBufferFormat);
-	/*
-	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	swapChainDesc.BufferDesc.Width = config.GetWidth();
-	swapChainDesc.BufferDesc.Height = config.GetHeight();
-	swapChainDesc.BufferDesc.RefreshRate.Numerator = config.GetNumerator();
-	swapChainDesc.BufferDesc.RefreshRate.Denominator = config.GetDenominator();
-	swapChainDesc.BufferDesc.Format = m_backBufferFormat;
-	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	swapChainDesc.SampleDesc.Count = 1; //m_msaaFlag ? 4 : 1;
-	swapChainDesc.SampleDesc.Quality = 0;// m_msaaFlag ? (m4xMsaaQuality - 1) : 0;
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.BufferCount = m_buffersCount;
-	swapChainDesc.OutputWindow = m_bindWnd;
-	swapChainDesc.Windowed = true;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	*/
+	
 
 	DXGI_SWAP_CHAIN_DESC sd;
-	sd.BufferDesc.Width = 800;
-	sd.BufferDesc.Height = 600;
+	sd.BufferDesc.Width = config.GetWidth();
+	sd.BufferDesc.Height = config.GetHeight();
 	sd.BufferDesc.RefreshRate.Numerator = 60;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;

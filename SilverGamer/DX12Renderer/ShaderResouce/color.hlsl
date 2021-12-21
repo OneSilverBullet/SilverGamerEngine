@@ -24,7 +24,7 @@ VertexOut VS(VertexIn vin)
 	return vout;
 }
 
-float PS(VertexOut pin) : SV_TARGET
+float4 PS(VertexOut pin) : SV_Target
 {
 	return pin.color;
 }

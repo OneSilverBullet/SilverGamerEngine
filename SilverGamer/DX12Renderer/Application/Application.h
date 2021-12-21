@@ -43,9 +43,16 @@ protected:
 	virtual void OnMouseDown(WPARAM btnState, int x, int y) { }
 	virtual void OnMouseUp(WPARAM btnState, int x, int y) { }
 	virtual void OnMouseMove(WPARAM btnState, int x, int y) { }
+	
 
 
 protected:
+	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView();
+	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView();
+	ID3D12Resource* CurrentBackBuffer();
+
+	void FlushCommandQueue();
+
 	bool InitMainWindow();
 	bool InitGraphics(); 
 	void FrameCalculate();
@@ -58,17 +65,45 @@ protected:
 	HWND m_mainWnd;
 
 	ApplicationState m_state;
+	ApplicationConfig m_appConfig;
 	SilverEngineLib::SGGeneralTimer m_timer;
+
 	D3D12_VIEWPORT m_screenViewport;
 	D3D12_RECT m_scissorRect;
 
-	Device* m_device;
-	SwapChain* m_swapChain;
-	CommandQueue* m_commandQueue;
-	CommandList* m_commandList;
-	ApplicationConfig m_appConfig;
-	Fence* m_fence;
+	Microsoft::WRL::ComPtr<IDXGIFactory4> mdxgiFactory;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
+	Microsoft::WRL::ComPtr<ID3D12Device> md3dDevice;
 
+	Microsoft::WRL::ComPtr<ID3D12Fence> mFence;
+	UINT64 mCurrentFence = 0;
+
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mDirectCmdListAlloc;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> mCommandList;
+
+	static const int SwapChainBufferCount = 2;
+	int mCurrBackBuffer = 0;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mSwapChainBuffer[SwapChainBufferCount];
+	Microsoft::WRL::ComPtr<ID3D12Resource> mDepthStencilBuffer;
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mRtvHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDsvHeap;
+	
+	D3D_DRIVER_TYPE md3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
+	DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	UINT mRtvDescriptorSize = 0;
+	UINT mDsvDescriptorSize = 0;
+	UINT mCbvSrvUavDescriptorSize = 0;
+
+	bool      m4xMsaaState = false;    // 4X MSAA enabled
+	UINT      m4xMsaaQuality = 0;      // quality level of 4X MSAA
+	int mClientWidth = 800;
+	int mClientHeight = 600;
+
+	Fence* m_fence;
 };
 
 

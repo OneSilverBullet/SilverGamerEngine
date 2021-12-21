@@ -44,7 +44,7 @@ INT Device::CheckMSAAQualityLevel(DXGI_FORMAT backBufferFormat)
 {
 	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS msQualityLevels;
 	msQualityLevels.Format = backBufferFormat;
-	msQualityLevels.SampleCount = 4;
+	msQualityLevels.SampleCount = 1;
 	msQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
 	msQualityLevels.NumQualityLevels = 0;
 	ThrowIfFailed(m_device->CheckFeatureSupport(
