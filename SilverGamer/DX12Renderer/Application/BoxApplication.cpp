@@ -261,7 +261,7 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 
 	//Set the descriptor
 	ID3D12DescriptorHeap* descriptorHeaps[] = { mCbvHeap.Get() };
-	mCommandList->SetDescriptorHeaps(1, descriptorHeaps);
+	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	//Set the Root Signature
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
@@ -310,15 +310,13 @@ void BoxApplication::OnMouseUp(WPARAM btnState, int x, int y)
 
 void BoxApplication::OnMouseMove(WPARAM btnState, int x, int y)
 {
-	m_lastPoint.x = x;
-	m_lastPoint.y = y;
 	if ((btnState & MK_LBUTTON) != 0) {
 		// Make each pixel correspond to a quarter of a degree.
 		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - m_lastPoint.x));
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - m_lastPoint.y));
 
-		mTheta += dx;
-		mPhi += dy;
+		mTheta -= dx;
+		mPhi -= dy;
 
 		// Restrict the angle mPhi.
 		mPhi = MathHelper::Clamp(mPhi, 0.1f, MathHelper::Pi - 0.1f);
@@ -333,11 +331,13 @@ void BoxApplication::OnMouseMove(WPARAM btnState, int x, int y)
 		// Restrict the radius.
 		mRadius = MathHelper::Clamp(mRadius, 3.0f, 15.0f);
 	}
+	m_lastPoint.x = x;
+	m_lastPoint.y = y;
 }
 
 void BoxApplication::OnResize()
 {
 	IApplication::OnResize();
-	XMMATRIX projMatrix = XMMatrixPerspectiveFovLH(0.25f * PI, m_state.AspectRatio(), 1.0f, 1000.0f);
-	XMStoreFloat4x4(&m_projMat, projMatrix);
+	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, m_state.AspectRatio(), 1.0f, 1000.0f);
+	XMStoreFloat4x4(&mProj, P);
 }

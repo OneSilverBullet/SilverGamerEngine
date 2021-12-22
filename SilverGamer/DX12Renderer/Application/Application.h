@@ -100,8 +100,8 @@ protected:
 
 	bool      m4xMsaaState = false;    // 4X MSAA enabled
 	UINT      m4xMsaaQuality = 0;      // quality level of 4X MSAA
-	int mClientWidth = 800;
-	int mClientHeight = 600;
+	int mClientWidth = 1280;
+	int mClientHeight = 720;
 
 	Fence* m_fence;
 };
