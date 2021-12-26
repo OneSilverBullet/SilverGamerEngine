@@ -3,6 +3,7 @@
 
 #include "../Common/d3dApp.h"
 #include "../Common/MathHelper.h"
+#include "../BasicFrame/UploadBuffer.h"
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -13,10 +14,30 @@ struct Vertex
 	XMFLOAT4 Color;
 };
 
-//
+//The Constants For per render pass
+struct RenderPassConstants
+{
+	XMFLOAT4X4 m_view = MathHelper::Identity4x4();
+	XMFLOAT4X4 m_invView = MathHelper::Identity4x4();
+	XMFLOAT4X4 m_proj = MathHelper::Identity4x4();
+	XMFLOAT4X4 m_invProj = MathHelper::Identity4x4();
+	XMFLOAT4X4 m_viewProj = MathHelper::Identity4x4();
+	XMFLOAT4X4 m_invViewProj = MathHelper::Identity4x4();
+	XMFLOAT3 m_eyePosW = { 0.0f, 0.0f, 0.0f };
+	float m_cvPerObjectPad1 = 0.0f; 
+	XMFLOAT2 m_renderTargetSize = { 0.0f, 0.0f };
+	XMFLOAT2 m_invRenderTargetSize = { 0.0f, 0.0f };
+	float m_nearZ = 0.0f;
+	float m_farZ = 0.0f;
+	float m_totalTime = 0.0f;
+	float m_deltaTime = 0.0f;
+};
+
+
+//The Constant For per object
 struct ObjectConstants
 {
-	XMFLOAT4X4 worldViewProj = MathHelper::Identity4x4();
+	XMFLOAT4X4 world = MathHelper::Identity4x4();
 };
 
 //SubMesh
@@ -28,6 +49,7 @@ struct ISubMesh
 	
 	DirectX::BoundingBox m_boundingBox;
 };
+
 
 //Mesh
 struct MeshBase
@@ -52,8 +74,8 @@ struct MeshBase
 	{
 		D3D12_VERTEX_BUFFER_VIEW vbv;
 		vbv.BufferLocation = m_vertexBufferGPU->GetGPUVirtualAddress();
-		vbv.SizeInBytes = m_vertexByteStride;
-		vbv.StrideInBytes = m_vertexBufferByteSize;
+		vbv.SizeInBytes = m_vertexBufferByteSize;
+		vbv.StrideInBytes = m_vertexByteStride;
 		return vbv;
 	}
 
@@ -72,5 +94,25 @@ struct MeshBase
 		m_indexBufferUploader = nullptr;
 	}
 };
+
+
+//FrameBuffer
+class FrameResource
+{
+public:
+	FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT waveVertCount);
+	FrameResource(const FrameResource& rs) = delete;
+	FrameResource& operator=(const FrameResource& rs) = delete;
+	~FrameResource() = delete;
+
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_commandListAllocator;
+	std::unique_ptr<UploadBuffer<RenderPassConstants>> m_passCB = nullptr;
+	std::unique_ptr<UploadBuffer<ObjectConstants>> m_objectCB = nullptr;
+
+	UINT64 m_fence = 0;
+};
+
+
+
 
 #endif

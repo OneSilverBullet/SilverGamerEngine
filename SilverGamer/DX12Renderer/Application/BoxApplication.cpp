@@ -152,32 +152,114 @@ void BoxApplication::BuildGeometry()
 	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
 	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
-	mBoxGeo = std::make_unique<MeshGeometry>();
-	mBoxGeo->Name = "boxGeo";
+	std::unique_ptr<MeshBase> mBoxGeo = std::make_unique<MeshBase>();
+	mBoxGeo->m_name = "boxGeo";
 
-	ThrowIfFailed(D3DCreateBlob(vbByteSize, &mBoxGeo->VertexBufferCPU));
-	CopyMemory(mBoxGeo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
+	ThrowIfFailed(D3DCreateBlob(vbByteSize, &mBoxGeo->m_vertexBufferCPU));
+	CopyMemory(mBoxGeo->m_vertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
 
-	ThrowIfFailed(D3DCreateBlob(ibByteSize, &mBoxGeo->IndexBufferCPU));
-	CopyMemory(mBoxGeo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
+	ThrowIfFailed(D3DCreateBlob(ibByteSize, &mBoxGeo->m_indexBufferCPU));
+	CopyMemory(mBoxGeo->m_indexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
-	mBoxGeo->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
-		mCommandList.Get(), vertices.data(), vbByteSize, mBoxGeo->VertexBufferUploader);
+	mBoxGeo->m_vertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
+		mCommandList.Get(), vertices.data(), vbByteSize, mBoxGeo->m_vertexBufferUploader);
 
-	mBoxGeo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
-		mCommandList.Get(), indices.data(), ibByteSize, mBoxGeo->IndexBufferUploader);
+	mBoxGeo->m_indexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
+		mCommandList.Get(), indices.data(), ibByteSize, mBoxGeo->m_indexBufferUploader);
 
-	mBoxGeo->VertexByteStride = sizeof(Vertex);
-	mBoxGeo->VertexBufferByteSize = vbByteSize;
-	mBoxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
-	mBoxGeo->IndexBufferByteSize = ibByteSize;
+	mBoxGeo->m_vertexByteStride = sizeof(Vertex);
+	mBoxGeo->m_vertexBufferByteSize = vbByteSize;
+	mBoxGeo->m_indexFormat = DXGI_FORMAT_R16_UINT;
+	mBoxGeo->m_indexBufferByteSize = ibByteSize;
 
-	SubmeshGeometry submesh;
-	submesh.IndexCount = (UINT)indices.size();
-	submesh.StartIndexLocation = 0;
-	submesh.BaseVertexLocation = 0;
+	ISubMesh submesh;
+	submesh.m_indexCount = (UINT)indices.size();
+	submesh.m_startIndexLocation = 0;
+	submesh.m_baseVertexLocation = 0;
 
-	mBoxGeo->DrawArgs["box"] = submesh;
+	mBoxGeo->m_submeshes["box"] = submesh;
+
+	m_geometries["box"] = std::move(mBoxGeo);
+}
+
+void BoxApplication::BuildFrameResources()
+{
+	for (int i = 0; i < gNumFrameResources; ++i) {
+		m_frameResources.push_back(std::make_unique<FrameResource>(
+			md3dDevice.Get(), 1, (UINT)m_renderItems.size(), 1));
+	}
+}
+
+void BoxApplication::BuildRenderItems()
+{
+	auto renderItem_box = std::make_unique<RenderItem>();
+	renderItem_box->m_world = MathHelper::Identity4x4();
+	renderItem_box->m_objectCBIndex = 0;
+	renderItem_box->geo = m_geometries["box"].get();
+	renderItem_box->m_primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	renderItem_box->m_indexCount = renderItem_box->geo->m_submeshes["box"].m_indexCount;
+	renderItem_box->m_startIndexLocation = renderItem_box->geo->m_submeshes["box"].m_startIndexLocation;
+	renderItem_box->m_baseVertexLocation = renderItem_box->geo->m_submeshes["box"].m_baseVertexLocation;
+
+	m_renderItemLayer[(int)RenderLayer::Opaque].push_back(renderItem_box.get());
+	m_renderItems.push_back(renderItem_box);
+}
+
+void BoxApplication::UpdateMainPassCB(const SilverEngineLib::SGGeneralTimer& timer)
+{
+	XMMATRIX view = XMLoadFloat4x4(&mView);
+	XMMATRIX proj = XMLoadFloat4x4(&mProj);
+	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
+	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
+	XMMATRIX invProj = XMMatrixInverse(&XMMatrixDeterminant(proj), proj);
+	XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
+	XMStoreFloat4x4(&m_mainPassConstants.m_view, view);
+	XMStoreFloat4x4(&m_mainPassConstants.m_proj, proj);
+	XMStoreFloat4x4(&m_mainPassConstants.m_viewProj, viewProj);
+	XMStoreFloat4x4(&m_mainPassConstants.m_invView, invView);
+	XMStoreFloat4x4(&m_mainPassConstants.m_invProj, invProj);
+	XMStoreFloat4x4(&m_mainPassConstants.m_invViewProj, invViewProj);
+	m_mainPassConstants.m_eyePosW = mEyePos;
+	m_mainPassConstants.m_renderTargetSize = XMFLOAT2((float)mClientWidth, (float)mClientHeight);
+	m_mainPassConstants.m_renderTargetSize = XMFLOAT2(1.0f/(float)mClientWidth, 1.0f/(float)mClientHeight);
+	m_mainPassConstants.m_nearZ = 1.0f;
+	m_mainPassConstants.m_farZ = 1000.0f;
+	m_mainPassConstants.m_totalTime = timer.TotalTime();
+	m_mainPassConstants.m_deltaTime = timer.DeltaTime();
+
+	auto currentPassCB = m_currentFrameResource->m_passCB.get();
+	currentPassCB->CopyData(0, m_mainPassConstants);
+}
+
+void BoxApplication::UpdateObjectCB(const SilverEngineLib::SGGeneralTimer& timer)
+{
+	//load the matrix from render items to the current frame resources
+	auto currObjectCB = m_currentFrameResource->m_objectCB.get();
+	for (auto& e : m_renderItems) {
+		if (e->m_numFrameDirty > 0) { //This object need to update
+			XMMATRIX world = XMLoadFloat4x4(&e->m_world);
+			//store object constants
+			ObjectConstants objConstants;
+			XMStoreFloat4x4(&objConstants.world, XMMatrixTranspose(world));
+			currObjectCB->CopyData(e->m_objectCBIndex, objConstants);
+			e->m_numFrameDirty--;//update 
+		}
+	}
+}
+
+void BoxApplication::UpdateCamera(const SilverEngineLib::SGGeneralTimer& timer)
+{
+	float x = mRadius * sinf(mPhi) * cosf(mTheta);
+	float z = mRadius * sinf(mPhi) * sinf(mTheta);
+	float y = mRadius * cosf(mPhi);
+
+	// Build the view matrix.
+	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
+	XMStoreFloat4x4(&mView, view);
 }
 
 void BoxApplication::BuildPSO()
@@ -211,26 +293,24 @@ void BoxApplication::BuildPSO()
 
 void BoxApplication::Update(const SilverEngineLib::SGGeneralTimer& timer)
 {
-	float x = mRadius * sinf(mPhi) * cosf(mTheta);
-	float z = mRadius * sinf(mPhi) * sinf(mTheta);
-	float y = mRadius * cosf(mPhi);
+	UpdateCamera(timer);
 
-	// Build the view matrix.
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	//Exchange current frame resource
+	m_currentFrameResourceIndex = (m_currentFrameResourceIndex + 1) % gNumFrameResources;
+	m_currentFrameResource = m_frameResources[m_currentFrameResourceIndex].get();
 
-	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&mView, view);
+	//If GPU not finish the work, then waite
+	if (m_currentFrameResource->m_fence && mFence->GetCompletedValue() < m_currentFrameResource->m_fence) {
+		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+		ThrowIfFailed(mFence->SetEventOnCompletion(m_currentFrameResource->m_fence, eventHandle));
+		WaitForSingleObject(eventHandle, INFINITE);
+		CloseHandle(eventHandle);
 
-	XMMATRIX world = XMLoadFloat4x4(&mWorld);
-	XMMATRIX proj = XMLoadFloat4x4(&mProj);
-	XMMATRIX worldViewProj = world * view * proj;
+	}
 
 	// Update the constant buffer with the latest worldViewProj matrix.
-	ObjectConstants objConstants;
-	XMStoreFloat4x4(&objConstants.worldViewProj, XMMatrixTranspose(worldViewProj));
-	mObjectCB->CopyData(0, objConstants);
+	UpdateObjectCB(timer);
+	UpdateMainPassCB(timer);
 }
 
 void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
@@ -276,7 +356,7 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 
 	//Draw model instance
 	mCommandList->DrawIndexedInstanced(
-		mBoxGeo->DrawArgs["box"].IndexCount, 1, 0, 0, 0
+		mBoxGeo->m_submeshes["box"].m_indexCount, 1, 0, 0, 0
 	);
 
 	mCommandList->ResourceBarrier(
