@@ -19,6 +19,8 @@ bool BoxApplication::Initialize()
 	BuildRootSignature();
 	BuildShaderAndInputLayout();
 	BuildGeometry();
+	BuildRenderItems();
+	BuildFrameResources();
 	BuildPSO();
 
 
@@ -67,15 +69,16 @@ void BoxApplication::BuildConstantBuffers()
 
 void BoxApplication::BuildRootSignature()
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
 
-	// Create a single descriptor table of CBVs.
-	CD3DX12_DESCRIPTOR_RANGE cbvTable;
-	cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-	slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
+	//Create root CBV
+	slotRootParameter[0].InitAsConstantBufferView(0);
+	slotRootParameter[1].InitAsConstantBufferView(1);
 
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, slotRootParameter, 0, nullptr,
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	//A root signature is an array of root parameters
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0,
+		nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
 
 	Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
@@ -205,6 +208,24 @@ void BoxApplication::BuildRenderItems()
 	m_renderItems.push_back(renderItem_box);
 }
 
+void BoxApplication::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& rItems)
+{
+	UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+	auto objectCB = m_currentFrameResource->m_objectCB->GetResource(); //Current Frame Constant Buffer
+	for (int i = 0; i < rItems.size(); ++i) {
+		auto ri = rItems[i];
+		//Load Geometry
+		cmdList->IASetVertexBuffers(0, 1, &ri->geo->VertexBufferView());
+		cmdList->IASetIndexBuffer(&ri->geo->IndexBufferView());
+		cmdList->IASetPrimitiveTopology(ri->m_primitiveType);
+		//Load Target Graphics Root Constant Buffer View
+		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress();
+		objCBAddress += i * objCBByteSize;
+		cmdList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+		cmdList->DrawIndexedInstanced(ri->m_indexCount, 1, ri->m_startIndexLocation, ri->m_baseVertexLocation, 0);
+	}
+}
+
 void BoxApplication::UpdateMainPassCB(const SilverEngineLib::SGGeneralTimer& timer)
 {
 	XMMATRIX view = XMLoadFloat4x4(&mView);
@@ -288,7 +309,11 @@ void BoxApplication::BuildPSO()
 	psoDesc.SampleDesc.Count = m4xMsaaState ? 4 : 1;
 	psoDesc.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
 	psoDesc.DSVFormat = mDepthStencilFormat;
-	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
+	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSOs["opaque"])));
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC wireFramePSODesc = psoDesc;
+	wireFramePSODesc.RasterizerState.FillMode = D3D12_FILL_MODE::D3D12_FILL_MODE_WIREFRAME;
+	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&wireFramePSODesc, IID_PPV_ARGS(&mPSOs["wire"])));
 }
 
 void BoxApplication::Update(const SilverEngineLib::SGGeneralTimer& timer)
@@ -315,8 +340,17 @@ void BoxApplication::Update(const SilverEngineLib::SGGeneralTimer& timer)
 
 void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 {
-	ThrowIfFailed(mDirectCmdListAlloc->Reset());
-	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), mPSO.Get()));
+	//Reset Current CmdListAllocator 
+	auto cmdListAlloc = m_currentFrameResource->m_commandListAllocator;	
+	ThrowIfFailed(cmdListAlloc->Reset());
+
+	if (!m_wireFrameRenderState) {
+		ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque"].Get()));
+	}
+	else
+	{
+		ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["wire"].Get()));
+	}
 
 	//resuse the command list
 	mCommandList->RSSetViewports(1, &m_screenViewport);
@@ -339,32 +373,23 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 		1, &CurrentBackBufferView(), true,
 		&DepthStencilView());
 
-	//Set the descriptor
-	ID3D12DescriptorHeap* descriptorHeaps[] = { mCbvHeap.Get() };
-	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
+	
 	//Set the Root Signature
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
-	//Upload the geometry
-	mCommandList->IASetVertexBuffers(0, 1, &mBoxGeo->VertexBufferView());
-	mCommandList->IASetIndexBuffer(&mBoxGeo->IndexBufferView());
-	mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//Update Pass Constant Buffer
+	auto passCB = m_currentFrameResource->m_passCB->GetResource();
+	mCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
 
-	//
-	mCommandList->SetGraphicsRootDescriptorTable(0, mCbvHeap->GetGPUDescriptorHandleForHeapStart());
-
-	//Draw model instance
-	mCommandList->DrawIndexedInstanced(
-		mBoxGeo->m_submeshes["box"].m_indexCount, 1, 0, 0, 0
-	);
+	DrawRenderItems(mCommandList.Get(), m_renderItemLayer[(int)RenderLayer::Opaque]);
 
 	mCommandList->ResourceBarrier(
-		1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+		1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), 
 			D3D12_RESOURCE_STATE_RENDER_TARGET,
 			D3D12_RESOURCE_STATE_PRESENT));
 	
 	ThrowIfFailed(mCommandList->Close());
+
 	// Add the command list to the queue for execution.
 	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
 	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
@@ -372,8 +397,12 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 	ThrowIfFailed(mSwapChain->Present(0, 0));
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 
+	//current frame resource's fence update
+	//complete one frame's calculation
+	m_currentFrameResource->m_fence++; 
+
 	//fence flush command queue
-	FlushCommandQueue();
+	mCommandQueue->Signal(mFence.Get(), mCurrentFence);
 }
 
 void BoxApplication::OnMouseDown(WPARAM btnState, int x, int y)

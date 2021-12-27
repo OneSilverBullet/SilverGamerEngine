@@ -12,7 +12,7 @@ using namespace DirectX::PackedVector;
 
 struct RenderItem
 {
-	RenderItem() = delete;
+	RenderItem() {};
 	XMFLOAT4X4 m_world = MathHelper::Identity4x4();
 	int m_numFrameDirty = gNumFrameResources;
 

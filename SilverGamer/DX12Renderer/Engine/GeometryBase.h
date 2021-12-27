@@ -103,7 +103,7 @@ public:
 	FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT waveVertCount);
 	FrameResource(const FrameResource& rs) = delete;
 	FrameResource& operator=(const FrameResource& rs) = delete;
-	~FrameResource() = delete;
+	~FrameResource() {};
 
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_commandListAllocator;
 	std::unique_ptr<UploadBuffer<RenderPassConstants>> m_passCB = nullptr;

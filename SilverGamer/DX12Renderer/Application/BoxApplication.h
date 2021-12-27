@@ -29,7 +29,7 @@ public:
 	void BuildFrameResources();
 	void BuildRenderItems();
 
-	void DrawRenderItems();
+	void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& rItems);
 	void UpdateMainPassCB(const SilverEngineLib::SGGeneralTimer& timer);
 	void UpdateObjectCB(const SilverEngineLib::SGGeneralTimer& timer);
 	void UpdateCamera(const SilverEngineLib::SGGeneralTimer& timer);
@@ -37,6 +37,7 @@ public:
 	//÷ÿππ
 	virtual void Update(const SilverEngineLib::SGGeneralTimer& timer);
 	virtual void Render(const SilverEngineLib::SGGeneralTimer& timer);
+
 	// Convenience overrides for handling mouse input.
 	virtual void OnMouseDown(WPARAM btnState, int x, int y);
 	virtual void OnMouseUp(WPARAM btnState, int x, int y);
@@ -59,6 +60,10 @@ private:
 
 	//render layer
 	std::vector<RenderItem*> m_renderItemLayer[(int)RenderLayer::Count];
+
+	//whether use the wire frame mode
+	bool m_wireFrameRenderState = false;
+
 
 	//main pass constants
 	RenderPassConstants m_mainPassConstants;
@@ -84,7 +89,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
 	std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> mPSO = nullptr;
+
+	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> mPSOs;
 
 	//MeshBase* m_geometry;
 	POINT m_lastPoint;
