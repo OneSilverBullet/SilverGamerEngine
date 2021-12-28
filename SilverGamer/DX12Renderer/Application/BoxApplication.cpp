@@ -13,9 +13,7 @@ bool BoxApplication::Initialize()
 
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
-	BuildCamera();
-	BuildDescriptorHeaps();
-	BuildConstantBuffers();
+
 	BuildRootSignature();
 	BuildShaderAndInputLayout();
 	BuildGeometry();
@@ -187,7 +185,7 @@ void BoxApplication::BuildGeometry()
 
 void BoxApplication::BuildFrameResources()
 {
-	for (int i = 0; i < gNumFrameResources; ++i) {
+	for (int i = 0; i < 3; ++i) {
 		m_frameResources.push_back(std::make_unique<FrameResource>(
 			md3dDevice.Get(), 1, (UINT)m_renderItems.size(), 1));
 	}
@@ -205,7 +203,7 @@ void BoxApplication::BuildRenderItems()
 	renderItem_box->m_baseVertexLocation = renderItem_box->geo->m_submeshes["box"].m_baseVertexLocation;
 
 	m_renderItemLayer[(int)RenderLayer::Opaque].push_back(renderItem_box.get());
-	m_renderItems.push_back(renderItem_box);
+	m_renderItems.push_back(std::move(renderItem_box));
 }
 
 void BoxApplication::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& rItems)
@@ -220,7 +218,7 @@ void BoxApplication::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const s
 		cmdList->IASetPrimitiveTopology(ri->m_primitiveType);
 		//Load Target Graphics Root Constant Buffer View
 		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress();
-		objCBAddress += i * objCBByteSize;
+		objCBAddress += ri->m_objectCBIndex * objCBByteSize;
 		cmdList->SetGraphicsRootConstantBufferView(0, objCBAddress);
 		cmdList->DrawIndexedInstanced(ri->m_indexCount, 1, ri->m_startIndexLocation, ri->m_baseVertexLocation, 0);
 	}
@@ -234,12 +232,12 @@ void BoxApplication::UpdateMainPassCB(const SilverEngineLib::SGGeneralTimer& tim
 	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
 	XMMATRIX invProj = XMMatrixInverse(&XMMatrixDeterminant(proj), proj);
 	XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
-	XMStoreFloat4x4(&m_mainPassConstants.m_view, view);
-	XMStoreFloat4x4(&m_mainPassConstants.m_proj, proj);
-	XMStoreFloat4x4(&m_mainPassConstants.m_viewProj, viewProj);
-	XMStoreFloat4x4(&m_mainPassConstants.m_invView, invView);
-	XMStoreFloat4x4(&m_mainPassConstants.m_invProj, invProj);
-	XMStoreFloat4x4(&m_mainPassConstants.m_invViewProj, invViewProj);
+	XMStoreFloat4x4(&m_mainPassConstants.m_view, XMMatrixTranspose(view));
+	XMStoreFloat4x4(&m_mainPassConstants.m_proj, XMMatrixTranspose(proj));
+	XMStoreFloat4x4(&m_mainPassConstants.m_viewProj, XMMatrixTranspose(viewProj));
+	XMStoreFloat4x4(&m_mainPassConstants.m_invView, XMMatrixTranspose(invView));
+	XMStoreFloat4x4(&m_mainPassConstants.m_invProj, XMMatrixTranspose(invProj));
+	XMStoreFloat4x4(&m_mainPassConstants.m_invViewProj, XMMatrixTranspose(invViewProj));
 	m_mainPassConstants.m_eyePosW = mEyePos;
 	m_mainPassConstants.m_renderTargetSize = XMFLOAT2((float)mClientWidth, (float)mClientHeight);
 	m_mainPassConstants.m_renderTargetSize = XMFLOAT2(1.0f/(float)mClientWidth, 1.0f/(float)mClientHeight);
@@ -321,7 +319,7 @@ void BoxApplication::Update(const SilverEngineLib::SGGeneralTimer& timer)
 	UpdateCamera(timer);
 
 	//Exchange current frame resource
-	m_currentFrameResourceIndex = (m_currentFrameResourceIndex + 1) % gNumFrameResources;
+	m_currentFrameResourceIndex = (m_currentFrameResourceIndex + 1) % 3;
 	m_currentFrameResource = m_frameResources[m_currentFrameResourceIndex].get();
 
 	//If GPU not finish the work, then waite
@@ -373,7 +371,6 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 		1, &CurrentBackBufferView(), true,
 		&DepthStencilView());
 
-	
 	//Set the Root Signature
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
@@ -399,7 +396,7 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 
 	//current frame resource's fence update
 	//complete one frame's calculation
-	m_currentFrameResource->m_fence++; 
+	m_currentFrameResource->m_fence = ++mCurrentFence; 
 
 	//fence flush command queue
 	mCommandQueue->Signal(mFence.Get(), mCurrentFence);
