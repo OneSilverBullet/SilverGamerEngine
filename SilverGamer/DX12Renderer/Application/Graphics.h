@@ -5,6 +5,7 @@
 #include "../Common/d3dUtil.h"
 #include "../Common/MathHelper.h"
 #include "../Engine/GeometryBase.h"
+#include "../Engine/Material.h"
 
 #define SG_NUM_FRAME_RESOURCES 3
 
@@ -20,7 +21,8 @@ struct RenderItem
 
 	UINT m_objectCBIndex = -1;//index to GPU constant buffer corresponding to this renderItem.
 	MeshBase* geo = nullptr;
-	
+	SGDX12::Material* mat = nullptr;
+
 	//Draw Indexed Instanced Parameters
 	D3D12_PRIMITIVE_TOPOLOGY m_primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	UINT m_indexCount = 0;

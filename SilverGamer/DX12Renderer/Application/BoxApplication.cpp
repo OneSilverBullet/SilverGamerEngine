@@ -1,6 +1,8 @@
 #include "BoxApplication.h"
 #include "../BasicFrame/UploadBuffer.h"
 
+
+
 BoxApplication::BoxApplication(HINSTANCE hInstance)
 	: IApplication(hInstance)
 {
@@ -31,6 +33,19 @@ bool BoxApplication::Initialize()
 	return true;
 }
 
+void BoxApplication::LoadTextures()
+{
+	auto testImage = std::make_unique<SGDX12::Texture>();
+	testImage->m_name = "test";
+	testImage->m_filename = L"../Resource/Textures/test.dds";
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(
+		md3dDevice.Get(), mCommandList.Get(),
+		testImage->m_filename.c_str(), testImage->m_resource,
+		testImage->m_uploadHeap));
+
+	m_textures[testImage->m_name] = std::move(testImage);
+}
+
 void BoxApplication::BuildCamera()
 {
 	//m_camera = new ThirdRoleCamera();
@@ -40,6 +55,7 @@ void BoxApplication::BuildCamera()
 
 void BoxApplication::BuildDescriptorHeaps()
 {
+	/*
 	//Create Constant Shader View
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
 	cbvHeapDesc.NumDescriptors = 1;
@@ -47,8 +63,33 @@ void BoxApplication::BuildDescriptorHeaps()
 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	cbvHeapDesc.NodeMask = 0;
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&mCbvHeap)));
+	*/
+	//Create SRV Heap
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc;
+	srvHeapDesc.NumDescriptors = 1;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&mSrvHeap)));
+
+	//Fill out the actual descriptors
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(mSrvHeap->GetCPUDescriptorHandleForHeapStart());
+
+	auto testImage = m_textures["test"]->m_resource;
+	
+	//Build Target Shader Resource View onto the srvHeap
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = testImage->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = -1;
+	md3dDevice->CreateShaderResourceView(testImage.Get(), &srvDesc, hDescriptor);
+
+
+
 }
 
+/*
 void BoxApplication::BuildConstantBuffers()
 {
 	mObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>(md3dDevice.Get(), 1, true);
@@ -63,20 +104,29 @@ void BoxApplication::BuildConstantBuffers()
 	md3dDevice->CreateConstantBufferView(
 		&cbvDesc,
 		mCbvHeap->GetCPUDescriptorHandleForHeapStart());
-}
+}*/
 
 void BoxApplication::BuildRootSignature()
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+	CD3DX12_DESCRIPTOR_RANGE texTable;
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-	//Create root CBV
-	slotRootParameter[0].InitAsConstantBufferView(0);
-	slotRootParameter[1].InitAsConstantBufferView(1);
+	CD3DX12_ROOT_PARAMETER slotRootParameter[4];
+
+	//create shader visible resource function param descriptor
+	slotRootParameter[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
+	slotRootParameter[1].InitAsConstantBufferView(0);
+	slotRootParameter[2].InitAsConstantBufferView(1);
+	slotRootParameter[3].InitAsConstantBufferView(2);
+
+	//the shader samplers array
+	auto staticSamplers = GetStaticSamplers(); //Get the textures samplers
 
 	//A root signature is an array of root parameters
-	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0,
-		nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter, 
+		(UINT)staticSamplers.size(),
+		staticSamplers.data(),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
@@ -87,6 +137,7 @@ void BoxApplication::BuildRootSignature()
 		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
 	}
 	ThrowIfFailed(hr);
+
 	//Create Root Signature
 	ThrowIfFailed(md3dDevice->CreateRootSignature(
 		0,
@@ -187,7 +238,7 @@ void BoxApplication::BuildFrameResources()
 {
 	for (int i = 0; i < 3; ++i) {
 		m_frameResources.push_back(std::make_unique<FrameResource>(
-			md3dDevice.Get(), 1, (UINT)m_renderItems.size(), 1));
+			md3dDevice.Get(), 1, (UINT)m_renderItems.size(), (UINT)m_materials.size(), 1));
 	}
 }
 
@@ -196,6 +247,7 @@ void BoxApplication::BuildRenderItems()
 	auto renderItem_box = std::make_unique<RenderItem>();
 	renderItem_box->m_world = MathHelper::Identity4x4();
 	renderItem_box->m_objectCBIndex = 0;
+	renderItem_box->mat = m_materials["testMat"].get();
 	renderItem_box->geo = m_geometries["box"].get();
 	renderItem_box->m_primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	renderItem_box->m_indexCount = renderItem_box->geo->m_submeshes["box"].m_indexCount;
@@ -206,20 +258,46 @@ void BoxApplication::BuildRenderItems()
 	m_renderItems.push_back(std::move(renderItem_box));
 }
 
+void BoxApplication::BuildMaterials()
+{
+	auto testMat = std::make_unique<SGDX12::Material>();
+	testMat->m_name = "testMat";
+	testMat->m_matCBIndex = 0;
+	testMat->m_diffuseSRVHeapIndex = 0;
+	testMat->m_diffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	testMat->m_fresnelR0 = XMFLOAT3(0.01f, 0.01f, 0.01f);
+	testMat->roughness = 0.125f;
+
+	m_materials[testMat->m_name] = std::move(testMat);
+
+}
+
 void BoxApplication::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& rItems)
 {
 	UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+	UINT matCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
+	
 	auto objectCB = m_currentFrameResource->m_objectCB->GetResource(); //Current Frame Constant Buffer
+	auto matCB = m_currentFrameResource->m_materialCB->GetResource();
+	
 	for (int i = 0; i < rItems.size(); ++i) {
 		auto ri = rItems[i];
 		//Load Geometry
 		cmdList->IASetVertexBuffers(0, 1, &ri->geo->VertexBufferView());
 		cmdList->IASetIndexBuffer(&ri->geo->IndexBufferView());
 		cmdList->IASetPrimitiveTopology(ri->m_primitiveType);
+
+		CD3DX12_GPU_DESCRIPTOR_HANDLE tex(mSrvHeap->GetGPUDescriptorHandleForHeapStart());
+		tex.Offset(ri->mat->m_diffuseSRVHeapIndex, mCbvSrvUavDescriptorSize);
+
 		//Load Target Graphics Root Constant Buffer View
-		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress();
-		objCBAddress += ri->m_objectCBIndex * objCBByteSize;
-		cmdList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+		D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress() + ri->m_objectCBIndex * objCBByteSize;
+		D3D12_GPU_VIRTUAL_ADDRESS matCBAddress = matCB->GetGPUVirtualAddress() + ri->mat->m_matCBIndex * matCBByteSize;
+		
+		cmdList->SetGraphicsRootDescriptorTable(0, tex);
+		cmdList->SetGraphicsRootConstantBufferView(1, objCBAddress);
+		cmdList->SetGraphicsRootConstantBufferView(3, matCBAddress);
+
 		cmdList->DrawIndexedInstanced(ri->m_indexCount, 1, ri->m_startIndexLocation, ri->m_baseVertexLocation, 0);
 	}
 }
@@ -262,6 +340,26 @@ void BoxApplication::UpdateObjectCB(const SilverEngineLib::SGGeneralTimer& timer
 			XMStoreFloat4x4(&objConstants.world, XMMatrixTranspose(world));
 			currObjectCB->CopyData(e->m_objectCBIndex, objConstants);
 			e->m_numFrameDirty--;//update 
+		}
+	}
+}
+
+//Update Material Constant Buffer
+void BoxApplication::UpdateMaterialCB(const SilverEngineLib::SGGeneralTimer& timer)
+{
+	auto currMaterialCB = m_currentFrameResource->m_materialCB.get();
+	for (auto& materialItem : m_materials) {
+		SGDX12::Material* mat = materialItem.second.get();
+		//need update
+		if (mat->m_numFramesDirty > 0) {
+			XMMATRIX matTransform = XMLoadFloat4x4(&mat->matTransform);
+			SGDX12::MaterialConstants matConstants;
+			matConstants.diffuseAlbedo = mat->m_diffuseAlbedo;
+			matConstants.fresnelR0 = mat->m_fresnelR0;
+			matConstants.roughness = mat->roughness;
+			XMStoreFloat4x4(&matConstants.matTransform, XMMatrixTranspose(matTransform));
+			currMaterialCB->CopyData(mat->m_matCBIndex, matConstants);
+			mat->m_numFramesDirty--;
 		}
 	}
 }
@@ -334,6 +432,7 @@ void BoxApplication::Update(const SilverEngineLib::SGGeneralTimer& timer)
 	// Update the constant buffer with the latest worldViewProj matrix.
 	UpdateObjectCB(timer);
 	UpdateMainPassCB(timer);
+	UpdateMaterialCB(timer);
 }
 
 void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
@@ -371,12 +470,16 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 		1, &CurrentBackBufferView(), true,
 		&DepthStencilView());
 
+	//Bind the descriptor heaps
+	ID3D12DescriptorHeap* descriptorHeaps[] = { mSrvHeap.Get() };
+	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
 	//Set the Root Signature
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
 	//Update Pass Constant Buffer
 	auto passCB = m_currentFrameResource->m_passCB->GetResource();
-	mCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
+	mCommandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress());
 
 	DrawRenderItems(mCommandList.Get(), m_renderItemLayer[(int)RenderLayer::Opaque]);
 
@@ -439,6 +542,58 @@ void BoxApplication::OnMouseMove(WPARAM btnState, int x, int y)
 	}
 	m_lastPoint.x = x;
 	m_lastPoint.y = y;
+}
+
+std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> BoxApplication::GetStaticSamplers()
+{
+	const CD3DX12_STATIC_SAMPLER_DESC pointWrap(
+		0,
+		D3D12_FILTER_MIN_MAG_MIP_POINT,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP
+	);
+	const CD3DX12_STATIC_SAMPLER_DESC pointClamp(
+		1,
+		D3D12_FILTER_MIN_MAG_MIP_POINT,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP
+	);
+	const CD3DX12_STATIC_SAMPLER_DESC linearWrap(
+		2,
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP
+	);
+	const CD3DX12_STATIC_SAMPLER_DESC linearClamp(
+		3,
+		D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP
+	);
+	const CD3DX12_STATIC_SAMPLER_DESC anisotropicWrap(
+		4,
+		D3D12_FILTER_ANISOTROPIC,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP
+	);
+	const CD3DX12_STATIC_SAMPLER_DESC anisotropicClamp(
+		5,
+		D3D12_FILTER_ANISOTROPIC,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP
+	);
+
+	return {
+		pointWrap, pointClamp,
+		linearWrap, linearClamp,
+		anisotropicWrap, anisotropicClamp
+	};
 }
 
 void BoxApplication::OnResize()

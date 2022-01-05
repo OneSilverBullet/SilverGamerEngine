@@ -8,8 +8,10 @@
 #include "../BasicFrame/CommandObject.h"
 #include "../BasicFrame/UploadBuffer.h"
 #include "../Engine/GeometryBase.h"
-#include "Graphics.h"
+#include "../Engine/Material.h"
+#include "Graphics.h"  
 #include <unordered_map>
+#include <array>
 
 class BoxApplication : public IApplication
 {
@@ -19,19 +21,21 @@ public:
 
 	virtual bool Initialize() override;
 
+	void LoadTextures();
 	void BuildCamera();
 	void BuildDescriptorHeaps();
-	void BuildConstantBuffers();
 	void BuildRootSignature();
 	void BuildShaderAndInputLayout();
 	void BuildPSO();
 	void BuildGeometry();
 	void BuildFrameResources();
 	void BuildRenderItems();
+	void BuildMaterials();
 
 	void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& rItems);
 	void UpdateMainPassCB(const SilverEngineLib::SGGeneralTimer& timer);
 	void UpdateObjectCB(const SilverEngineLib::SGGeneralTimer& timer);
+	void UpdateMaterialCB(const SilverEngineLib::SGGeneralTimer& timer);
 	void UpdateCamera(const SilverEngineLib::SGGeneralTimer& timer);
 
 	//÷ÿππ
@@ -42,6 +46,8 @@ public:
 	virtual void OnMouseDown(WPARAM btnState, int x, int y);
 	virtual void OnMouseUp(WPARAM btnState, int x, int y);
 	virtual void OnMouseMove(WPARAM btnState, int x, int y);
+
+	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers();
 
 protected:
 	virtual void OnResize() override; //The Size changed function
@@ -87,10 +93,14 @@ private:
 
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
+	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mSrvHeap = nullptr;
 	std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
 
 	std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> mPSOs;
+	std::unordered_map<std::string, std::unique_ptr<SGDX12::Texture>> m_textures;
+	std::unordered_map<std::string, std::unique_ptr<SGDX12::Material>> m_materials;
+
 
 	//MeshBase* m_geometry;
 	POINT m_lastPoint;

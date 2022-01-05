@@ -45,7 +45,6 @@ protected:
 	virtual void OnMouseMove(WPARAM btnState, int x, int y) { }
 	
 
-
 protected:
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView();
 	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView();
@@ -105,8 +104,5 @@ protected:
 
 	Fence* m_fence;
 };
-
-
-
 
 #endif

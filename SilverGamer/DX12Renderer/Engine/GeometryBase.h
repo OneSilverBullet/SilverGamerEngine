@@ -100,13 +100,14 @@ struct MeshBase
 class FrameResource
 {
 public:
-	FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT waveVertCount);
+	FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT waveVertCount);
 	FrameResource(const FrameResource& rs) = delete;
 	FrameResource& operator=(const FrameResource& rs) = delete;
 	~FrameResource() {};
 
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_commandListAllocator;
 	std::unique_ptr<UploadBuffer<RenderPassConstants>> m_passCB = nullptr;
+	std::unique_ptr<UploadBuffer<SGDX12::MaterialConstants>> m_materialCB = nullptr;
 	std::unique_ptr<UploadBuffer<ObjectConstants>> m_objectCB = nullptr;
 
 	UINT64 m_fence = 0;
