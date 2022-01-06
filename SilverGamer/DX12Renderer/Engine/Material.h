@@ -15,8 +15,8 @@ namespace SGDX12
 	{
 		std::string m_name;
 		std::wstring m_filename;
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_resource;
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_uploadHeap;
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_resource = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_uploadHeap = nullptr;
 	};
 
 

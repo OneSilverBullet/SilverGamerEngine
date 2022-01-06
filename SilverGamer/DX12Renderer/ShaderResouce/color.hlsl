@@ -46,7 +46,7 @@ cbuffer cbPass : register(b1)
     float4 gAmbientLight;
 };
 
-struct cbMaterial : register(b2)
+cbuffer cbMaterial : register(b2)
 {
     float4 gDiffuseAlbedo;
     float3 gFresnelR0;
@@ -93,7 +93,7 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-    float4 diffuseAlbedo = gDiffuseMap.Sample(gsamPointWrap, pin.TexC) * gDiffuseAlbedo;
+    float4 diffuseAlbedo = gDiffuseMap.Sample(gsamPointWrap, pin.texC) * gDiffuseAlbedo;
 
     // Vector from point being lit to eye
 	return diffuseAlbedo;

@@ -4,6 +4,7 @@
 #include "../Common/d3dApp.h"
 #include "../Common/MathHelper.h"
 #include "../BasicFrame/UploadBuffer.h"
+#include "../Engine/Material.h"
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;

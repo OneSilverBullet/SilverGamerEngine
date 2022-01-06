@@ -15,10 +15,14 @@ bool BoxApplication::Initialize()
 
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
+	mCbvSrvUavDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+	LoadTextures();
 	BuildRootSignature();
+	BuildDescriptorHeaps();
 	BuildShaderAndInputLayout();
 	BuildGeometry();
+	BuildMaterials();
 	BuildRenderItems();
 	BuildFrameResources();
 	BuildPSO();
@@ -37,10 +41,11 @@ void BoxApplication::LoadTextures()
 {
 	auto testImage = std::make_unique<SGDX12::Texture>();
 	testImage->m_name = "test";
-	testImage->m_filename = L"../Resource/Textures/test.dds";
+	testImage->m_filename = L"../Resource/Textures/WoodCrate01.dds";
 	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(
 		md3dDevice.Get(), mCommandList.Get(),
-		testImage->m_filename.c_str(), testImage->m_resource,
+		testImage->m_filename.c_str(), 
+		testImage->m_resource,
 		testImage->m_uploadHeap));
 
 	m_textures[testImage->m_name] = std::move(testImage);
@@ -65,7 +70,7 @@ void BoxApplication::BuildDescriptorHeaps()
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&mCbvHeap)));
 	*/
 	//Create SRV Heap
-	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc;
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 	srvHeapDesc.NumDescriptors = 1;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
@@ -82,11 +87,8 @@ void BoxApplication::BuildDescriptorHeaps()
 	srvDesc.Format = testImage->GetDesc().Format;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.Texture2D.MipLevels = -1;
+	srvDesc.Texture2D.MipLevels = testImage->GetDesc().MipLevels;
 	md3dDevice->CreateShaderResourceView(testImage.Get(), &srvDesc, hDescriptor);
-
-
-
 }
 
 /*
