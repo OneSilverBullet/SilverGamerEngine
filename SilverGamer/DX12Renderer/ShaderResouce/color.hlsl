@@ -12,14 +12,15 @@
 #endif
 
 Texture2D gDiffuseMap : register(t0);
-
+SamplerState gsamLinear  : register(s0);
+/*
 SamplerState gsamPointWrap : register(s0);
 SamplerState gsamPointClamp : register(s1);
 SamplerState gsamLinearWrap : register(s2);
 SamplerState gsamLinearClamp : register(s3);
 SamplerState gsamAnisotropicWrap : register(s4);
 SamplerState gsamAnisotropicClamp : register(s5);
-
+*/
 
 cbuffer cbPerObject : register(b0)
 {
@@ -86,14 +87,14 @@ VertexOut VS(VertexIn vin)
 
     // vertex attributes for interpolation across triangle
     float4 texC = mul(float4(vin.texC, 0.0f, 1.0f), gTexTransform);
-    vout.texC = mul(texC, gMatTransform).xy;
+    vout.texC = vin.texC;
 
 	return vout;
 }
 
 float4 PS(VertexOut pin) : SV_Target
 {
-    float4 diffuseAlbedo = gDiffuseMap.Sample(gsamPointWrap, pin.texC) * gDiffuseAlbedo;
+    float4 diffuseAlbedo = gDiffuseMap.Sample(gsamLinear, pin.texC) * gDiffuseAlbedo;
 
     // Vector from point being lit to eye
 	return diffuseAlbedo;

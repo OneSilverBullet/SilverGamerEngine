@@ -9,10 +9,44 @@
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
+struct VertexData
+{
+	DirectX::XMFLOAT3 Pos;
+	DirectX::XMFLOAT3 Normal;
+	DirectX::XMFLOAT2 TexC;
+};
+
+
 struct Vertex
 {
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
+	Vertex() {}
+	Vertex(
+		const XMFLOAT3& pos,
+		const XMFLOAT3& norm,
+		const XMFLOAT3& tangent,
+		const XMFLOAT2& tex
+	) :
+		Position(pos),
+		Normal(norm),
+		TangentU(tangent),
+		TexC(tex)
+	{}
+	Vertex(
+		float px, float py, float pz,
+		float nx, float ny, float nz,
+		float tx, float ty, float tz,
+		float u, float v
+	):
+		Position(px, py, pz),
+		Normal(nx,ny,nz),
+		TangentU(tx, ty, tz),
+		TexC(u, v)
+	{}
+
+	XMFLOAT3 Position;
+	XMFLOAT3 Normal;
+	XMFLOAT3 TangentU;
+	XMFLOAT2 TexC;
 };
 
 //The Constants For per render pass
@@ -39,6 +73,7 @@ struct RenderPassConstants
 struct ObjectConstants
 {
 	XMFLOAT4X4 world = MathHelper::Identity4x4();
+	XMFLOAT4X4 texTransform = MathHelper::Identity4x4();
 };
 
 //SubMesh
@@ -52,7 +87,7 @@ struct ISubMesh
 };
 
 
-//Mesh
+//DX12 Mesh Data Internal
 struct MeshBase
 {
 	std::string m_name;
@@ -94,6 +129,35 @@ struct MeshBase
 		m_vertexBufferUploader = nullptr;
 		m_indexBufferUploader = nullptr;
 	}
+};
+
+//Mesh Data
+struct MeshData
+{
+	std::vector<Vertex> m_vertices;
+	std::vector<UINT> m_indices;
+	std::vector<UINT16>& GetIndices16() {
+		if (m_indices16.empty()) {
+			m_indices16.resize(m_indices.size());
+			for (int i = 0; i < m_indices.size(); ++i) {
+				m_indices16[i] = static_cast<UINT16>(m_indices[i]);
+			}
+		}
+		return m_indices16;
+	}
+
+private:
+	std::vector<UINT16> m_indices16;
+
+};
+
+
+class GeometryGenerator
+{
+public:
+	static MeshData* Box(float width, float height, float depth, UINT numSubdivision);
+
+
 };
 
 

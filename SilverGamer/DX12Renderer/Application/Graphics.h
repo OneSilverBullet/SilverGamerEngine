@@ -17,6 +17,7 @@ struct RenderItem
 {
 	RenderItem() = default;
 	XMFLOAT4X4 m_world = MathHelper::Identity4x4();
+	XMFLOAT4X4 m_texTransform = MathHelper::Identity4x4();
 	int m_numFrameDirty = 3;
 
 	UINT m_objectCBIndex = -1;//index to GPU constant buffer corresponding to this renderItem.

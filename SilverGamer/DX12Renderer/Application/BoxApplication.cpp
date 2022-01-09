@@ -124,6 +124,8 @@ void BoxApplication::BuildRootSignature()
 	//the shader samplers array
 	auto staticSamplers = GetStaticSamplers(); //Get the textures samplers
 
+	int samplerSize = staticSamplers.size();
+
 	//A root signature is an array of root parameters
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter, 
 		(UINT)staticSamplers.size(),
@@ -158,52 +160,30 @@ void BoxApplication::BuildShaderAndInputLayout()
 	mInputLayout =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 	};
 }
 
 void BoxApplication::BuildGeometry()
 {
-	std::array<Vertex, 8> vertices =
-	{
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green) }),
-		Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue) }),
-		Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) }),
-		Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) }),
-		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) })
-	};
+	MeshData* data = GeometryGenerator::Box(1.0f, 1.0f, 1.0f, 3);
 
-	std::array<std::uint16_t, 36> indices =
-	{
-		// front face
-		0, 1, 2,
-		0, 2, 3,
+	ISubMesh submesh;
+	submesh.m_indexCount = (UINT)data->m_indices.size();
+	submesh.m_startIndexLocation = 0;
+	submesh.m_baseVertexLocation = 0;
 
-		// back face
-		4, 6, 5,
-		4, 7, 6,
+	std::vector<VertexData> vertices(data->m_vertices.size());
+	for (int i = 0; i < data->m_vertices.size(); ++i) {
+		vertices[i].Pos = data->m_vertices[i].Position;
+		vertices[i].Normal = data->m_vertices[i].Normal;
+		vertices[i].TexC = data->m_vertices[i].TexC;
+	}
 
-		// left face
-		4, 5, 1,
-		4, 1, 0,
+	std::vector<UINT16> indices = data->GetIndices16();
 
-		// right face
-		3, 2, 6,
-		3, 6, 7,
-
-		// top face
-		1, 5, 6,
-		1, 6, 2,
-
-		// bottom face
-		4, 0, 3,
-		4, 3, 7
-	};
-
-	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
+	const UINT vbByteSize = (UINT)vertices.size() * sizeof(VertexData);
 	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
 	std::unique_ptr<MeshBase> mBoxGeo = std::make_unique<MeshBase>();
@@ -221,15 +201,11 @@ void BoxApplication::BuildGeometry()
 	mBoxGeo->m_indexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),
 		mCommandList.Get(), indices.data(), ibByteSize, mBoxGeo->m_indexBufferUploader);
 
-	mBoxGeo->m_vertexByteStride = sizeof(Vertex);
+	mBoxGeo->m_vertexByteStride = sizeof(VertexData);
 	mBoxGeo->m_vertexBufferByteSize = vbByteSize;
 	mBoxGeo->m_indexFormat = DXGI_FORMAT_R16_UINT;
 	mBoxGeo->m_indexBufferByteSize = ibByteSize;
 
-	ISubMesh submesh;
-	submesh.m_indexCount = (UINT)indices.size();
-	submesh.m_startIndexLocation = 0;
-	submesh.m_baseVertexLocation = 0;
 
 	mBoxGeo->m_submeshes["box"] = submesh;
 
@@ -267,11 +243,11 @@ void BoxApplication::BuildMaterials()
 	testMat->m_matCBIndex = 0;
 	testMat->m_diffuseSRVHeapIndex = 0;
 	testMat->m_diffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	testMat->m_fresnelR0 = XMFLOAT3(0.01f, 0.01f, 0.01f);
-	testMat->roughness = 0.125f;
+	testMat->m_fresnelR0 = XMFLOAT3(0.05f, 0.05f, 0.05f);
+	testMat->roughness = 0.2f;
+	testMat->matTransform = MathHelper::Identity4x4();
 
 	m_materials[testMat->m_name] = std::move(testMat);
-
 }
 
 void BoxApplication::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& rItems)
@@ -337,9 +313,12 @@ void BoxApplication::UpdateObjectCB(const SilverEngineLib::SGGeneralTimer& timer
 	for (auto& e : m_renderItems) {
 		if (e->m_numFrameDirty > 0) { //This object need to update
 			XMMATRIX world = XMLoadFloat4x4(&e->m_world);
+			XMMATRIX texTransform = XMLoadFloat4x4(&e->m_texTransform);
 			//store object constants
 			ObjectConstants objConstants;
 			XMStoreFloat4x4(&objConstants.world, XMMatrixTranspose(world));
+			XMStoreFloat4x4(&objConstants.texTransform, XMMatrixTranspose(texTransform));
+
 			currObjectCB->CopyData(e->m_objectCBIndex, objConstants);
 			e->m_numFrameDirty--;//update 
 		}
@@ -482,7 +461,7 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 	//Update Pass Constant Buffer
 	auto passCB = m_currentFrameResource->m_passCB->GetResource();
 	mCommandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress());
-
+	
 	DrawRenderItems(mCommandList.Get(), m_renderItemLayer[(int)RenderLayer::Opaque]);
 
 	mCommandList->ResourceBarrier(
