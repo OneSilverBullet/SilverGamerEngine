@@ -301,27 +301,42 @@ void BoxApplication::UpdateMainPassCB(const SilverEngineLib::SGGeneralTimer& tim
 	m_mainPassConstants.m_farZ = 1000.0f;
 	m_mainPassConstants.m_totalTime = timer.TotalTime();
 	m_mainPassConstants.m_deltaTime = timer.DeltaTime();
+	m_mainPassConstants.m_ambientLight = { 0.25f, 0.25f, 0.35f, 1.0f };
+	m_mainPassConstants.m_lights[0].m_direction = { -1, -1, -1 };
+	m_mainPassConstants.m_lights[0].m_strength = { 0.6f, 0.6f, 0.6f };
+	m_mainPassConstants.m_lights[1].m_direction = { -1, -1, -1 };
+	m_mainPassConstants.m_lights[1].m_strength = { 0.3f, 0.3f, 0.3f };
+	m_mainPassConstants.m_lights[2].m_direction = { -1, -1, -1 };
+	m_mainPassConstants.m_lights[2].m_strength = { 0.15f, 0.15f, 0.15f };
 
 	auto currentPassCB = m_currentFrameResource->m_passCB.get();
 	currentPassCB->CopyData(0, m_mainPassConstants);
 }
+
+float angle = 0.0f;
 
 void BoxApplication::UpdateObjectCB(const SilverEngineLib::SGGeneralTimer& timer)
 {
 	//load the matrix from render items to the current frame resources
 	auto currObjectCB = m_currentFrameResource->m_objectCB.get();
 	for (auto& e : m_renderItems) {
-		if (e->m_numFrameDirty > 0) { //This object need to update
+		//if (e->m_numFrameDirty > 0) { //This object need to update
 			XMMATRIX world = XMLoadFloat4x4(&e->m_world);
 			XMMATRIX texTransform = XMLoadFloat4x4(&e->m_texTransform);
+
+			angle += timer.DeltaTime() * 0.3f;
+			if (angle > 360) angle -= 360;
+			XMMATRIX rotateMat = XMMatrixRotationY(angle);
+			world = XMMatrixMultiply(world, rotateMat);
+
 			//store object constants
 			ObjectConstants objConstants;
 			XMStoreFloat4x4(&objConstants.world, XMMatrixTranspose(world));
 			XMStoreFloat4x4(&objConstants.texTransform, XMMatrixTranspose(texTransform));
 
 			currObjectCB->CopyData(e->m_objectCBIndex, objConstants);
-			e->m_numFrameDirty--;//update 
-		}
+		//	e->m_numFrameDirty--;//update 
+		//}
 	}
 }
 

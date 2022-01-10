@@ -33,6 +33,8 @@
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Engine\Camera.cpp" />
     <ClCompile Include="Engine\GeometryBase.cpp" />
+    <ClCompile Include="Engine\Light.cpp" />
+    <ClCompile Include="Engine\Material.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -52,9 +54,16 @@
     <ClInclude Include="Common\MathHelper.h" />
     <ClInclude Include="Engine\Camera.h" />
     <ClInclude Include="Engine\GeometryBase.h" />
+    <ClInclude Include="Engine\Light.h" />
+    <ClInclude Include="Engine\Material.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderResouce\color.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShaderResouce\light_common.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

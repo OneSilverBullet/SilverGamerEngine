@@ -5,6 +5,7 @@
 #include "../Common/MathHelper.h"
 #include "../BasicFrame/UploadBuffer.h"
 #include "../Engine/Material.h"
+#include "../Engine/Light.h"
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -66,6 +67,8 @@ struct RenderPassConstants
 	float m_farZ = 0.0f;
 	float m_totalTime = 0.0f;
 	float m_deltaTime = 0.0f;
+	XMFLOAT4 m_ambientLight = { 0.0f, 0.0f, 0.0f, 1.0f };
+	SGDX12::Light m_lights[MAX_LIGHT_NUM];
 };
 
 

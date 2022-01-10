@@ -68,6 +68,12 @@
     <ClCompile Include="Application\BoxApplication.cpp">
       <Filter>文件\Application</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Material.cpp">
+      <Filter>文件\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Light.cpp">
+      <Filter>文件\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\d3dUtil.h">
@@ -118,9 +124,18 @@
     <ClInclude Include="Application\BoxApplication.h">
       <Filter>文件\Application</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Material.h">
+      <Filter>文件\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Light.h">
+      <Filter>文件\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderResouce\color.hlsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="ShaderResouce\light_common.hlsl">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>

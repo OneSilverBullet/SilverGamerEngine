@@ -11,16 +11,17 @@
 #define NUM_SPOT_LIGHTS 0
 #endif
 
+#include "light_common.hlsl"
+
 Texture2D gDiffuseMap : register(t0);
-SamplerState gsamLinear  : register(s0);
-/*
+
 SamplerState gsamPointWrap : register(s0);
 SamplerState gsamPointClamp : register(s1);
 SamplerState gsamLinearWrap : register(s2);
 SamplerState gsamLinearClamp : register(s3);
 SamplerState gsamAnisotropicWrap : register(s4);
 SamplerState gsamAnisotropicClamp : register(s5);
-*/
+
 
 cbuffer cbPerObject : register(b0)
 {
@@ -45,6 +46,7 @@ cbuffer cbPass : register(b1)
     float gTotalTime;
     float gDeltaTime;
     float4 gAmbientLight;
+    Light gLights[MaxLights];
 };
 
 cbuffer cbMaterial : register(b2)
@@ -94,10 +96,28 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-    float4 diffuseAlbedo = gDiffuseMap.Sample(gsamLinear, pin.texC) * gDiffuseAlbedo;
+    float4 diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.texC) * gDiffuseAlbedo;
+    pin.normalW = normalize(pin.normalW);
 
+    // Vector from point being lit to eye. 
+    float3 toEyeW = normalize(gEyePosW - pin.posW);
+
+    // Light terms.
+    float4 ambient = gAmbientLight * diffuseAlbedo;
+
+    const float shininess = 1.0f - gRoughness;
+    Material mat = { diffuseAlbedo, gFresnelR0, shininess };
+    float3 shadowFactor = 1.0f;
+
+    float4 directLight = ComputeLighting(gLights, mat,
+            pin.posW, pin.normalW, toEyeW, shadowFactor);
+
+    float4 litColor = ambient + directLight;
+
+    // Common convention to take alpha from diffuse material.
+    litColor.a = diffuseAlbedo.a;
     // Vector from point being lit to eye
-	return diffuseAlbedo;
+	return litColor;
 }
 
 
