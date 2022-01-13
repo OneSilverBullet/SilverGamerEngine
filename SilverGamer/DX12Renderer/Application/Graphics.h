@@ -9,7 +9,6 @@
 
 #define SG_NUM_FRAME_RESOURCES 3
 
-
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
@@ -38,6 +37,12 @@ enum class RenderLayer : int
 	Count
 };
 
+
+struct SG_D3D_SHADER_MACRO
+{
+	LPCSTR Name;
+	LPCSTR Definition;
+};
 
 
 #endif

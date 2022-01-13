@@ -38,7 +38,7 @@ public:
 	void UpdateMaterialCB(const SilverEngineLib::SGGeneralTimer& timer);
 	void UpdateCamera(const SilverEngineLib::SGGeneralTimer& timer);
 
-	//重构
+	//重构0
 	virtual void Update(const SilverEngineLib::SGGeneralTimer& timer);
 	virtual void Render(const SilverEngineLib::SGGeneralTimer& timer);
 

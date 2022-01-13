@@ -97,6 +97,11 @@ VertexOut VS(VertexIn vin)
 float4 PS(VertexOut pin) : SV_Target
 {
     float4 diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.texC) * gDiffuseAlbedo;
+ 
+#ifdef ALPHA_TEST
+    clip(diffuseAlbedo.a - 0.1f);
+#endif
+    
     pin.normalW = normalize(pin.normalW);
 
     // Vector from point being lit to eye. 

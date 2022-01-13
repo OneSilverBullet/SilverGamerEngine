@@ -1,8 +1,6 @@
 #include "BoxApplication.h"
 #include "../BasicFrame/UploadBuffer.h"
 
-
-
 BoxApplication::BoxApplication(HINSTANCE hInstance)
 	: IApplication(hInstance)
 {
@@ -49,6 +47,16 @@ void BoxApplication::LoadTextures()
 		testImage->m_uploadHeap));
 
 	m_textures[testImage->m_name] = std::move(testImage);
+
+	auto fenceTexture = std::make_unique<SGDX12::Texture>();
+	fenceTexture->m_name = "fence";
+	fenceTexture->m_filename = L"../Resource/Textures/WireFence.dds";
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(
+		md3dDevice.Get(), mCommandList.Get(),
+		fenceTexture->m_filename.c_str(),
+		fenceTexture->m_resource,
+		fenceTexture->m_uploadHeap));
+	m_textures[fenceTexture->m_name] = std::move(fenceTexture);
 }
 
 void BoxApplication::BuildCamera()
@@ -60,15 +68,6 @@ void BoxApplication::BuildCamera()
 
 void BoxApplication::BuildDescriptorHeaps()
 {
-	/*
-	//Create Constant Shader View
-	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-	cbvHeapDesc.NumDescriptors = 1;
-	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	cbvHeapDesc.NodeMask = 0;
-	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&mCbvHeap)));
-	*/
 	//Create SRV Heap
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 	srvHeapDesc.NumDescriptors = 1;
@@ -79,7 +78,7 @@ void BoxApplication::BuildDescriptorHeaps()
 	//Fill out the actual descriptors
 	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(mSrvHeap->GetCPUDescriptorHandleForHeapStart());
 
-	auto testImage = m_textures["test"]->m_resource;
+	auto testImage = m_textures["fence"]->m_resource;
 	
 	//Build Target Shader Resource View onto the srvHeap
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -90,23 +89,6 @@ void BoxApplication::BuildDescriptorHeaps()
 	srvDesc.Texture2D.MipLevels = testImage->GetDesc().MipLevels;
 	md3dDevice->CreateShaderResourceView(testImage.Get(), &srvDesc, hDescriptor);
 }
-
-/*
-void BoxApplication::BuildConstantBuffers()
-{
-	mObjectCB = std::make_unique<UploadBuffer<ObjectConstants>>(md3dDevice.Get(), 1, true);
-	UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-	//Get the constant buffer's gpu addr
-	D3D12_GPU_VIRTUAL_ADDRESS cbAddress = mObjectCB->GetResource()->GetGPUVirtualAddress();
-	int boxCBufIndex = 0;
-	cbAddress += boxCBufIndex * objCBByteSize;
-	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-	cbvDesc.BufferLocation = cbAddress;
-	cbvDesc.SizeInBytes = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-	md3dDevice->CreateConstantBufferView(
-		&cbvDesc,
-		mCbvHeap->GetCPUDescriptorHandleForHeapStart());
-}*/
 
 void BoxApplication::BuildRootSignature()
 {
@@ -124,7 +106,7 @@ void BoxApplication::BuildRootSignature()
 	//the shader samplers array
 	auto staticSamplers = GetStaticSamplers(); //Get the textures samplers
 
-	int samplerSize = staticSamplers.size();
+	int samplerSize = (int)staticSamplers.size();
 
 	//A root signature is an array of root parameters
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter, 
@@ -154,8 +136,13 @@ void BoxApplication::BuildShaderAndInputLayout()
 {
 	HRESULT hr = S_OK;
 
+	const D3D_SHADER_MACRO alphaTestDefines[] = {
+		"ALPHA_TEST", "1",
+		NULL, NULL
+	};
+
 	mvsByteCode = d3dUtil::CompileShader(L"ShaderResouce\\color.hlsl", nullptr, "VS", "vs_5_0");
-	mpsByteCode = d3dUtil::CompileShader(L"ShaderResouce\\color.hlsl", nullptr, "PS", "ps_5_0");
+	mpsByteCode = d3dUtil::CompileShader(L"ShaderResouce\\color.hlsl", alphaTestDefines, "PS", "ps_5_0");
 
 	mInputLayout =
 	{
@@ -406,11 +393,31 @@ void BoxApplication::BuildPSO()
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC wireFramePSODesc = psoDesc;
 	wireFramePSODesc.RasterizerState.FillMode = D3D12_FILL_MODE::D3D12_FILL_MODE_WIREFRAME;
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&wireFramePSODesc, IID_PPV_ARGS(&mPSOs["wire"])));
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC transportPSODesc = psoDesc;
+	D3D12_RENDER_TARGET_BLEND_DESC transparencyBlendDesc;
+	transparencyBlendDesc.BlendEnable = true;
+	transparencyBlendDesc.LogicOpEnable = false;
+	transparencyBlendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	transparencyBlendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	transparencyBlendDesc.BlendOp = D3D12_BLEND_OP_ADD;
+	transparencyBlendDesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+	transparencyBlendDesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+	transparencyBlendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	transparencyBlendDesc.LogicOp = D3D12_LOGIC_OP_NOOP;
+	transparencyBlendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	transportPSODesc.BlendState.RenderTarget[0] = transparencyBlendDesc;
+	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&transportPSODesc, IID_PPV_ARGS(&mPSOs["trans"])));
+
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC alphaTestPSO = psoDesc;
+	alphaTestPSO.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&alphaTestPSO, IID_PPV_ARGS(&mPSOs["alphaTested"])));
 }
 
 void BoxApplication::Update(const SilverEngineLib::SGGeneralTimer& timer)
 {
-	UpdateCamera(timer);
+
 
 	//Exchange current frame resource
 	m_currentFrameResourceIndex = (m_currentFrameResourceIndex + 1) % 3;
@@ -429,6 +436,7 @@ void BoxApplication::Update(const SilverEngineLib::SGGeneralTimer& timer)
 	UpdateObjectCB(timer);
 	UpdateMainPassCB(timer);
 	UpdateMaterialCB(timer);
+	UpdateCamera(timer);
 }
 
 void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
@@ -438,7 +446,7 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 	ThrowIfFailed(cmdListAlloc->Reset());
 
 	if (!m_wireFrameRenderState) {
-		ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["opaque"].Get()));
+		ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["alphaTested"].Get()));
 	}
 	else
 	{
