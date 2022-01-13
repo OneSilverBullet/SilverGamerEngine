@@ -68,6 +68,10 @@ struct RenderPassConstants
 	float m_totalTime = 0.0f;
 	float m_deltaTime = 0.0f;
 	XMFLOAT4 m_ambientLight = { 0.0f, 0.0f, 0.0f, 1.0f };
+	DirectX::XMFLOAT4 FogColor = { 0.7f, 0.7f, 0.7f, 1.0f };
+	float gFogStart = 1.0f;
+	float gFogRange = 10.0f;
+	DirectX::XMFLOAT2 cbPerObjectPad2;
 	SGDX12::Light m_lights[MAX_LIGHT_NUM];
 };
 

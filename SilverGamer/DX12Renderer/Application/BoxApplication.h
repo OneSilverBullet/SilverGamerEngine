@@ -70,10 +70,8 @@ private:
 	//whether use the wire frame mode
 	bool m_wireFrameRenderState = false;
 
-
 	//main pass constants
 	RenderPassConstants m_mainPassConstants;
-
 
 	//Shader* m_shader;
 	//ThirdRoleCamera* m_camera;

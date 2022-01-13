@@ -25,7 +25,6 @@ bool BoxApplication::Initialize()
 	BuildFrameResources();
 	BuildPSO();
 
-
 	ThrowIfFailed(mCommandList->Close());
 	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
 	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
@@ -138,7 +137,8 @@ void BoxApplication::BuildShaderAndInputLayout()
 
 	const D3D_SHADER_MACRO alphaTestDefines[] = {
 		"ALPHA_TEST", "1",
-		NULL, NULL
+		"FOG", "1",
+		NULL, NULL,
 	};
 
 	mvsByteCode = d3dUtil::CompileShader(L"ShaderResouce\\color.hlsl", nullptr, "VS", "vs_5_0");
@@ -295,7 +295,6 @@ void BoxApplication::UpdateMainPassCB(const SilverEngineLib::SGGeneralTimer& tim
 	m_mainPassConstants.m_lights[1].m_strength = { 0.3f, 0.3f, 0.3f };
 	m_mainPassConstants.m_lights[2].m_direction = { -1, -1, -1 };
 	m_mainPassConstants.m_lights[2].m_strength = { 0.15f, 0.15f, 0.15f };
-
 	auto currentPassCB = m_currentFrameResource->m_passCB.get();
 	currentPassCB->CopyData(0, m_mainPassConstants);
 }
@@ -349,12 +348,12 @@ void BoxApplication::UpdateMaterialCB(const SilverEngineLib::SGGeneralTimer& tim
 
 void BoxApplication::UpdateCamera(const SilverEngineLib::SGGeneralTimer& timer)
 {
-	float x = mRadius * sinf(mPhi) * cosf(mTheta);
-	float z = mRadius * sinf(mPhi) * sinf(mTheta);
-	float y = mRadius * cosf(mPhi);
-
+	mEyePos.x = mRadius * sinf(mPhi) * cosf(mTheta);
+	mEyePos.z = mRadius * sinf(mPhi) * sinf(mTheta);
+	mEyePos.y = mRadius * cosf(mPhi);
+	
 	// Build the view matrix.
-	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+	XMVECTOR pos = XMVectorSet(mEyePos.x, mEyePos.y, mEyePos.z, 1.0f);
 	XMVECTOR target = XMVectorZero();
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 

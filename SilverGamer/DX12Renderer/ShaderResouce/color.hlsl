@@ -46,6 +46,9 @@ cbuffer cbPass : register(b1)
     float gTotalTime;
     float gDeltaTime;
     float4 gAmbientLight;
+    float4 gFogColor;
+    float gFogStart;
+    float gFogRange;
     Light gLights[MaxLights];
 };
 
@@ -105,7 +108,9 @@ float4 PS(VertexOut pin) : SV_Target
     pin.normalW = normalize(pin.normalW);
 
     // Vector from point being lit to eye. 
-    float3 toEyeW = normalize(gEyePosW - pin.posW);
+    float3 toEyeW = gEyePosW - pin.posW;
+    float distToEye = length(toEyeW);
+    toEyeW = normalize(toEyeW);
 
     // Light terms.
     float4 ambient = gAmbientLight * diffuseAlbedo;
@@ -118,6 +123,13 @@ float4 PS(VertexOut pin) : SV_Target
             pin.posW, pin.normalW, toEyeW, shadowFactor);
 
     float4 litColor = ambient + directLight;
+
+
+#ifdef FOG
+    float fogAmount = saturate((distToEye - gFogStart) /
+        gFogRange);
+    litColor = lerp(litColor, gFogColor, fogAmount);
+#endif
 
     // Common convention to take alpha from diffuse material.
     litColor.a = diffuseAlbedo.a;
