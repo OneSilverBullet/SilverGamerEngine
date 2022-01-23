@@ -12,6 +12,7 @@
 #include "Graphics.h"  
 #include <unordered_map>
 #include <array>
+#include <map>
 
 class BoxApplication : public IApplication
 {
@@ -31,6 +32,8 @@ public:
 	void BuildFrameResources();
 	void BuildRenderItems();
 	void BuildMaterials();
+	void BuildChuyin();
+
 
 	void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& rItems);
 	void UpdateMainPassCB(const SilverEngineLib::SGGeneralTimer& timer);
@@ -76,8 +79,8 @@ private:
 	//Shader* m_shader;
 	//ThirdRoleCamera* m_camera;
 
-	Microsoft::WRL::ComPtr<ID3DBlob> mvsByteCode = nullptr;
-	Microsoft::WRL::ComPtr<ID3DBlob> mpsByteCode = nullptr;
+	std::map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> m_shaderCode;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> mSpriteLayout; 
 	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
 
 	float mTheta = 1.5f * XM_PI;

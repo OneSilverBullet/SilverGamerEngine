@@ -34,6 +34,7 @@ struct RenderItem
 enum class RenderLayer : int
 {
 	Opaque = 0,
+	Sprite = 1,
 	Count
 };
 
