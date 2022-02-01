@@ -9,6 +9,7 @@
 #include "../BasicFrame/UploadBuffer.h"
 #include "../Engine/GeometryBase.h"
 #include "../Engine/Material.h"
+#include "../Engine/PostEffect.h"
 #include "Graphics.h"  
 #include <unordered_map>
 #include <array>
@@ -26,6 +27,7 @@ public:
 	void BuildCamera();
 	void BuildDescriptorHeaps();
 	void BuildRootSignature();
+	void BuildPostProcessRootSignature();
 	void BuildShaderAndInputLayout();
 	void BuildPSO();
 	void BuildGeometry();
@@ -76,11 +78,15 @@ private:
 	//main pass constants
 	RenderPassConstants m_mainPassConstants;
 
+	
+
+	std::unique_ptr<BlurFilter> m_blurFilter;
+
 	//Shader* m_shader;
 	//ThirdRoleCamera* m_camera;
 
 	std::map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> m_shaderCode;
-	std::vector<D3D12_INPUT_ELEMENT_DESC> mSpriteLayout; 
+	std::vector<D3D12_INPUT_ELEMENT_DESC>   mSpriteLayout;
 	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
 
 	float mTheta = 1.5f * XM_PI;
@@ -94,6 +100,8 @@ private:
 
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> mPostProcessRootSignature = nullptr;
+
 	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mSrvHeap = nullptr;
 	std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;

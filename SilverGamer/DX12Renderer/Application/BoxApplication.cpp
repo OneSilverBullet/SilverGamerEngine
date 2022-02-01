@@ -15,8 +15,12 @@ bool BoxApplication::Initialize()
 
 	mCbvSrvUavDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+	m_blurFilter = std::make_unique<BlurFilter>(md3dDevice.Get(),
+		mClientWidth, mClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+
 	LoadTextures();
 	BuildRootSignature();
+	BuildPostProcessRootSignature();
 	BuildDescriptorHeaps();
 	BuildShaderAndInputLayout();
 	BuildGeometry();
@@ -83,7 +87,7 @@ void BoxApplication::BuildDescriptorHeaps()
 {
 	//Create SRV Heap
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 2;
+	srvHeapDesc.NumDescriptors = 2 + 8;
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&mSrvHeap)));
@@ -118,6 +122,11 @@ void BoxApplication::BuildDescriptorHeaps()
 	srvDesc.Texture2DArray.ArraySize = treeArrayTex->GetDesc().DepthOrArraySize;
 	md3dDevice->CreateShaderResourceView(treeArrayTex.Get(), &srvDesc, hDescriptor);
 	*/
+
+	m_blurFilter->BuildDescriptors(
+		CD3DX12_CPU_DESCRIPTOR_HANDLE(mSrvHeap->GetCPUDescriptorHandleForHeapStart(), 3, mCbvSrvUavDescriptorSize),
+		CD3DX12_GPU_DESCRIPTOR_HANDLE(mSrvHeap->GetGPUDescriptorHandleForHeapStart(), 3, mCbvSrvUavDescriptorSize),
+	mCbvSrvUavDescriptorSize);
 
 }
 
@@ -163,6 +172,46 @@ void BoxApplication::BuildRootSignature()
 		IID_PPV_ARGS(&mRootSignature)));
 }
 
+void BoxApplication::BuildPostProcessRootSignature()
+{
+	CD3DX12_DESCRIPTOR_RANGE srvTable;
+	srvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
+	CD3DX12_DESCRIPTOR_RANGE uavTable;
+	uavTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+
+	// Root parameter can be a table, root descriptor or root constants.
+	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
+
+	// Perfomance TIP: Order from most frequent to least frequent.
+	slotRootParameter[0].InitAsConstants(12, 0);
+	slotRootParameter[1].InitAsDescriptorTable(1, &srvTable);
+	slotRootParameter[2].InitAsDescriptorTable(1, &uavTable);
+
+	// A root signature is an array of root parameters.
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(3, slotRootParameter,
+		0, nullptr,
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+	Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if(errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(md3dDevice->CreateRootSignature(
+		0,
+		serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(mPostProcessRootSignature.GetAddressOf())));
+}
+
 void BoxApplication::BuildShaderAndInputLayout()
 {
 	HRESULT hr = S_OK;
@@ -185,6 +234,10 @@ void BoxApplication::BuildShaderAndInputLayout()
 	m_shaderCode["spriteVS"] = d3dUtil::CompileShader(L"ShaderResouce\\sprite.hlsl", nullptr, "VS", "vs_5_0");
 	m_shaderCode["spriteGS"] = d3dUtil::CompileShader(L"ShaderResouce\\sprite.hlsl", nullptr, "GS", "gs_5_0");
 	m_shaderCode["spritePS"] = d3dUtil::CompileShader(L"ShaderResouce\\sprite.hlsl", chuyinMacro, "PS", "ps_5_0");
+
+	m_shaderCode["horzBlurCS"] = d3dUtil::CompileShader(L"ShaderResouce\\blur.hlsl", nullptr, "HorzBlurCS", "cs_5_0");
+	m_shaderCode["vertBlurCS"] = d3dUtil::CompileShader(L"ShaderResouce\\blur.hlsl", nullptr, "VertBlurCS", "cs_5_0");
+
 
 	mInputLayout =
 	{
@@ -564,6 +617,33 @@ void BoxApplication::BuildPSO()
 	spritePSO.InputLayout = { mSpriteLayout.data(), (UINT)mSpriteLayout.size() };
 	spritePSO.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 	ThrowIfFailed(md3dDevice->CreateGraphicsPipelineState(&spritePSO, IID_PPV_ARGS(&mPSOs["sprite"])));
+
+
+	//PSO with Compute Shader
+		// PSO for horizontal blur
+	//
+	D3D12_COMPUTE_PIPELINE_STATE_DESC horzBlurPSO = {};
+	horzBlurPSO.pRootSignature = mPostProcessRootSignature.Get();
+	horzBlurPSO.CS =
+	{
+		reinterpret_cast<BYTE*>(m_shaderCode["horzBlurCS"]->GetBufferPointer()),
+		m_shaderCode["horzBlurCS"]->GetBufferSize()
+	};
+	horzBlurPSO.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+	ThrowIfFailed(md3dDevice->CreateComputePipelineState(&horzBlurPSO, IID_PPV_ARGS(&mPSOs["horzBlur"])));
+
+	//
+	// PSO for vertical blur
+	//
+	D3D12_COMPUTE_PIPELINE_STATE_DESC vertBlurPSO = {};
+	vertBlurPSO.pRootSignature = mPostProcessRootSignature.Get();
+	vertBlurPSO.CS =
+	{
+		reinterpret_cast<BYTE*>(m_shaderCode["vertBlurCS"]->GetBufferPointer()),
+		m_shaderCode["vertBlurCS"]->GetBufferSize()
+	};
+	vertBlurPSO.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+	ThrowIfFailed(md3dDevice->CreateComputePipelineState(&vertBlurPSO, IID_PPV_ARGS(&mPSOs["vertBlur"])));
 }
 
 void BoxApplication::Update(const SilverEngineLib::SGGeneralTimer& timer)
@@ -640,10 +720,24 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 	DrawRenderItems(mCommandList.Get(), m_renderItemLayer[(int)RenderLayer::Sprite]);
 
 
+	m_blurFilter->Execute(mCommandList.Get(), mPostProcessRootSignature.Get(),
+		mPSOs["horzBlur"].Get(), mPSOs["vertBlur"].Get(), CurrentBackBuffer(), 4);
+
+	// Prepare to copy blurred output to the back buffer.
+	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_DEST));
+
+	mCommandList->CopyResource(CurrentBackBuffer(), m_blurFilter->Output());
+
+	// Transition to PRESENT state.
+	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PRESENT));
+
+	/*
 	mCommandList->ResourceBarrier(
 		1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), 
 			D3D12_RESOURCE_STATE_RENDER_TARGET,
-			D3D12_RESOURCE_STATE_PRESENT));
+			D3D12_RESOURCE_STATE_PRESENT));*/
 	
 	ThrowIfFailed(mCommandList->Close());
 

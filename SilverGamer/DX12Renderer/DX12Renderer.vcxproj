@@ -35,6 +35,7 @@
     <ClCompile Include="Engine\GeometryBase.cpp" />
     <ClCompile Include="Engine\Light.cpp" />
     <ClCompile Include="Engine\Material.cpp" />
+    <ClCompile Include="Engine\PostEffect.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -56,6 +57,7 @@
     <ClInclude Include="Engine\GeometryBase.h" />
     <ClInclude Include="Engine\Light.h" />
     <ClInclude Include="Engine\Material.h" />
+    <ClInclude Include="Engine\PostEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderResouce\color.hlsl">
@@ -64,6 +66,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderResouce\light_common.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShaderResouce\blur.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="ShaderResouce\sprite.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
