@@ -276,7 +276,7 @@ void BoxApplication::BuildRenderItems()
 	chuyinSpritesRitem->m_objectCBIndex = 1;
 	chuyinSpritesRitem->mat = m_materials["chuyinSprite"].get();
 	chuyinSpritesRitem->geo = m_geometries["chuyinGeo"].get();
-	chuyinSpritesRitem->m_primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	chuyinSpritesRitem->m_primitiveType = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
 	chuyinSpritesRitem->m_indexCount = chuyinSpritesRitem->geo->m_submeshes["chuyinGeo"].m_indexCount;
 	chuyinSpritesRitem->m_startIndexLocation = chuyinSpritesRitem->geo->m_submeshes["chuyinGeo"].m_startIndexLocation;
 	chuyinSpritesRitem->m_baseVertexLocation = chuyinSpritesRitem->geo->m_submeshes["chuyinGeo"].m_baseVertexLocation;
@@ -632,6 +632,8 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 	//Update Pass Constant Buffer
 	auto passCB = m_currentFrameResource->m_passCB->GetResource();
 	mCommandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress());
+
+	mCommandList->SetPipelineState(mPSOs["trans"].Get());
 	DrawRenderItems(mCommandList.Get(), m_renderItemLayer[(int)RenderLayer::Opaque]);
 
 	mCommandList->SetPipelineState(mPSOs["sprite"].Get());
