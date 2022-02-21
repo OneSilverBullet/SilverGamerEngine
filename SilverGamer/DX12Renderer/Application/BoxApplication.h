@@ -79,8 +79,14 @@ private:
 	RenderPassConstants m_mainPassConstants;
 
 	
-
+	bool IsBlur = false;
+	bool IsSobel = true;
 	std::unique_ptr<BlurFilter> m_blurFilter;
+	std::unique_ptr<SobelFilter> m_sobelFilter;
+
+	//Construct a render target
+	std::unique_ptr<RenderTarget> m_offscreenTex = nullptr;
+
 
 	//Shader* m_shader;
 	//ThirdRoleCamera* m_camera;
@@ -101,6 +107,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mPostProcessRootSignature = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> mSobelRootSignature = nullptr;
 
 	//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCbvHeap = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mSrvHeap = nullptr;

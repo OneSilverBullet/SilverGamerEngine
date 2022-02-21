@@ -18,6 +18,12 @@ bool BoxApplication::Initialize()
 	m_blurFilter = std::make_unique<BlurFilter>(md3dDevice.Get(),
 		mClientWidth, mClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 
+	m_sobelFilter = std::make_unique<SobelFilter>(md3dDevice.Get(),
+		mClientWidth, mClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+	m_offscreenTex = std::make_unique<RenderTarget>(md3dDevice.Get(),
+		mClientWidth, mClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+
 	LoadTextures();
 	BuildRootSignature();
 	BuildPostProcessRootSignature();
@@ -123,11 +129,19 @@ void BoxApplication::BuildDescriptorHeaps()
 	md3dDevice->CreateShaderResourceView(treeArrayTex.Get(), &srvDesc, hDescriptor);
 	*/
 
-	m_blurFilter->BuildDescriptors(
-		CD3DX12_CPU_DESCRIPTOR_HANDLE(mSrvHeap->GetCPUDescriptorHandleForHeapStart(), 3, mCbvSrvUavDescriptorSize),
-		CD3DX12_GPU_DESCRIPTOR_HANDLE(mSrvHeap->GetGPUDescriptorHandleForHeapStart(), 3, mCbvSrvUavDescriptorSize),
-	mCbvSrvUavDescriptorSize);
+	if (IsBlur) {
+		m_blurFilter->BuildDescriptors(
+			CD3DX12_CPU_DESCRIPTOR_HANDLE(mSrvHeap->GetCPUDescriptorHandleForHeapStart(), 3, mCbvSrvUavDescriptorSize),
+			CD3DX12_GPU_DESCRIPTOR_HANDLE(mSrvHeap->GetGPUDescriptorHandleForHeapStart(), 3, mCbvSrvUavDescriptorSize),
+			mCbvSrvUavDescriptorSize);
+	}
 
+	if (IsSobel) {
+		m_sobelFilter->BuildDescriptors(
+			CD3DX12_CPU_DESCRIPTOR_HANDLE(mSrvHeap->GetCPUDescriptorHandleForHeapStart(), 3, mCbvSrvUavDescriptorSize),
+			CD3DX12_GPU_DESCRIPTOR_HANDLE(mSrvHeap->GetGPUDescriptorHandleForHeapStart(), 3, mCbvSrvUavDescriptorSize),
+			mCbvSrvUavDescriptorSize);
+	}
 }
 
 void BoxApplication::BuildRootSignature()
@@ -174,6 +188,7 @@ void BoxApplication::BuildRootSignature()
 
 void BoxApplication::BuildPostProcessRootSignature()
 {
+	//Build Blur Root Signature
 	CD3DX12_DESCRIPTOR_RANGE srvTable;
 	srvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
@@ -210,6 +225,32 @@ void BoxApplication::BuildPostProcessRootSignature()
 		serializedRootSig->GetBufferPointer(),
 		serializedRootSig->GetBufferSize(),
 		IID_PPV_ARGS(mPostProcessRootSignature.GetAddressOf())));
+
+	//Build Sobel Root Signature
+	CD3DX12_ROOT_PARAMETER sobelSlotRootParameter[2];
+	sobelSlotRootParameter[0].InitAsDescriptorTable(1, &srvTable);
+	sobelSlotRootParameter[1].InitAsDescriptorTable(1, &uavTable);
+	CD3DX12_ROOT_SIGNATURE_DESC sobelRootSigDesc(2, sobelSlotRootParameter,
+		0, nullptr,
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	Microsoft::WRL::ComPtr<ID3DBlob> sobelSerializedRootSig = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> sobelErrorBlob = nullptr;
+	hr = D3D12SerializeRootSignature(&sobelRootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		sobelSerializedRootSig.GetAddressOf(), sobelErrorBlob.GetAddressOf());
+
+	if (sobelErrorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)sobelErrorBlob->GetBufferPointer());
+	}
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(md3dDevice->CreateRootSignature(
+		0,
+		sobelSerializedRootSig->GetBufferPointer(),
+		sobelSerializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(mSobelRootSignature.GetAddressOf())));
+
+
 }
 
 void BoxApplication::BuildShaderAndInputLayout()
@@ -237,6 +278,8 @@ void BoxApplication::BuildShaderAndInputLayout()
 
 	m_shaderCode["horzBlurCS"] = d3dUtil::CompileShader(L"ShaderResouce\\blur.hlsl", nullptr, "HorzBlurCS", "cs_5_0");
 	m_shaderCode["vertBlurCS"] = d3dUtil::CompileShader(L"ShaderResouce\\blur.hlsl", nullptr, "VertBlurCS", "cs_5_0");
+
+	m_shaderCode["sobelCS"] = d3dUtil::CompileShader(L"ShaderResouce\\sobel.hlsl", nullptr, "SobelCS", "cs_5_0");
 
 
 	mInputLayout =
@@ -644,6 +687,17 @@ void BoxApplication::BuildPSO()
 	};
 	vertBlurPSO.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 	ThrowIfFailed(md3dDevice->CreateComputePipelineState(&vertBlurPSO, IID_PPV_ARGS(&mPSOs["vertBlur"])));
+
+	//Sobel
+	D3D12_COMPUTE_PIPELINE_STATE_DESC sobelPSO = {};
+	sobelPSO.pRootSignature = mSobelRootSignature.Get();
+	sobelPSO.CS =
+	{
+		reinterpret_cast<BYTE*>(m_shaderCode["sobelCS"]->GetBufferPointer()),
+		m_shaderCode["sobelCS"]->GetBufferSize()
+	};
+	sobelPSO.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+	ThrowIfFailed(md3dDevice->CreateComputePipelineState(&sobelPSO, IID_PPV_ARGS(&mPSOs["sobel"])));
 }
 
 void BoxApplication::Update(const SilverEngineLib::SGGeneralTimer& timer)
@@ -681,30 +735,39 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 		ThrowIfFailed(mCommandList->Reset(cmdListAlloc.Get(), mPSOs["wire"].Get()));
 	}
 
+	//Bind the descriptor heaps
+	ID3D12DescriptorHeap* descriptorHeaps[] = { mSrvHeap.Get() };
+	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
 	//resuse the command list
 	mCommandList->RSSetViewports(1, &m_screenViewport);
 	mCommandList->RSSetScissorRects(1, &m_scissorRect);
 	
 	//indicate a state transition on the resource usage
+	/*
 	mCommandList->ResourceBarrier(1,
 		&CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 			D3D12_RESOURCE_STATE_PRESENT,
+			D3D12_RESOURCE_STATE_RENDER_TARGET));*/
+
+	mCommandList->ResourceBarrier(1,
+		&CD3DX12_RESOURCE_BARRIER::Transition(m_offscreenTex->Resource(),
+			D3D12_RESOURCE_STATE_GENERIC_READ,
 			D3D12_RESOURCE_STATE_RENDER_TARGET));
 
+
 	//clear the backbuffer and depthstencile buffer
-	mCommandList->ClearRenderTargetView(CurrentBackBufferView(),
+	mCommandList->ClearRenderTargetView(m_offscreenTex->Rtv(),
 		DirectX::Colors::LightSteelBlue, 0, nullptr);
 	mCommandList->ClearDepthStencilView(DepthStencilView(),
 		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
 	//render the target texture
 	mCommandList->OMSetRenderTargets(
-		1, &CurrentBackBufferView(), true,
+		1, &m_offscreenTex->Rtv(), true,
 		&DepthStencilView());
 
-	//Bind the descriptor heaps
-	ID3D12DescriptorHeap* descriptorHeaps[] = { mSrvHeap.Get() };
-	mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
 
 	//Set the Root Signature
 	mCommandList->SetGraphicsRootSignature(mRootSignature.Get());
@@ -719,25 +782,55 @@ void BoxApplication::Render(const SilverEngineLib::SGGeneralTimer& timer)
 	mCommandList->SetPipelineState(mPSOs["sprite"].Get());
 	DrawRenderItems(mCommandList.Get(), m_renderItemLayer[(int)RenderLayer::Sprite]);
 
+	//After Draw the world, change the render target state
+	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
+		m_offscreenTex->Resource(), 
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_GENERIC_READ
+	));
 
-	m_blurFilter->Execute(mCommandList.Get(), mPostProcessRootSignature.Get(),
-		mPSOs["horzBlur"].Get(), mPSOs["vertBlur"].Get(), CurrentBackBuffer(), 4);
+	if (IsBlur)
+	{
+		m_blurFilter->Execute(mCommandList.Get(), mPostProcessRootSignature.Get(),
+			mPSOs["horzBlur"].Get(), mPSOs["vertBlur"].Get(), CurrentBackBuffer(), 4);
 
-	// Prepare to copy blurred output to the back buffer.
-	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-		D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_DEST));
+		// Prepare to copy blurred output to the back buffer.
+		mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+			D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COPY_DEST));
 
-	mCommandList->CopyResource(CurrentBackBuffer(), m_blurFilter->Output());
+		mCommandList->CopyResource(CurrentBackBuffer(), m_blurFilter->Output());
 
-	// Transition to PRESENT state.
-	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
-		D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PRESENT));
+		// Transition to PRESENT state.
+		mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+			D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PRESENT));
+	}
+	else if (IsSobel) {
+		m_sobelFilter->Execute(mCommandList.Get(), mSobelRootSignature.Get(),
+			mPSOs["sobel"].Get(), m_offscreenTex->Srv());
 
-	/*
-	mCommandList->ResourceBarrier(
-		1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), 
-			D3D12_RESOURCE_STATE_RENDER_TARGET,
-			D3D12_RESOURCE_STATE_PRESENT));*/
+		// Prepare to copy blurred output to the back buffer.
+		mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+
+		mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+
+
+		mCommandList->SetGraphicsRootSignature(mPostProcessRootSignature.Get());
+		mCommandList->SetPipelineState(mPSOs["composite"].Get());
+
+		TODO:NEED TO BUILD COMPOSITE SHADER
+
+		// Transition to PRESENT state.
+		mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+			D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PRESENT));
+	}
+	else
+	{
+		mCommandList->ResourceBarrier(
+			1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
+				D3D12_RESOURCE_STATE_RENDER_TARGET,
+				D3D12_RESOURCE_STATE_PRESENT));
+	}
 	
 	ThrowIfFailed(mCommandList->Close());
 
@@ -852,4 +945,9 @@ void BoxApplication::OnResize()
 	IApplication::OnResize();
 	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, m_state.AspectRatio(), 1.0f, 1000.0f);
 	XMStoreFloat4x4(&mProj, P);
+
+	if (m_sobelFilter != nullptr)
+		m_sobelFilter->OnResize(mClientWidth, mClientHeight);
+	if (m_offscreenTex != nullptr)
+		m_offscreenTex->OnResize(mClientWidth, mClientHeight);
 }

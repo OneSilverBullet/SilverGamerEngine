@@ -150,5 +150,8 @@
     <None Include="ShaderResouce\sprite.hlsl">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="ShaderResouce\sobel.hlsl">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
